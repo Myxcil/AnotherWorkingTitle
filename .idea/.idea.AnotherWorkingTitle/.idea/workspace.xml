@@ -12,12 +12,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e96cb596-fb4c-4d80-8572-2f93042fb76d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/TerrainChunk.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/TerrainChunk.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.AnotherWorkingTitle/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AnotherWorkingTitle/.idea/projectSettingsUpdater.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.AnotherWorkingTitle/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AnotherWorkingTitle/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AnotherWorkingTitle.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/AnotherWorkingTitle.uproject" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/AnotherWorkingTitle.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/AnotherWorkingTitle.Build.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultGame.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultGame.ini" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,8 +41,8 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/TerrainChunk.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/TerrainChunk.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://D:/AnotherWorkingTitle/AnotherWorkingTitle.uproject" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://D:/AnotherWorkingTitle/Source/AnotherWorkingTitle/AnotherWorkingTitle.Build.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -61,6 +59,7 @@
     ".NET Project.AutomationTool.executor": "Debug",
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "C++ Project.AnotherWorkingTitle.executor": "Debug",
+    "C/C++ Project.AnotherWorkingTitle.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -75,7 +74,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected=".NET Project.AutomationTool">
+  <component name="RunManager" selected="C/C++ Project.AnotherWorkingTitle">
     <configuration name="AnotherWorkingTitle" type="CppProject" factoryName="C++ Project">
       <configuration_1 setup="1">
         <option name="CONFIGURATION" value="Development Editor" />
@@ -257,6 +256,30 @@
         <option name="TERMINAL_INTERACTION_BEHAVIOR" value="AUTO_DETECT" />
         <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/Intermediate/ProjectFiles/AnotherWorkingTitle.vcxproj" />
       </configuration_15>
+      <configuration_16 setup="1">
+        <option name="CONFIGURATION" value="Development_Editor" />
+        <option name="PLATFORM" value="x64" />
+        <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
+        <option name="EXE_PATH" value="$(LocalDebuggerCommand)" />
+        <option name="PROGRAM_PARAMETERS" value="$(LocalDebuggerCommandArguments)" />
+        <option name="WORKING_DIRECTORY" value="$(LocalDebuggerWorkingDirectory)" />
+        <option name="PASS_PARENT_ENVS" value="1" />
+        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="TERMINAL_INTERACTION_BEHAVIOR" value="AUTO_DETECT" />
+        <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/Intermediate/ProjectFiles/AnotherWorkingTitle.vcxproj" />
+      </configuration_16>
+      <configuration_17 setup="1">
+        <option name="CONFIGURATION" value="DebugGame_Editor" />
+        <option name="PLATFORM" value="x64" />
+        <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
+        <option name="EXE_PATH" value="$(LocalDebuggerCommand)" />
+        <option name="PROGRAM_PARAMETERS" value="$(LocalDebuggerCommandArguments)" />
+        <option name="WORKING_DIRECTORY" value="$(LocalDebuggerWorkingDirectory)" />
+        <option name="PASS_PARENT_ENVS" value="1" />
+        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="TERMINAL_INTERACTION_BEHAVIOR" value="AUTO_DETECT" />
+        <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/Intermediate/ProjectFiles/AnotherWorkingTitle.vcxproj" />
+      </configuration_17>
       <option name="DEFAULT_PROJECT_PATH" value="$PROJECT_DIR$/Intermediate/ProjectFiles/AnotherWorkingTitle.vcxproj" />
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/Intermediate/ProjectFiles/AnotherWorkingTitle.vcxproj" />
       <option name="AUTO_SELECT_PRIORITY" value="10010" />
@@ -535,6 +558,7 @@
       <workItem from="1754149649904" duration="1749000" />
       <workItem from="1754213520758" duration="141000" />
       <workItem from="1755078985039" duration="734000" />
+      <workItem from="1755179840406" duration="774000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <option name="closed" value="true" />
@@ -544,7 +568,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748721094128</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="reformatted">
+      <option name="closed" value="true" />
+      <created>1755180029921</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1755180029921</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -555,7 +587,8 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="initial commit" />
+    <MESSAGE value="reformatted" />
+    <option name="LAST_COMMIT_MESSAGE" value="reformatted" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
