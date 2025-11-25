@@ -1,6 +1,12 @@
-﻿#pragma once
+﻿// (c) 2025 MK
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "AIConstants.h"
 
 class UAbstractAction;
+class FWorldState;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 class IAgent
@@ -14,7 +20,7 @@ public:
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual const FWorldState& GetWorldState() const = 0;
-	virtual const TArray<const UAbstractAction*>& GetActions(EWorldPropertyKey Key);
+	virtual const TArray<const UAbstractAction*>& GetActions(EWorldPropertyKey Key) const = 0;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void SetSprinting(const bool bEnable) = 0;
@@ -26,6 +32,7 @@ public:
 	virtual bool IsSearchDone() const = 0;
 	
 	virtual bool Goto(UObject* Object) = 0;
+	virtual void Stop() = 0;
 	virtual bool HasMovingFailed() const = 0;
 	virtual bool HasFinishedMoving() const = 0;
 };

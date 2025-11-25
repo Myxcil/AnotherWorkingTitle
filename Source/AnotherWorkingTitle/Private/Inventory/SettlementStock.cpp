@@ -1,7 +1,7 @@
 ﻿// (c) 2025 MK
 
 
-#include "AnotherWorkingTitle/Public/Inventory/SettlementStock.h"
+#include "Inventory/SettlementStock.h"
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

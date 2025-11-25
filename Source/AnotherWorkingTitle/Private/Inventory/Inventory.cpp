@@ -1,7 +1,7 @@
 ﻿// (c) 2025 MK
 
 
-#include "AnotherWorkingTitle/Public/Inventory/Inventory.h"
+#include "Inventory/Inventory.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 FInventory::AddResource(const UResourceDefinition* Resource, const int32 Amount)

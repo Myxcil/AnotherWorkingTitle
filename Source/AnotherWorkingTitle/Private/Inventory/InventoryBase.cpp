@@ -1,7 +1,7 @@
 ﻿// (c) 2025 MK
 
 
-#include "AnotherWorkingTitle/Public/Inventory/InventoryBase.h"
+#include "Inventory/InventoryBase.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 FInventoryBase::RemoveResource(const UResourceDefinition* Resource, const int32 Amount)

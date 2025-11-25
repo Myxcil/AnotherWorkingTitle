@@ -1,9 +1,9 @@
 ﻿// (c) 2025 MK
 
 
-#include "AnotherWorkingTitle/Public/Resources/ResourceRegistrySubsystem.h"
+#include "Resources/ResourceRegistrySubsystem.h"
 
-#include "AnotherWorkingTitle/Public/Resources/ResourceDefinition.h"
+#include "Resources/ResourceDefinition.h"
 #include "Engine/AssetManager.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,19 +3,27 @@
 
 #include "Settlers/SettlerCharacter.h"
 
+#include "AI/GOAPAgentComponent.h"
+#include "Interactive/WorkComponent.h"
+#include "Inventory//InventoryComponent.h"
+#include "Settlers/NeedsComponent.h"
+
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 ASettlerCharacter::ASettlerCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
+	NeedsComponent = CreateDefaultSubobject<UNeedsComponent>(TEXT("NeedsComponent"));
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	WorkComponent = CreateDefaultSubobject<UWorkComponent>(TEXT("WorkComponent"));
+	GOAPAgentComponent = CreateDefaultSubobject<UGOAPAgentComponent>(TEXT("GOAPAgentComponent"));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ASettlerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
