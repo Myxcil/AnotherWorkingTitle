@@ -12,7 +12,7 @@ struct FInventory : public FInventoryBase
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 MaxCarryWeight = 10;
 	
 	int32 GetCurrentWeight() const

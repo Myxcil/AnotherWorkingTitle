@@ -25,7 +25,7 @@ void UInventoryComponent::AddResource(const UResourceDefinition* Resource, const
 	const int32 NumAdded = Inventory.AddResource(Resource, Amount);
 	if (NumAdded == Amount)
 	{
-		OnInventoryChanged.Broadcast(Inventory);
+		OnInventoryChanged.Broadcast();
 	}
 	UE_LOG(LogAWT, Log, TEXT("%s inventory add %s (%dx) = %d"), *GetOwner()->GetName(), *Resource->Id.ToString(), Amount, NumAdded);
 }
@@ -42,5 +42,5 @@ void UInventoryComponent::TransferAll(FSettlementStock& Destination)
 		}
 	}
 	Inventory.Clear();
-	OnInventoryChanged.Broadcast(Inventory);
+	OnInventoryChanged.Broadcast();
 }

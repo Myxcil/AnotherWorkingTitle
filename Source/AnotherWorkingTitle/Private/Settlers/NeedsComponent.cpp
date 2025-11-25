@@ -3,6 +3,11 @@
 
 #include "Settlers/NeedsComponent.h"
 
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+namespace 
+{
+	float Clamp01(const float InValue) { return FMath::Clamp(InValue, 0.0f, 1.0f); }
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UNeedsComponent::UNeedsComponent()
@@ -20,6 +25,27 @@ void UNeedsComponent::BeginPlay()
 void UNeedsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	constexpr float SecondsPerInGameHour = 60.0f;
+	const float DeltaTimeInGame = DeltaTime / SecondsPerInGameHour;
+	
+	Needs.Hunger = Clamp01( Needs.Hunger + HungerRatePerHour * DeltaTimeInGame);
+	Needs.Thirst = Clamp01( Needs.Thirst + ThirstRatePerHour * DeltaTimeInGame);
+	Needs.Fatigue = Clamp01( Needs.Fatigue + FatigueRatePerHour * DeltaTimeInGame);
+
+	float TotalDamage = 0;
+	if (Needs.Hunger >= 1.0f)
+	{
+		TotalDamage += DamageForCriticalHunger;
+	}
+	if (Needs.Thirst >= 1.0f)
+	{
+		TotalDamage += DamageForCriticalThirst;
+	}
+	if (TotalDamage > 0)
+	{
+		Needs.Damage = Clamp01( Needs.Damage + TotalDamage * DeltaTimeInGame);
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -66,5 +92,6 @@ void UNeedsComponent::ChangeNeedValue(const ENeedType NeedType, const float Delt
 {
 	const float OldValue = GetNeedValue(NeedType);
 	const float NewValue = OldValue + Delta;
-	SetNeedValue(NeedType, FMath::Clamp(NewValue, 0.0f, 1.0f));
+	const float ClampedValue = Clamp01(NewValue);
+	SetNeedValue(NeedType, ClampedValue);
 }

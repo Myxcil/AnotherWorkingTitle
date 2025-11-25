@@ -30,7 +30,7 @@ void AResourceNode::Interact_Implementation(ASettlerCharacter* InstigatorCharact
 		const int32 NumHarvested = Harvest(1);
 		if (NumHarvested > 0)
 		{
-			InventoryComponent->AddResource(Resource, NumHarvested);
+			InventoryComponent->AddResource(Stack.Resource, NumHarvested);
 		}
 	}
 }
@@ -38,10 +38,10 @@ void AResourceNode::Interact_Implementation(ASettlerCharacter* InstigatorCharact
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 AResourceNode::Harvest(const int32 RequestedAmount)
 {
-	if (!Resource || Amount <= 0 || RequestedAmount <= 0)
+	if (!Stack.Resource || Stack.Amount <= 0 || RequestedAmount <= 0)
 		return 0;
 	
-	const int32 Harvested = FMath::Min(Amount, RequestedAmount);
-	Amount -= Harvested;
+	const int32 Harvested = FMath::Min(Stack.Amount, RequestedAmount);
+	Stack.Amount -= Harvested;
 	return Harvested;
 }

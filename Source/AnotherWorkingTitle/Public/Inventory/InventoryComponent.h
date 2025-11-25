@@ -9,7 +9,7 @@
 
 struct FSettlementStock;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryChanged, FInventoryBase&, Inventory);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryChanged);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -31,7 +31,9 @@ public:
 	void TransferAll(FSettlementStock& Destination);
 
 	UPROPERTY(BlueprintAssignable)
-	FInventoryChanged OnInventoryChanged; 
+	FInventoryChanged OnInventoryChanged;
+	UFUNCTION(BlueprintPure)
+	const FInventory& GetInventory() const { return Inventory; }
 	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

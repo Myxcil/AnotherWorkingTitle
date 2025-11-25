@@ -12,7 +12,7 @@ struct FInventoryBase
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FResourceStack> Stacks;
 
 	int32 GetAmount(const UResourceDefinition* Resource) const
