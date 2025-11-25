@@ -43,11 +43,9 @@ constexpr int32 NumNodeTypes = static_cast<int32>(ENodeType::FreePosition) + 1;
 UENUM()
 enum class EWorldPropertyKey : uint8
 {
-	Item,
 	AtNode,
 	PathExists,
 	Interact,
-	Leave,
 	Wait,
 
 	Count,

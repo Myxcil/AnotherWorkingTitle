@@ -23,7 +23,7 @@ public:
 	virtual uint32 GetMatchFlags() const { return 0xffffffff; }
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual bool Evaluate(IAgent& Agent) const;
+	virtual float Evaluate(IAgent& Agent) const;
 	virtual bool Init(IAgent& Agent, FWorldState& WorldState, bool bIsPlanning) const;
 	virtual void DeInit(IAgent& Agent, bool bIsSuccess) const;
 };

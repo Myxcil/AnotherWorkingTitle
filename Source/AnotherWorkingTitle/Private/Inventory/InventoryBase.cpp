@@ -4,6 +4,9 @@
 #include "Inventory/InventoryBase.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+FGlobalInventoryChanged FInventoryBase::OnInventoryChanged;
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 FInventoryBase::RemoveResource(const UResourceDefinition* Resource, const int32 Amount)
 {
 	if (!Resource || Amount <= 0)
@@ -30,6 +33,11 @@ int32 FInventoryBase::RemoveResource(const UResourceDefinition* Resource, const 
 		
 		if (RemainingAmount <= 0)
 			break;
+	}
+	
+	if (RemovedTotal != 0)
+	{
+		OnInventoryChanged.Broadcast();
 	}
 	
 	return RemovedTotal;

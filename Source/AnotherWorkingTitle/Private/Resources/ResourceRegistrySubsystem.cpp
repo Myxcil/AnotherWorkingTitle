@@ -17,13 +17,18 @@ void UResourceRegistrySubsystem::Initialize(FSubsystemCollectionBase& Collection
 	Resources.Reset();
 	Resources.Reserve(ResourceIds.Num());
 	
+	ResourceMapByCategory.Reset();
+	
 	for (const FPrimaryAssetId& Id : ResourceIds)
 	{
-		if (UObject* Asset = UAssetManager::Get().GetPrimaryAssetObject(Id))
+		if (const UObject* Asset = UAssetManager::Get().GetPrimaryAssetObject(Id))
 		{
-			if (UResourceDefinition* Resource = Cast<UResourceDefinition>(Asset))
+			if (const UResourceDefinition* Resource = Cast<UResourceDefinition>(Asset))
 			{
 				Resources.Add(Resource);
+				
+				TArray<const UResourceDefinition*>& ResourceMap = ResourceMapByCategory.FindOrAdd(Resource->Category);
+				ResourceMap.Add(Resource);
 			}
 		}
 	}

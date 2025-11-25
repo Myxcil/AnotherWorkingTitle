@@ -16,8 +16,17 @@ class ANOTHERWORKINGTITLE_API AStockpile : public AActor, public IInteraction
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	static const TArray<AStockpile*>& GetInstances();
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	AStockpile();
 	
+protected:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
+public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	const FSettlementStock& GetSettlementStock() const { return SettlementStock; }
 	FSettlementStock& GetSettlementStockMutable() { return SettlementStock; }

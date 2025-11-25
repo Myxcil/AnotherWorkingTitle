@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ResourceCategory.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "ResourceRegistrySubsystem.generated.h"
 
@@ -20,8 +21,13 @@ public:
 	
 	const UResourceDefinition* FindById(const FName Id) const;
 
+	const TArray<const UResourceDefinition*>& GetAllResources() const { return Resources; }
+	const TArray<const UResourceDefinition*>& GetResources(const EResourceCategory Category) const { return ResourceMapByCategory[Category]; }
+
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY()
-	TArray<UResourceDefinition*> Resources;
+	TArray<const UResourceDefinition*> Resources;
+	
+	TMap<EResourceCategory, TArray<const UResourceDefinition*>> ResourceMapByCategory;
 };

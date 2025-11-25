@@ -31,3 +31,9 @@ void ASettlerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ASettlerCharacter::IsBusy() const
+{
+	return false;
+}

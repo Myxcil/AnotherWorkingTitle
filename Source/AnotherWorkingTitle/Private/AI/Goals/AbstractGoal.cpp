@@ -13,7 +13,7 @@ FString UAbstractGoal::GetTypeName() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UAbstractGoal::Evaluate(IAgent& Agent) const
+float UAbstractGoal::Evaluate(IAgent& Agent) const
 {
 	checkf(false, TEXT("Shouldn't be called, it's abstract"));
 	return false;

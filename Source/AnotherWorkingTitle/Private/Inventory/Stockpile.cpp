@@ -6,12 +6,38 @@
 #include "Inventory/InventoryComponent.h"
 #include "Settlers/SettlerCharacter.h"
 
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+namespace 
+{
+	TArray<AStockpile*> AllStockpiles;
+}
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+const TArray<AStockpile*>& AStockpile::GetInstances()
+{
+	return AllStockpiles;
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 AStockpile::AStockpile()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AStockpile::BeginPlay()
+{
+	Super::BeginPlay();
+	AllStockpiles.Add(this);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AStockpile::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	AllStockpiles.Remove(this);
+	Super::EndPlay(EndPlayReason);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -17,13 +17,6 @@ UActionGoto::UActionGoto()
 int32 UActionGoto::GetCost(IAgent& Agent, const FWorldState& WorldState) const
 {
 	float Cost = Super::GetCost(Agent, WorldState);
-	if (const FWorldProperty* PropItem = WorldState.Get(EWorldPropertyKey::Item))
-	{
-		if (PropItem->Type == EWorldPropertyType::Object && PropItem->Object)
-		{
-			Cost *= 2.0f;
-		}
-	}
 	return Cost;
 }
 
@@ -41,14 +34,6 @@ float UActionGoto::CalculateRuntimeCost(IAgent& Agent, const FWorldState& WorldS
 	const FVector Location = Transform.GetLocation();
 	float Distance = FVector::Distance(PlannedLocation, Location);
 
-	if (const FWorldProperty* PropItem = WorldState.Get(EWorldPropertyKey::Item))
-	{
-		if (PropItem->Type == EWorldPropertyType::Object && PropItem->Object)
-		{
-			Distance *= 10.0f;
-		}
-	}
-	
 	Cost += Distance;
 
 	PlannedLocation = Location;
@@ -81,13 +66,12 @@ bool UActionGoto::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& 
 		return false;
 	}
 
-	return Super::Activate(Agent, AIState, CurrentWorldState);
+	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UActionGoto::Deactivate(IAgent& Agent, FAIState& AIState) const
 {
-	Super::Deactivate(Agent, AIState);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

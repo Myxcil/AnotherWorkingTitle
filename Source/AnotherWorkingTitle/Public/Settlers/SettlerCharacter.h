@@ -33,6 +33,8 @@ public:
 	UInventoryComponent* GetInventoryComponent() const	{ return InventoryComponent; }
 	UWorkComponent* GetWorkComponent() const			{ return WorkComponent; }
 	UGOAPAgentComponent* GetGOAPAgentComponent() const	{ return GOAPAgentComponent; }
+	
+	bool IsBusy() const;
 
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

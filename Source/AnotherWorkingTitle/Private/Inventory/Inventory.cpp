@@ -44,5 +44,11 @@ int32 FInventory::AddResource(const UResourceDefinition* Resource, const int32 A
 		RemainingAmount -= ToAdd;
 		AddedTotal += ToAdd;
 	}
+	
+	if (AddedTotal)
+	{
+		OnInventoryChanged.Broadcast();
+	}
+	
 	return AddedTotal;
 }

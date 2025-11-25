@@ -6,6 +6,17 @@
 #include "Inventory//InventoryComponent.h"
 #include "Settlers/SettlerCharacter.h"
 
+namespace 
+{
+	TArray<AResourceNode*> AllResourceNodes;
+}
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+const TArray<AResourceNode*>& AResourceNode::GetInstances()
+{
+	return AllResourceNodes;
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 AResourceNode::AResourceNode()
@@ -17,6 +28,14 @@ AResourceNode::AResourceNode()
 void AResourceNode::BeginPlay()
 {
 	Super::BeginPlay();
+	AllResourceNodes.Add(this);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AResourceNode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	AllResourceNodes.Remove(this);
+	Super::EndPlay(EndPlayReason);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -31,6 +31,9 @@ void ASettlerAIController::OnPossess(APawn* InPawn)
 	{
 		GOAP->OnAIRequestMoveToLocation.BindUObject(this, &ThisClass::HandleAIRequestMoveToLocation);
 		GOAP->OnAIRequestStopMovement.BindUObject(this, &ThisClass::HandleAIRequestStopMovement);
+		
+		GOAP->InitializeAgent();
+		
 		CachedGOAP = GOAP;
 	}
 	

@@ -16,18 +16,22 @@ class ANOTHERWORKINGTITLE_API AResourceNode : public AActor, public IInteraction
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	static const TArray<AResourceNode*>& GetInstances();
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	AResourceNode();
 	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	// IInteraction
 	virtual void Interact_Implementation(ASettlerCharacter* InstigatorCharacter) override;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	bool HasResources() const { return Stack.Resource && Stack.Amount > 0; }
+	bool HasResource(const UResourceDefinition* InResource) const { return Stack.Resource == InResource && Stack.Amount > 0; }
 	int32 Harvest(const int32 RequestedAmount);
 	
 private:

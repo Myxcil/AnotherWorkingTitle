@@ -25,4 +25,6 @@ void FSettlementStock::AddResource(const UResourceDefinition* Resource, const in
 		NewStack.Amount = Amount;
 		Stacks.Add(MoveTemp(NewStack));
 	}
+
+	OnInventoryChanged.Broadcast();
 }
