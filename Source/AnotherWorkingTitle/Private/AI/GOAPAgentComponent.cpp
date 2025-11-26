@@ -371,6 +371,12 @@ const UAbstractGoal* UGOAPAgentComponent::ChooseTopGoal()
 			return A.Priority > B.Priority; 
 		});
 	
+		AI_LOG(TEXT("%s evaluated goals"), *SettlerPtr->GetName());
+		for (int32 I=0; I < NumGoals; ++I)
+		{
+			AI_LOG(TEXT(" %.4f %s"), GoalList[I].Priority, *GoalList[I].Goal->GetTypeName())
+		}
+		
 		bWorldIsDirty = false;
 	}
 
@@ -536,6 +542,30 @@ int32 UGOAPAgentComponent::GetAmountInInventory(const UResourceDefinition* Resou
 		}
 	}
 	return 0;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+float UGOAPAgentComponent::CalculateAccumulatedInventoryValue() const
+{
+	float InventoryValue = 0.0f;
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (const UInventoryComponent* InventoryComponent = Settler->GetInventoryComponent())
+		{
+			const FInventory& Inventory = InventoryComponent->GetInventory();
+			int32 TotalItems = 0;
+			for (const FResourceStack& Stack : Inventory.Stacks)
+			{
+				InventoryValue += FAIHelper::CalculateResourceScarcity(Stack.Resource) * Stack.Amount;
+				TotalItems += Stack.Amount;
+			}
+			if (TotalItems > 0)
+			{
+				InventoryValue /= TotalItems;
+			}
+		}
+	}
+	return FAIHelper::Clamp01(InventoryValue);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

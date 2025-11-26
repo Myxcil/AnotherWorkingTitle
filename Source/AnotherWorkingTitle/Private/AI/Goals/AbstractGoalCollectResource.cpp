@@ -1,7 +1,7 @@
 ﻿// (c) 2025 MK
 
 
-#include "AI/Goals/GoalCollectResource.h"
+#include "AI/Goals/AbstractGoalCollectResource.h"
 
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
@@ -9,12 +9,12 @@
 #include "Resources/ResourceNode.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-float UGoalCollectResource::Evaluate(IAgent& Agent) const
+float UAbstractGoalCollectResource::Evaluate(IAgent& Agent) const
 {
 	if (Agent.IsInCriticalState())
 		return 0;
 	
-	const UResourceDefinition* Resource = FAIHelper::FindMinResourceInStockpiles(Agent.GetResourceRegistry());
+	const UResourceDefinition* Resource = GetResource(Agent);
 	if (!Resource)
 		return 0;
 	
@@ -25,15 +25,17 @@ float UGoalCollectResource::Evaluate(IAgent& Agent) const
 	if (!Agent.CanPickup(Resource))
 		return 0;
 	
-	return 0.5f;
+	const float Scarcity = FAIHelper::CalculateResourceScarcity(Resource);
+	const float DistanceWeight = FAIHelper::CalculateDistanceWeight(Agent.GetGroundPosition(), ResourceNode->GetActorLocation());
+		
+	return Scarcity * DistanceWeight;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGoalCollectResource::Init(IAgent& Agent, FWorldState& WorldState, bool bIsPlanning) const
+bool UAbstractGoalCollectResource::Init(IAgent& Agent, FWorldState& WorldState, bool bIsPlanning) const
 {
-	const UResourceDefinition* Resource = FAIHelper::FindMinResourceInStockpiles(Agent.GetResourceRegistry());
-	if (!Resource)
-		return false;
+	const UResourceDefinition* Resource = GetResource(Agent);
+	check(Resource);
 	
 	AResourceNode* ResourceNode = FAIHelper::FindNearestResourceNode(Agent.GetGroundPosition(), Resource);
 	if (!ResourceNode)
@@ -48,6 +50,6 @@ bool UGoalCollectResource::Init(IAgent& Agent, FWorldState& WorldState, bool bIs
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UGoalCollectResource::DeInit(IAgent& Agent, bool bIsSuccess) const
+void UAbstractGoalCollectResource::DeInit(IAgent& Agent, bool bIsSuccess) const
 {
 }

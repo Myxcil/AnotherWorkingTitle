@@ -29,13 +29,18 @@ protected:
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	const FSettlementStock& GetSettlementStock() const { return SettlementStock; }
-	
 	int32 RemoveResource(const UResourceDefinition* Resource, const int32 Amount);
+	
+	UFUNCTION(BlueprintCallable)
+	void CollectContent(UPARAM(ref) TArray<FResourceStack>& ResourceStacks);
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// IInteraction
 	virtual void Interact_Implementation(ASettlerCharacter* InstigatorCharacter) override;
 
+	UPROPERTY(BlueprintAssignable)
+	FInventoryChanged OnInventoryChanged;
+	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	FSettlementStock SettlementStock;

@@ -37,6 +37,8 @@ public:
 	bool HasResource(const UResourceDefinition* InResource) const { return Stack.Resource == InResource && Stack.Amount > 0; }
 	int32 Harvest(const int32 RequestedAmount);
 	
+	const UResourceDefinition* GetResource() const { return Stack.Resource; }
+	
 	UPROPERTY(BlueprintAssignable)
 	FResourceDepleted OnResourceDepleted;
 	

@@ -65,6 +65,7 @@ public:
 	
 	virtual bool CanPickup(const UResourceDefinition* Resource, const int32 Amount = 1) const override;
 	virtual int32 GetAmountInInventory(const UResourceDefinition* Resource) const override;
+	virtual float CalculateAccumulatedInventoryValue() const override;
 
 	virtual void Interact(IInteraction* Interaction) override;
 	virtual bool IsInteractionDone() const override;

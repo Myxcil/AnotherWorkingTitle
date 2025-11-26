@@ -42,3 +42,36 @@ int32 FInventoryBase::RemoveResource(const UResourceDefinition* Resource, const 
 	
 	return RemovedTotal;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void FInventoryBase::Collect(TMap<const UResourceDefinition*, int32>& ResourceMap) const
+{
+	for (int32 I=0; I < Stacks.Num(); ++I)
+	{
+		const FResourceStack& Stack = Stacks[I];
+		int32& Total = ResourceMap.FindOrAdd(Stack.Resource);
+		Total += Stack.Amount;
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void FInventoryBase::Collect(TArray<FResourceStack>& ResourceStacks) const
+{
+	for (int32 I=0; I < Stacks.Num(); ++I)
+	{
+		const FResourceStack& Stack = Stacks[I];
+		const UResourceDefinition* Resource = Stack.Resource;
+		const int32 Index = ResourceStacks.IndexOfByPredicate([Resource](const FResourceStack& Element)
+		{
+			return Resource == Element.Resource;
+		});
+		if (Index == INDEX_NONE)
+		{
+			ResourceStacks.Add(Stack);
+		}
+		else
+		{
+			ResourceStacks[Index].Amount += Stack.Amount;
+		}
+	}
+}

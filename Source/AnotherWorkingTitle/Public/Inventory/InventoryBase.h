@@ -8,6 +8,7 @@
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 DECLARE_MULTICAST_DELEGATE(FGlobalInventoryChanged)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryChanged);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
@@ -37,6 +38,10 @@ struct FInventoryBase
 	}
 
 	int32 RemoveResource(const UResourceDefinition* Resource, const int32 Amount);
+	
+	void Collect(TMap<const UResourceDefinition*, int32>& ResourceMap) const;
+	
+	void Collect(TArray<FResourceStack>& ResourceStacks) const;
 	
 	void Clear()
 	{

@@ -110,14 +110,10 @@ AResourceNode* FAIHelper::FindNearestResourceNode(const FVector& RefPosition, co
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 AStockpile* FAIHelper::FindNearestStockpile(const FVector& RefPosition)
 {
-	const TArray<AStockpile*>& AllStockpiles = AStockpile::GetInstances();
-	if (AllStockpiles.Num() == 0)
-		return nullptr;
-	
 	AStockpile* NearestPile = nullptr;
 	float SqMinDist = std::numeric_limits<float>::max();
 	
-	for (AStockpile* Stockpile : AllStockpiles)
+	for (AStockpile* Stockpile : AStockpile::GetInstances())
 	{
 		if (!Stockpile)
 			continue;
@@ -131,4 +127,35 @@ AStockpile* FAIHelper::FindNearestStockpile(const FVector& RefPosition)
 	}
 	
 	return NearestPile;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+float FAIHelper::CalculateResourceScarcity(const UResourceDefinition* Resource)
+{
+	TMap<const UResourceDefinition*, int32> ResourceMap;
+	for (AStockpile* Stockpile : AStockpile::GetInstances())
+	{
+		Stockpile->GetSettlementStock().Collect(ResourceMap);
+	}
+	if (!ResourceMap.Contains(Resource))
+		return 1.0f;
+	
+	int32 TotalAmount = 0;
+	for (const TTuple<const UResourceDefinition*, int>& Iter : ResourceMap)
+	{
+		TotalAmount += Iter.Value;
+	}
+	if (TotalAmount == 0)
+		return 1.0f;
+	
+	const float RcpScale = 1.0f / TotalAmount;
+	return 1.0f - Clamp01(RcpScale * ResourceMap[Resource]); 
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+float FAIHelper::CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale)
+{
+	const float Distance = FVector::Distance(From, To);
+	const float Weight = Scale * Distance;
+	return FMath::Max(1.0f - Clamp01(Weight), Scale);
 }

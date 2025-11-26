@@ -22,7 +22,10 @@ float UGoalDropItemsAtStockpile::Evaluate(IAgent& Agent) const
 	if (!NearestStockpile)
 		return 0;
 	
-	return 0.4f;
+	const float InventoryValue = Agent.CalculateAccumulatedInventoryValue();
+	const float DistanceWeight = FAIHelper::CalculateDistanceWeight(Agent.GetGroundPosition(), NearestStockpile->GetActorLocation());
+	
+	return InventoryValue * DistanceWeight;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 
 #include "Construction/BuildingSite.h"
 
+#include "AI/AIHelper.h"
 #include "AnotherWorkingTitle/AnotherWorkingTitle.h"
 #include "Construction/BuildingDefinition.h"
 #include "Inventory/Stockpile.h"
@@ -73,7 +74,7 @@ bool ABuildingSite::ApplyWork(const float Amount)
 			UE_LOG(LogAWT, Log, TEXT("%s begin build"), *GetName());
 		}
 		
-		BuildProgress = FMath::Clamp(BuildProgress + Amount, 0.0f, 1.0f);
+		BuildProgress = FAIHelper::Clamp01(BuildProgress + Amount);
 		
 		OnBuildingProgress.Broadcast(BuildProgress);
 		
@@ -152,10 +153,10 @@ bool ABuildingSite::CanAfford(const TArray<AStockpile*>& AllStockpiles, const TA
 		}
 		if (TotalAmount < Requirement.Amount)
 		{
-			return true;
+			return false;
 		}
 	}
-	return false;
+	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

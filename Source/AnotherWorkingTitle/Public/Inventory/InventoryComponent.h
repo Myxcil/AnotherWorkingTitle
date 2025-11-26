@@ -9,8 +9,6 @@
 
 struct FSettlementStock;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryChanged);
-
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ANOTHERWORKINGTITLE_API UInventoryComponent : public UActorComponent

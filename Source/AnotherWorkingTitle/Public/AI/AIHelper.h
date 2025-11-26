@@ -13,9 +13,17 @@ class UResourceDefinition;
 class ANOTHERWORKINGTITLE_API FAIHelper
 {
 public:
+	FORCEINLINE static float Clamp01(const float InValue) { return FMath::Clamp(InValue, 0.0f, 1.0f); } 
+	
 	static bool GetObjectTransform(const UObject* Object, FTransform& Result);
 	
 	static const UResourceDefinition* FindMinResourceInStockpiles(const UResourceRegistrySubsystem* ResourceRegistry);
+	
 	static AResourceNode* FindNearestResourceNode(const FVector& RefPosition, const UResourceDefinition* Resource);
+	
 	static AStockpile* FindNearestStockpile(const FVector& RefPosition);
+	
+	static float CalculateResourceScarcity(const UResourceDefinition* Resource);
+
+	static float CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale = 0.00001f);
 };

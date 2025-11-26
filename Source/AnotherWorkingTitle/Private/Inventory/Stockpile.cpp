@@ -43,7 +43,18 @@ void AStockpile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 AStockpile::RemoveResource(const UResourceDefinition* Resource, const int32 Amount)
 {
-	return SettlementStock.RemoveResource(Resource, Amount);
+	const int32 NumRemoved = SettlementStock.RemoveResource(Resource, Amount);
+	if (NumRemoved > 0)
+	{
+		OnInventoryChanged.Broadcast();
+	}
+	return NumRemoved;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AStockpile::CollectContent(TArray<FResourceStack>& ResourceStacks)
+{
+	SettlementStock.Collect(ResourceStacks);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -55,5 +66,6 @@ void AStockpile::Interact_Implementation(ASettlerCharacter* InstigatorCharacter)
 	if (UInventoryComponent* InventoryComponent = InstigatorCharacter->GetInventoryComponent())
 	{
 		InventoryComponent->TransferAll(SettlementStock);
+		OnInventoryChanged.Broadcast();
 	}
 }
