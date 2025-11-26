@@ -48,8 +48,8 @@ void ASettlerAIController::OnUnPossess()
 {
 	if (UGOAPAgentComponent* GOAP = CachedGOAP.Get())
 	{
-		GOAP->OnAIRequestMoveToLocation.BindUObject(this, &ThisClass::HandleAIRequestMoveToLocation);
-		GOAP->OnAIRequestStopMovement.BindUObject(this, &ThisClass::HandleAIRequestStopMovement);
+		GOAP->OnAIRequestMoveToLocation.Unbind();
+		GOAP->OnAIRequestStopMovement.Unbind();
 	}
 	
 	CachedSettler.Reset();

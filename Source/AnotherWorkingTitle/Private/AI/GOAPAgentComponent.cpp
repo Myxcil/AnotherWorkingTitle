@@ -184,8 +184,7 @@ void UGOAPAgentComponent::TickGOAP(const float DeltaSeconds)
 			}
 			else
 			{
-				ResetPlan(false);
-				State = EInternalState::IdleFailed;
+				OnGoalFailed(Goal);
 			}
 		}
 		break;
@@ -194,8 +193,7 @@ void UGOAPAgentComponent::TickGOAP(const float DeltaSeconds)
 		{
 			if (!ExecutePlan(SettlerCharacter))
 			{
-				ResetPlan(false);
-				State = EInternalState::IdleFailed;
+				OnGoalFailed(CurrentGoal.Get());
 			}
 		}
 		break;
@@ -239,7 +237,7 @@ bool UGOAPAgentComponent::ExecutePlan(ASettlerCharacter* SettlerCharacter)
 	// Plan just started, init goal
 	if (PlanStep == -1)
 	{
-		if (!CurrentGoal->Evaluate(*this))
+		if (CurrentGoal->Evaluate(*this) <= 0)
 		{
 			AI_LOG(TEXT("%s %s became invalid"), *SettlerCharacter->GetName(), *CurrentGoal->GetTypeName());
 			CurrentGoal = nullptr;
@@ -336,7 +334,6 @@ void UGOAPAgentComponent::EvaluateGoals()
 		if (NextGoal != CurrentGoal)
 		{
 			ResetPlan(false);
-
 			CurrentGoal = NextGoal;
 			if (CurrentGoal != nullptr)
 			{
@@ -353,32 +350,55 @@ void UGOAPAgentComponent::EvaluateGoals()
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 const UAbstractGoal* UGOAPAgentComponent::ChooseTopGoal()
 {
+	const int32 NumGoals = GoalList.Num();
+	if (NumGoals == 0)
+		return nullptr;
+	
 	const UAbstractGoal* NextGoal = CurrentGoal.Get();
 
 	// if world view has changed, re-evaluate all goals
 	// store best rated goal	
 	if (bWorldIsDirty)
 	{
-		const int32 NumGoals = GoalList.Num();
 		for (int32 i = 0; i < NumGoals; ++i)
 		{
 			GoalList[i].Priority = GoalList[i].Goal->Evaluate(*this);
 		}
-		
+	
 		GoalList.Sort([](const FGoalInstance& A, const FGoalInstance& B)
 		{
 			return A.Priority > B.Priority; 
 		});
-		
+	
 		bWorldIsDirty = false;
 	}
 
-	if (GoalList[0].Priority > 0)
+	for (int32 I=0; I < NumGoals; ++I)
 	{
-		NextGoal = GoalList[0].Goal;
+		if (GoalList[I].Priority > 0)
+		{
+			NextGoal = GoalList[I].Goal;
+			break;
+		}
 	}
-		
+	
 	return NextGoal;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UGOAPAgentComponent::OnGoalFailed(const UAbstractGoal* Goal)
+{
+	const int32 NumGoals = GoalList.Num();
+	for (int32 I=0; I < NumGoals; ++I)
+	{
+		if (GoalList[I].Goal == Goal)
+		{
+			GoalList[I].Priority = 0;
+			break;
+		}
+	}
+	
+	ResetPlan(false);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

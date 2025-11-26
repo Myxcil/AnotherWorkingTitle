@@ -77,11 +77,12 @@ private:
 	bool ExecutePlan(ASettlerCharacter* SettlerCharacter);
 	void EvaluateGoals();
 	const UAbstractGoal* ChooseTopGoal();
+	void OnGoalFailed(const UAbstractGoal* Goal);
 
 	bool IsBusy(ASettlerCharacter* SettlerCharacter) const;
 	
 	void SetDirty();
-	
+		
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float DefaultAcceptanceRadius = 50.0f;
