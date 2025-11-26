@@ -45,4 +45,6 @@ public:
 	FBuildCost BuildCost;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Building")
 	float TimeToBuild = 10.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Building")
+	TSubclassOf<AActor> BuildingToSpawn;
 };

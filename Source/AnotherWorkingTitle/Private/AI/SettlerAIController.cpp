@@ -3,6 +3,7 @@
 
 #include "AI/SettlerAIController.h"
 
+#include "NavigationSystem.h"
 #include "AI/GOAPAgentComponent.h"
 #include "Settlers/SettlerCharacter.h"
 #include "Navigation/PathFollowingComponent.h"
@@ -75,26 +76,48 @@ void ASettlerAIController::Tick(float DeltaTime)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool ASettlerAIController::HandleAIRequestMoveToLocation(const FVector& Location, const float AcceptanceRadius)
+bool ASettlerAIController::HandleAIRequestMoveToLocation(const FVector& Location, const float LocationThreshold, const float AcceptanceRadius)
 {
-	if (!CachedSettler.IsValid())
+	const ASettlerCharacter* Settler = CachedSettler.Get();
+	if (!Settler)
 		return false;
 	
+	UGOAPAgentComponent* GOAP = CachedGOAP.Get();
+	if (!GOAP)
+		return false;
+	
+	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	if (!NavSys)
+		return false;
+
+	FNavLocation ProjectedLocation;
+	const FVector QueryExtent(LocationThreshold, LocationThreshold, 200.f); // an dein Setup anpassen
+
+	const bool bFoundNavPos = NavSys->ProjectPointToNavigation(Location, ProjectedLocation, QueryExtent, &Settler->GetNavAgentPropertiesRef());
+	if (!bFoundNavPos)
+	{
+		// Ziel ist komplett außerhalb jedes NavMesh – MoveRequest nicht ausführen,
+		// GOAP informieren, damit die aktuelle Action/Goal scheitern kann.
+		AI_WARN(TEXT("%s failed to sample position at %s"), *CachedSettler->GetName(), *Location.ToString());
+		GOAP->OnMovementComplete(false);
+		return false;
+	}
+	
 	FAIMoveRequest MoveRequest;
-	MoveRequest.SetGoalLocation(Location);
+	MoveRequest.SetGoalLocation(ProjectedLocation.Location);
 	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
 	MoveRequest.SetUsePathfinding(true);
 	
 	const EPathFollowingRequestResult::Type Result = MoveTo(MoveRequest); 
 	if (Result == EPathFollowingRequestResult::Failed)
 	{
-		AI_WARN(TEXT("%s failed to move to %s, result=%d"), *CachedSettler->GetName(), *Location.ToString(), Result);
+		AI_WARN(TEXT("%s failed to move to %s, result=%d"), *CachedSettler->GetName(), *ProjectedLocation.Location.ToString(), Result);
 		return false;
 	}
 
 	if (Result == EPathFollowingRequestResult::AlreadyAtGoal)
 	{
-		AI_WARN(TEXT("%s already at %s"), *CachedSettler->GetName(), *Location.ToString());
+		AI_WARN(TEXT("%s already at %s"), *CachedSettler->GetName(), *ProjectedLocation.Location.ToString());
 		return true;
 	}
 

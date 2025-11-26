@@ -9,6 +9,9 @@
 #include "ResourceNode.generated.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResourceDepleted);
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
 class ANOTHERWORKINGTITLE_API AResourceNode : public AActor, public IInteraction
 {
@@ -33,6 +36,9 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool HasResource(const UResourceDefinition* InResource) const { return Stack.Resource == InResource && Stack.Amount > 0; }
 	int32 Harvest(const int32 RequestedAmount);
+	
+	UPROPERTY(BlueprintAssignable)
+	FResourceDepleted OnResourceDepleted;
 	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -480,7 +480,7 @@ bool UGOAPAgentComponent::Goto(UObject* Object)
 		{
 			bMoveRequestDone = false;
 			bMoveRequestFailed = false;
-			return OnAIRequestMoveToLocation.Execute(Transform.GetLocation(), DefaultAcceptanceRadius);
+			return OnAIRequestMoveToLocation.Execute(Transform.GetLocation(), LocationThreshold, DefaultAcceptanceRadius);
 		}
 	}
 	return false;

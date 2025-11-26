@@ -16,7 +16,8 @@ public class AnotherWorkingTitle : ModuleRules
 			"InputCore", 
 			"EnhancedInput", 
 			"ProceduralMeshComponent", 
-			"AIModule"
+			"AIModule",
+			"NavigationSystem"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

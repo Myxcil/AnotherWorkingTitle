@@ -14,7 +14,7 @@ class ASettlerCharacter;
 class UAbstractGoal;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-DECLARE_DELEGATE_RetVal_TwoParams(bool, FAIRequestMoveToLocation, const FVector& /*Location*/, const float /*AcceptanceRadius*/);
+DECLARE_DELEGATE_RetVal_ThreeParams(bool, FAIRequestMoveToLocation, const FVector& /*Location*/, const float /*LocationThreshold*/, const float /*AcceptanceRadius*/);
 DECLARE_DELEGATE(FAIRequestStopMovement);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -90,6 +90,8 @@ private:
 	void SetDirty();
 		
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float LocationThreshold = 200.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float DefaultAcceptanceRadius = 50.0f;
 	

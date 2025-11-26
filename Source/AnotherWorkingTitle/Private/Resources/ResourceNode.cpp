@@ -50,6 +50,10 @@ void AResourceNode::Interact_Implementation(ASettlerCharacter* InstigatorCharact
 		if (NumHarvested > 0)
 		{
 			InventoryComponent->AddResource(Stack.Resource, NumHarvested);
+			if (Stack.Amount == 0)
+			{
+				OnResourceDepleted.Broadcast();			
+			}
 		}
 	}
 }

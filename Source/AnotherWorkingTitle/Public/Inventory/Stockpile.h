@@ -29,7 +29,8 @@ protected:
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	const FSettlementStock& GetSettlementStock() const { return SettlementStock; }
-	FSettlementStock& GetSettlementStockMutable() { return SettlementStock; }
+	
+	int32 RemoveResource(const UResourceDefinition* Resource, const int32 Amount);
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// IInteraction

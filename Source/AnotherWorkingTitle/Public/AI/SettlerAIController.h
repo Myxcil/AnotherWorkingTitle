@@ -26,7 +26,7 @@ public:
 	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	bool HandleAIRequestMoveToLocation(const FVector& Location, const float AcceptanceRadius);
+	bool HandleAIRequestMoveToLocation(const FVector& Location, const float LocationThreshold, const float AcceptanceRadius);
 	void HandleAIRequestStopMovement();
 	
 	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;

@@ -6,8 +6,8 @@
 #include "GameFramework/Character.h"
 #include "SettlerCharacter.generated.h"
 
+class IHoldInteraction;
 class UGOAPAgentComponent;
-class UWorkComponent;
 class UInventoryComponent;
 class UNeedsComponent;
 
@@ -29,13 +29,19 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void Tick(float DeltaTime) override;
 	
-	UNeedsComponent* GetNeedsComponent() const			{ return NeedsComponent; }
-	UInventoryComponent* GetInventoryComponent() const	{ return InventoryComponent; }
-	UWorkComponent* GetWorkComponent() const			{ return WorkComponent; }
-	UGOAPAgentComponent* GetGOAPAgentComponent() const	{ return GOAPAgentComponent; }
-	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool IsBusy() const;
 
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	UNeedsComponent* GetNeedsComponent() const				{ return NeedsComponent; }
+	UInventoryComponent* GetInventoryComponent() const		{ return InventoryComponent; }
+	UGOAPAgentComponent* GetGOAPAgentComponent() const		{ return GOAPAgentComponent; }
+
+	UFUNCTION(BlueprintCallable)
+	void TryBeginInteract(AActor* Target);
+	UFUNCTION(BlueprintCallable)
+	void TryEndInteract();
+	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintReadOnly)
@@ -43,7 +49,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UWorkComponent> WorkComponent;
-	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UGOAPAgentComponent> GOAPAgentComponent;
+	
+	TWeakObjectPtr<AActor> CurrentHoldInteraction;
 };

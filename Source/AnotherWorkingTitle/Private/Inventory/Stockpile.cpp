@@ -41,6 +41,12 @@ void AStockpile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 AStockpile::RemoveResource(const UResourceDefinition* Resource, const int32 Amount)
+{
+	return SettlementStock.RemoveResource(Resource, Amount);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AStockpile::Interact_Implementation(ASettlerCharacter* InstigatorCharacter)
 {
 	if (!InstigatorCharacter)
