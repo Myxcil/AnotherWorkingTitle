@@ -12,6 +12,7 @@
 #include "Inventory/InventoryComponent.h"
 #include "Settlers/SettlerCharacter.h"
 #include "Resources/ResourceRegistrySubsystem.h"
+#include "Settlers/NeedsComponent.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UGOAPAgentComponent::UGOAPAgentComponent()
@@ -402,7 +403,7 @@ void UGOAPAgentComponent::OnGoalFailed(const UAbstractGoal* Goal)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGOAPAgentComponent::IsBusy(ASettlerCharacter* SettlerCharacter) const
+bool UGOAPAgentComponent::IsBusy(const ASettlerCharacter* SettlerCharacter) const
 {
 	if (SettlerCharacter->IsBusy())
 		return true;
@@ -549,4 +550,23 @@ void UGOAPAgentComponent::Interact(IInteraction* Interaction)
 			SetDirty();
 		}
 	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UGOAPAgentComponent::IsInteractionDone() const
+{
+	return true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UGOAPAgentComponent::IsInCriticalState() const
+{
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (const UNeedsComponent* NeedsComponent = Settler->GetNeedsComponent())
+		{
+			return NeedsComponent->IsAnyNeedCritical();
+		}
+	}
+	return false;
 }

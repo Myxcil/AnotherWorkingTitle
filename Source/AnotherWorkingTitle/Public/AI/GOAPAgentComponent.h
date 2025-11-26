@@ -67,6 +67,9 @@ public:
 	virtual int32 GetAmountInInventory(const UResourceDefinition* Resource) const override;
 
 	virtual void Interact(IInteraction* Interaction) override;
+	virtual bool IsInteractionDone() const override;
+	
+	virtual bool IsInCriticalState() const override;
 	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -79,7 +82,7 @@ private:
 	const UAbstractGoal* ChooseTopGoal();
 	void OnGoalFailed(const UAbstractGoal* Goal);
 
-	bool IsBusy(ASettlerCharacter* SettlerCharacter) const;
+	bool IsBusy(const ASettlerCharacter* SettlerCharacter) const;
 	
 	void SetDirty();
 		

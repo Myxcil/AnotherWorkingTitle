@@ -95,3 +95,16 @@ void UNeedsComponent::ChangeNeedValue(const ENeedType NeedType, const float Delt
 	const float ClampedValue = Clamp01(NewValue);
 	SetNeedValue(NeedType, ClampedValue);
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UNeedsComponent::IsAnyNeedCritical() const
+{
+	for (const ENeedType Type : TEnumRange<ENeedType>())
+	{
+		if (IsNeedCritical(Type))
+		{
+			return true;
+		}
+	}
+	return false;
+}

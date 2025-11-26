@@ -11,6 +11,9 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 float UGoalDropItemsAtStockpile::Evaluate(IAgent& Agent) const
 {
+	if (Agent.IsInCriticalState())
+		return 0;
+	
 	const int32 CarryingAmount = Agent.GetAmountInInventory(nullptr);
 	if (CarryingAmount == 0)
 		return 0;

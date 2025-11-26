@@ -38,7 +38,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsNeedUncomfortable(const ENeedType NeedType) const { return GetNeedValue(NeedType) >= UncomfortableThreshold; }
 	UFUNCTION(BlueprintPure)
-	bool IsNeedCritical(const ENeedType NeedType) const { return GetNeedValue(NeedType) >= CriticalThreshold; } 
+	bool IsNeedCritical(const ENeedType NeedType) const { return GetNeedValue(NeedType) >= CriticalThreshold; }
+	
+	bool IsAnyNeedCritical() const;
 
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

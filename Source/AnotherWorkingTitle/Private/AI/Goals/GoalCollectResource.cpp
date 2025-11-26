@@ -11,6 +11,9 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 float UGoalCollectResource::Evaluate(IAgent& Agent) const
 {
+	if (Agent.IsInCriticalState())
+		return 0;
+	
 	const UResourceDefinition* Resource = FAIHelper::FindMinResourceInStockpiles(Agent.GetResourceRegistry());
 	if (!Resource)
 		return 0;
