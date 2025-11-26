@@ -19,25 +19,25 @@ UENUM()
 enum class EFactType : uint8
 {
 	Knowledge,
-	Object,
-	Item,
+	
+	Count
 };
-constexpr int32 NumFactTypes = static_cast<int32>(EFactType::Item) + 1;
+constexpr int32 NumFactTypes = static_cast<int32>(EFactType::Count);
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()
 enum class ENodeType : uint8
 {
 	Unknown,
-
 	Actor,
 	Component,
 	Object,
 	ObjectClass,
-
 	FreePosition,
+	
+	Count,
 };
-constexpr int32 NumNodeTypes = static_cast<int32>(ENodeType::FreePosition) + 1;
+constexpr int32 NumNodeTypes = static_cast<int32>(ENodeType::Count);
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()
