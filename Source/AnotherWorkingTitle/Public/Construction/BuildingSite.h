@@ -13,6 +13,7 @@ struct FResourceAmount;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBuildingProgress, float, Progress);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBuildCostUpdated, const TArray<FResourceAmount>&, Missing);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
@@ -22,11 +23,15 @@ class ANOTHERWORKINGTITLE_API ABuildingSite : public AActor, public IHoldInterac
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	static const TArray<ABuildingSite*>& GetInstances();
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	ABuildingSite();
 
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,16 +45,20 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FBuildingProgress OnBuildingProgress;
+	UPROPERTY(BlueprintAssignable)
+	FBuildCostUpdated OnBuildCostUpdated; 
 	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool TryConsumeBuildResources();
 	bool CanAfford(const TArray<AStockpile*>& AllStockpiles, const TArray<FResourceAmount>& Requirements) const;
 	void OnBuildCompleted();
+	UFUNCTION()
+	void OnStockpileUpdated();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UBuildingDefinition> BuildingDefinition;
+	TObjectPtr<const UBuildingDefinition> BuildingDefinition;
 	
 	bool bIsBuildStarted = false;
 	float BuildProgress = 0;

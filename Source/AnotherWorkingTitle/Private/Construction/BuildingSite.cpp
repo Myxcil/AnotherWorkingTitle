@@ -8,6 +8,17 @@
 #include "Construction/BuildingDefinition.h"
 #include "Inventory/Stockpile.h"
 
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+namespace 
+{
+	TArray<ABuildingSite*> AllBuildingSites;	
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+const TArray<ABuildingSite*>& ABuildingSite::GetInstances()
+{
+	return AllBuildingSites;
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 ABuildingSite::ABuildingSite()
@@ -19,7 +30,23 @@ ABuildingSite::ABuildingSite()
 void ABuildingSite::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	AllBuildingSites.Add(this);
+	for (AStockpile* Stockpile : AStockpile::GetInstances())
+	{
+		Stockpile->OnInventoryChanged.AddDynamic(this, &ThisClass::OnStockpileUpdated);
+	}
+	OnStockpileUpdated();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ABuildingSite::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	for (AStockpile* Stockpile : AStockpile::GetInstances())
+	{
+		Stockpile->OnInventoryChanged.RemoveDynamic(this, &ThisClass::OnStockpileUpdated);
+	}
+	AllBuildingSites.Remove(this);
+	Super::EndPlay(EndPlayReason);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -174,4 +201,27 @@ void ABuildingSite::OnBuildCompleted()
 	}
 	
 	World->DestroyActor(this);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ABuildingSite::OnStockpileUpdated()
+{
+	TArray<FResourceAmount> Requirements = BuildingDefinition->BuildCost.Requirements;
+	for (int32 I=Requirements.Num()-1; I >= 0; --I)
+	{
+		FResourceAmount& Requirement = Requirements[I];
+		for (const AStockpile* Stockpile : AStockpile::GetInstances())
+		{
+			const FSettlementStock& SettlementStock = Stockpile->GetSettlementStock();
+			const int32 StoredAmount = SettlementStock.GetAmount(Requirement.Resource);
+			const int32 ToRemove = FMath::Min(Requirement.Amount, StoredAmount);
+			Requirement.Amount -= ToRemove;
+		}
+		
+		if (Requirement.Amount == 0)
+		{
+			Requirements.RemoveAt(I);
+		}
+	}
+	OnBuildCostUpdated.Broadcast(Requirements);
 }

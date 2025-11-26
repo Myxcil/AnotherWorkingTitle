@@ -149,7 +149,8 @@ float FAIHelper::CalculateResourceScarcity(const UResourceDefinition* Resource)
 		return 1.0f;
 	
 	const float RcpScale = 1.0f / TotalAmount;
-	return 1.0f - Clamp01(RcpScale * ResourceMap[Resource]); 
+	const float Scarcity = 1.0f - Clamp01(RcpScale * ResourceMap[Resource]);
+	return 0.1f + 0.9f * Scarcity;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

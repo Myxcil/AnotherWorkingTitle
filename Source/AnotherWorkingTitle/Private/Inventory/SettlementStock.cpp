@@ -20,10 +20,9 @@ void FSettlementStock::AddResource(const UResourceDefinition* Resource, const in
 	}
 	else
 	{
-		FResourceStack NewStack;
+		FResourceStack& NewStack = Stacks.AddDefaulted_GetRef();
 		NewStack.Resource = Resource;
 		NewStack.Amount = Amount;
-		Stacks.Add(MoveTemp(NewStack));
 	}
 
 	OnInventoryChanged.Broadcast();

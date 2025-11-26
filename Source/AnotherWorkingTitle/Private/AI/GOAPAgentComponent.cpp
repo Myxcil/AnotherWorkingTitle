@@ -345,6 +345,11 @@ void UGOAPAgentComponent::EvaluateGoals()
 				State = EInternalState::IdleFailed;
 			}
 		}
+		else if (NextGoal == nullptr)
+		{
+			State = EInternalState::IdleFailed;
+			CurrentGoal = nullptr;
+		}
 	}
 }
 
