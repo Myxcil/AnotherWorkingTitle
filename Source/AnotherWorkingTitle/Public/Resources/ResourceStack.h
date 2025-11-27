@@ -17,6 +17,13 @@ struct FResourceStack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Amount = 0;
 	
-	int32 GetTotalWeight() const { return Resource ? Resource->UnitWeight * Amount : 0; }
-	bool IsValid() const { return Resource && Amount > 0; }
+	bool IsValid() const { return Resource != nullptr && Amount > 0; }
+	
+	int32 Add(const int32 AmountToAdd)
+	{
+		check(Resource);
+		const int32 MaxToAdd = FMath::Min(AmountToAdd, Resource->MaxStackSize - Amount);
+		Amount += MaxToAdd;
+		return AmountToAdd - MaxToAdd;
+	}
 };

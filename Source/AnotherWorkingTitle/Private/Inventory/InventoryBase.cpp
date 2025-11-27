@@ -7,6 +7,15 @@
 FGlobalInventoryChanged FInventoryBase::OnInventoryChanged;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+void FInventoryBase::SanityCheck() const
+{
+	for (const FResourceStack& Stack : Stacks)
+	{
+		check(Stack.IsValid());
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 FInventoryBase::RemoveResource(const UResourceDefinition* Resource, const int32 Amount)
 {
 	if (!Resource || Amount <= 0)

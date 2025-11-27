@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionGoto::UActionGoto()
 {
-	Preconditions.Set(EWorldPropertyKey::Interact, static_cast<UObject*>(nullptr));
+	Preconditions.Set(EWorldPropertyKey::Harvest, static_cast<UObject*>(nullptr));
 	Preconditions.Set(EWorldPropertyKey::PathExists, EWorldPropertyKey::AtNode);
 	Results.Set(EWorldPropertyKey::AtNode, EWorldPropertyKey::AtNode);
 }

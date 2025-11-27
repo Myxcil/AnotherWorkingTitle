@@ -58,7 +58,7 @@ void AStockpile::CollectContent(TArray<FResourceStack>& ResourceStacks)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void AStockpile::Interact_Implementation(ASettlerCharacter* InstigatorCharacter)
+void AStockpile::TransferWholeInventory(ASettlerCharacter* InstigatorCharacter)
 {
 	if (!InstigatorCharacter)
 		return;
@@ -68,4 +68,10 @@ void AStockpile::Interact_Implementation(ASettlerCharacter* InstigatorCharacter)
 		InventoryComponent->TransferAll(SettlementStock);
 		OnInventoryChanged.Broadcast();
 	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AStockpile::Interact_Implementation(ASettlerCharacter* InstigatorCharacter)
+{
+	TransferWholeInventory(InstigatorCharacter);
 }

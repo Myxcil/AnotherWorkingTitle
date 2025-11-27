@@ -5,25 +5,30 @@
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void FSettlementStock::AddResource(const UResourceDefinition* Resource, const int32 Amount)
+int32 FSettlementStock::AddResource(const UResourceDefinition* Resource, const int32 Amount)
 {
 	if (!Resource || Amount <= 0)
-		return;
+		return 0;
 	
-	FResourceStack* Existing = Stacks.FindByPredicate([Resource](const FResourceStack& Stack)
+	int32 RemainingAmount = Amount;
+	while (RemainingAmount > 0)
 	{
-		return Stack.Resource == Resource;
-	});
-	if (Existing)
-	{
-		Existing->Amount += Amount;
+		FResourceStack* ExistingStack = Stacks.FindByPredicate([Resource](const FResourceStack& Stack)
+		{
+			return Stack.Resource == Resource && Stack.Amount < Stack.Resource->MaxStackSize;
+		});
+		
+		if (!ExistingStack)
+		{
+			ExistingStack = &Stacks.AddDefaulted_GetRef();
+			ExistingStack->Resource = Resource;
+			ExistingStack->Amount = 0;
+		}
+		
+		RemainingAmount = ExistingStack->Add(RemainingAmount);
 	}
-	else
-	{
-		FResourceStack& NewStack = Stacks.AddDefaulted_GetRef();
-		NewStack.Resource = Resource;
-		NewStack.Amount = Amount;
-	}
-
+	
 	OnInventoryChanged.Broadcast();
+	
+	return Amount;
 }

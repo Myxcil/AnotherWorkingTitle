@@ -35,6 +35,9 @@ public:
 	void CollectContent(UPARAM(ref) TArray<FResourceStack>& ResourceStacks);
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	void TransferWholeInventory(ASettlerCharacter* InstigatorCharacter);
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// IInteraction
 	virtual void Interact_Implementation(ASettlerCharacter* InstigatorCharacter) override;
 

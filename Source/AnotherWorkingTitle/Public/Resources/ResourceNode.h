@@ -30,19 +30,24 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	void Harvest(ASettlerCharacter* InstigatorCharacter);
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// IInteraction
 	virtual void Interact_Implementation(ASettlerCharacter* InstigatorCharacter) override;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool HasResource(const UResourceDefinition* InResource) const { return Stack.Resource == InResource && Stack.Amount > 0; }
-	int32 Harvest(const int32 RequestedAmount);
-	
 	const UResourceDefinition* GetResource() const { return Stack.Resource; }
 	
 	UPROPERTY(BlueprintAssignable)
 	FResourceDepleted OnResourceDepleted;
 	
 private:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	int32 Harvest(const int32 RequestedAmount);
+
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FResourceStack Stack;

@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AIConstants.h"
+#include "Actions/AbstractAction.h"
+#include "Inventory/Stockpile.h"
 
+class AResourceNode;
 class IInteraction;
 class UResourceDefinition;
 class UResourceRegistrySubsystem;
@@ -29,7 +32,7 @@ public:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual FString GetActorName() const = 0;
 	virtual UResourceRegistrySubsystem* GetResourceRegistry() const = 0;
-	
+
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual const FWorldState& GetWorldState() const = 0;
 	virtual const TArray<const UAbstractAction*>& GetActions(EWorldPropertyKey Key) const = 0;
@@ -51,12 +54,13 @@ public:
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual bool CanPickup(const UResourceDefinition* Resource, const int32 Amount = 1) const = 0;
+	virtual int32 GetTotalAmountInInventory() const = 0;
 	virtual int32 GetAmountInInventory(const UResourceDefinition* Resource) const = 0;
 	virtual float CalculateAccumulatedInventoryValue() const = 0;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual void Interact(IInteraction* Interaction) = 0;
-	virtual bool IsInteractionDone() const = 0;
+	virtual void Harvest(AResourceNode* ResourceNode) = 0;
+	virtual void DepositAll(AStockpile* Stockpile) = 0;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual bool IsInCriticalState() const = 0;

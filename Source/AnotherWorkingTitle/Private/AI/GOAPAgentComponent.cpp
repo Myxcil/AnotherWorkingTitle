@@ -7,8 +7,8 @@
 #include "AI/AISettings.h"
 #include "AI/Actions/AbstractAction.h"
 #include "AI/Goals/AbstractGoal.h"
-#include "Interactive/Interaction.h"
 #include "Inventory/InventoryComponent.h"
+#include "Resources/ResourceNode.h"
 #include "Resources/ResourceRegistrySubsystem.h"
 #include "Settlers/NeedsComponent.h"
 #include "Settlers/SettlerCharacter.h"
@@ -146,7 +146,7 @@ void UGOAPAgentComponent::TickGOAP(const float DeltaSeconds)
 		BusyTimer -= DeltaSeconds;
 	}
 	
-	if (IsBusy(SettlerCharacter))
+	if (IsBusy())
 		return;
 	
 	if (Memory.IsModified())
@@ -218,7 +218,7 @@ void UGOAPAgentComponent::InitWorldState(ASettlerCharacter* SettlerCharacter)
 		const EWorldPropertyKey PropertyKey = static_cast<EWorldPropertyKey>(KeyIndex);
 		switch (PropertyKey)
 		{
-		case EWorldPropertyKey::Interact:
+		case EWorldPropertyKey::Harvest:
 			WorldState.Set(PropertyKey, static_cast<UObject*>(nullptr));
 			break;
 			
@@ -411,23 +411,25 @@ void UGOAPAgentComponent::OnGoalFailed(const UAbstractGoal* Goal)
 	
 	ResetPlan(false);
 }
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGOAPAgentComponent::IsBusy(const ASettlerCharacter* SettlerCharacter) const
-{
-	if (SettlerCharacter->IsBusy())
-		return true;
-	
-	if (BusyTimer > 0)
-		return true;
-	
-	return false;
-}
-
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UGOAPAgentComponent::SetDirty()
 {
 	bWorldIsDirty = true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UGOAPAgentComponent::IsBusy() const
+{
+	if (BusyTimer > 0)
+		return true;
+	
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (Settler->IsBusy())
+			return true;
+	}
+	
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -526,11 +528,25 @@ bool UGOAPAgentComponent::CanPickup(const UResourceDefinition* Resource, const i
 			if (const UInventoryComponent* InventoryComponent = Settler->GetInventoryComponent())
 			{
 				const FInventory& Inventory = InventoryComponent->GetInventory();
-				return Inventory.CanCarryMore(Resource->UnitWeight * Amount);
+				return Inventory.CanCarryMore(Resource, Amount);
 			}
 		}
 	}
 	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 UGOAPAgentComponent::GetTotalAmountInInventory() const
+{
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (const UInventoryComponent* InventoryComponent = Settler->GetInventoryComponent())
+		{
+			const FInventory& Inventory = InventoryComponent->GetInventory();
+			return Inventory.GetTotalAmount();
+		}
+	}
+	return 0;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -572,13 +588,13 @@ float UGOAPAgentComponent::CalculateAccumulatedInventoryValue() const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UGOAPAgentComponent::Interact(IInteraction* Interaction)
+void UGOAPAgentComponent::Harvest(AResourceNode* ResourceNode)
 {
-	if (Interaction)
+	if (ResourceNode)
 	{
 		if (ASettlerCharacter* Settler = SettlerPtr.Get())
 		{
-			Interaction->Interact_Implementation(Settler);
+			ResourceNode->Harvest(Settler);
 			BusyTimer = 0.5f;
 			SetDirty();
 		}
@@ -586,9 +602,17 @@ void UGOAPAgentComponent::Interact(IInteraction* Interaction)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGOAPAgentComponent::IsInteractionDone() const
+void UGOAPAgentComponent::DepositAll(AStockpile* Stockpile)
 {
-	return true;
+	if (Stockpile)
+	{
+		if (ASettlerCharacter* Settler = SettlerPtr.Get())
+		{
+			Stockpile->TransferWholeInventory(Settler);
+			BusyTimer = 0.5f;
+			SetDirty();
+		}
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

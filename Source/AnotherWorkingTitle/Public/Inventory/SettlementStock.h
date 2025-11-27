@@ -13,5 +13,5 @@ struct FSettlementStock : public FInventoryBase
 {
 	GENERATED_BODY()
 
-	void AddResource(const UResourceDefinition* Resource, const int32 Amount);
+	int32 AddResource(const UResourceDefinition* Resource, const int32 Amount);
 };

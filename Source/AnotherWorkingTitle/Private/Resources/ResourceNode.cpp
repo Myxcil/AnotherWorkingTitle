@@ -39,7 +39,7 @@ void AResourceNode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void AResourceNode::Interact_Implementation(ASettlerCharacter* InstigatorCharacter)
+void AResourceNode::Harvest(ASettlerCharacter* InstigatorCharacter)
 {
 	if (!InstigatorCharacter)
 		return;
@@ -56,6 +56,12 @@ void AResourceNode::Interact_Implementation(ASettlerCharacter* InstigatorCharact
 			}
 		}
 	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AResourceNode::Interact_Implementation(ASettlerCharacter* InstigatorCharacter)
+{
+	Harvest(InstigatorCharacter);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

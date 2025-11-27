@@ -16,38 +16,46 @@ struct FInventoryBase
 {
 	GENERATED_BODY()
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FResourceStack> Stacks;
 
-	int32 GetAmount(const UResourceDefinition* Resource) const
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	int32 GetTotalAmount() const
 	{
-		if (!Resource)
+		return Algo::Accumulate(Stacks, 0, [](const int32 Total, const FResourceStack& Stack )
 		{
-			return Algo::Accumulate(Stacks, 0, [](const int32 Total, const FResourceStack& Stack )
-			{
-				return Total + Stack.Amount;
-			});
-		}
-		else
-		{
-			return Algo::Accumulate(Stacks, 0, [Resource](const int32 Total, const FResourceStack& Stack )
-			{
-				return Total + (Stack.Resource == Resource ? Stack.Amount : 0);
-			});
-		}
+			return Total + Stack.Amount;
+		});
 	}
 
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	int32 GetAmount(const UResourceDefinition* Resource) const
+	{
+		check(Resource);
+		return Algo::Accumulate(Stacks, 0, [Resource](const int32 Total, const FResourceStack& Stack )
+		{
+			return Total + (Stack.Resource == Resource ? Stack.Amount : 0);
+		});
+	}
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	int32 RemoveResource(const UResourceDefinition* Resource, const int32 Amount);
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void Collect(TMap<const UResourceDefinition*, int32>& ResourceMap) const;
-	
 	void Collect(TArray<FResourceStack>& ResourceStacks) const;
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void Clear()
 	{
 		Stacks.Reset();
 		OnInventoryChanged.Broadcast();
 	}
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	void SanityCheck() const;
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	static FGlobalInventoryChanged OnInventoryChanged;
 };

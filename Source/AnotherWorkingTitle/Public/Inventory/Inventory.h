@@ -13,17 +13,11 @@ struct FInventory : public FInventoryBase
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 MaxCarryWeight = 10;
+	int32 MaxStacks = 10;
 	
-	int32 GetCurrentWeight() const
-	{
-		return Algo::Accumulate(Stacks, 0, [](const int32 Weight, const FResourceStack& Stack) { return Weight+Stack.GetTotalWeight(); });
-	}
-	
-	bool CanCarryMore(const int32 AdditionalWeight) const
-	{
-		return GetCurrentWeight() + AdditionalWeight <= MaxCarryWeight;
-	}
+	bool CanCarryMore(const UResourceDefinition* Resource, const int32 Amount) const;
+	int32 GetNumUsedSlots() const;
+	int32 GetNumFreeSlots() const { return MaxStacks - GetNumUsedSlots(); }
 	
 	int32 AddResource(const UResourceDefinition* Resource, const int32 Amount);
 };

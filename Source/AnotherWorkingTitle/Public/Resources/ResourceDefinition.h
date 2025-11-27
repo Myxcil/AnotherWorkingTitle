@@ -22,8 +22,8 @@ public:
 	FText DisplayName;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Resource")
 	EResourceCategory Category = EResourceCategory::Material; 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Resource")
-	int32 UnitWeight = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Resource", meta=(ClampMin="1"))
+	int32 MaxStackSize = 10; 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Resource")
 	TObjectPtr<UTexture2D> Icon = nullptr;
 	

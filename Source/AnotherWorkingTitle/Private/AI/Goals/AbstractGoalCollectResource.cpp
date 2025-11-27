@@ -45,7 +45,7 @@ bool UAbstractGoalCollectResource::Init(IAgent& Agent, FWorldState& WorldState, 
 	if (!Agent.CanPickup(Resource))
 		return false;
 	
-	WorldState.Set(EWorldPropertyKey::Interact, ResourceNode);
+	WorldState.Set(EWorldPropertyKey::Harvest, ResourceNode);
 	
 	return true;
 }

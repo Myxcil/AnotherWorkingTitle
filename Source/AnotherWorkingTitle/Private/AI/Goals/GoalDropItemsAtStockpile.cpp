@@ -14,7 +14,7 @@ float UGoalDropItemsAtStockpile::Evaluate(IAgent& Agent) const
 	if (Agent.IsInCriticalState())
 		return 0;
 	
-	const int32 CarryingAmount = Agent.GetAmountInInventory(nullptr);
+	const int32 CarryingAmount = Agent.GetTotalAmountInInventory();
 	if (CarryingAmount == 0)
 		return 0;
 	
@@ -32,15 +32,11 @@ float UGoalDropItemsAtStockpile::Evaluate(IAgent& Agent) const
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 bool UGoalDropItemsAtStockpile::Init(IAgent& Agent, FWorldState& WorldState, bool bIsPlanning) const
 {
-	const int32 CarryingAmount = Agent.GetAmountInInventory(nullptr);
-	if (CarryingAmount == 0)
-		return false;
-	
 	AStockpile* NearestStockpile = FAIHelper::FindNearestStockpile(Agent.GetFeetPosition());
 	if (!NearestStockpile)
 		return false;
 	
-	WorldState.Set(EWorldPropertyKey::Interact, NearestStockpile);
+	WorldState.Set(EWorldPropertyKey::Transfer, NearestStockpile);
 	
 	return true;
 }

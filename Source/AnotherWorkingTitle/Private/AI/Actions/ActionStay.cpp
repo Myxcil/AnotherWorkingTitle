@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionStay::UActionStay()
 {
-	Preconditions.Set(EWorldPropertyKey::Interact, static_cast<UObject*>(nullptr));
+	Preconditions.Set(EWorldPropertyKey::Harvest, static_cast<UObject*>(nullptr));
 	Results.Set(EWorldPropertyKey::AtNode, EWorldPropertyKey::AtNode);
 }
 

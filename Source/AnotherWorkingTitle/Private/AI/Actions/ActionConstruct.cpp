@@ -59,5 +59,5 @@ void UActionConstruct::Deactivate(IAgent& Agent, FAIState& AIState) const
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 EActionResult UActionConstruct::IsComplete(IAgent& Agent, FAIState& AIState) const
 {
-	return Agent.IsInteractionDone() ? EActionResult::Complete : EActionResult::Incomplete;
+	return EActionResult::Complete;
 }

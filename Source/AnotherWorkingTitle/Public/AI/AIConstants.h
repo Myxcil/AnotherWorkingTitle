@@ -43,11 +43,13 @@ constexpr int32 NumNodeTypes = static_cast<int32>(ENodeType::Count);
 UENUM()
 enum class EWorldPropertyKey : uint8
 {
-	AtNode,
-	PathExists,
-	Interact,
 	Wait,
 
+	AtNode,
+	PathExists,
+
+	Harvest,
+	Transfer,
 	Construct,
 	
 	Count,

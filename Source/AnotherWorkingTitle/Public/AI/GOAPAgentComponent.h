@@ -64,12 +64,13 @@ public:
 	virtual bool HasFinishedMoving() const override;
 	
 	virtual bool CanPickup(const UResourceDefinition* Resource, const int32 Amount = 1) const override;
+	virtual int32 GetTotalAmountInInventory() const override;
 	virtual int32 GetAmountInInventory(const UResourceDefinition* Resource) const override;
 	virtual float CalculateAccumulatedInventoryValue() const override;
-
-	virtual void Interact(IInteraction* Interaction) override;
-	virtual bool IsInteractionDone() const override;
 	
+	virtual void Harvest(AResourceNode* ResourceNode) override;
+	virtual void DepositAll(AStockpile* Stockpile) override;
+
 	virtual bool IsInCriticalState() const override;
 	
 private:
@@ -86,9 +87,8 @@ private:
 	const UAbstractGoal* ChooseTopGoal();
 	void OnGoalFailed(const UAbstractGoal* Goal);
 
-	bool IsBusy(const ASettlerCharacter* SettlerCharacter) const;
-	
 	void SetDirty();
+	bool IsBusy() const;
 		
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
