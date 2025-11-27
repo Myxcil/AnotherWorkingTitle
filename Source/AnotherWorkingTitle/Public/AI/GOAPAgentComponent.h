@@ -66,7 +66,6 @@ public:
 	virtual bool CanPickup(const UResourceDefinition* Resource, const int32 Amount = 1) const override;
 	virtual int32 GetTotalAmountInInventory() const override;
 	virtual int32 GetAmountInInventory(const UResourceDefinition* Resource) const override;
-	virtual float CalculateAccumulatedInventoryValue() const override;
 	
 	virtual void Harvest(AResourceNode* ResourceNode) override;
 	virtual void DepositAll(AStockpile* Stockpile) override;

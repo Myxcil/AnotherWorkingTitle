@@ -26,7 +26,7 @@ public:
 	
 	static float CalculateResourceScarcity(const UResourceDefinition* Resource);
 
-	static float CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale = 0.00001f);
+	static float CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale = 0.0001f);
 	
 	static ABuildingSite* FindNearestUnfinishedBuilding(const FVector& RefPosition);
 };

@@ -23,9 +23,9 @@ float UGoalDropItemsAtStockpile::Evaluate(IAgent& Agent) const
 	if (!NearestStockpile)
 		return 0;
 	
-	const float InventoryValue = Agent.CalculateAccumulatedInventoryValue();
+	const float CarryingWeight = FAIHelper::Clamp01(0.05f * CarryingAmount);
 	const float DistanceWeight = FAIHelper::CalculateDistanceWeight(Agent.GetFeetPosition(), NearestStockpile->GetActorLocation());
-	const float NormalizedPriority = InventoryValue * DistanceWeight;
+	const float NormalizedPriority = CarryingWeight * DistanceWeight;
 
 	return FMath::GetRangeValue(GoalPriorities::PriorityScaleDeposit, NormalizedPriority);
 }

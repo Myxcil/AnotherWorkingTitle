@@ -564,30 +564,6 @@ int32 UGOAPAgentComponent::GetAmountInInventory(const UResourceDefinition* Resou
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-float UGOAPAgentComponent::CalculateAccumulatedInventoryValue() const
-{
-	float InventoryValue = 0.0f;
-	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
-	{
-		if (const UInventoryComponent* InventoryComponent = Settler->GetInventoryComponent())
-		{
-			const FInventory& Inventory = InventoryComponent->GetInventory();
-			int32 TotalItems = 0;
-			for (const FResourceStack& Stack : Inventory.Stacks)
-			{
-				InventoryValue += FAIHelper::CalculateResourceScarcity(Stack.Resource) * Stack.Amount;
-				TotalItems += Stack.Amount;
-			}
-			if (TotalItems > 0)
-			{
-				InventoryValue /= TotalItems;
-			}
-		}
-	}
-	return FAIHelper::Clamp01(InventoryValue);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UGOAPAgentComponent::Harvest(AResourceNode* ResourceNode)
 {
 	if (ResourceNode)

@@ -56,7 +56,6 @@ public:
 	virtual bool CanPickup(const UResourceDefinition* Resource, const int32 Amount = 1) const = 0;
 	virtual int32 GetTotalAmountInInventory() const = 0;
 	virtual int32 GetAmountInInventory(const UResourceDefinition* Resource) const = 0;
-	virtual float CalculateAccumulatedInventoryValue() const = 0;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void Harvest(AResourceNode* ResourceNode) = 0;
