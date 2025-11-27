@@ -1,3 +1,5 @@
+// (c) 2024 by Crenetic GmbH Studios
+
 #pragma once
 
 class UAISettings;
@@ -13,15 +15,6 @@ ANOTHERWORKINGTITLE_API DECLARE_LOG_CATEGORY_EXTERN(LogGOAP, Log, All);
 #define AI_LOG(Format, ...) UE_PRIVATE_LOG(PREPROCESSOR_NOTHING, constexpr, LogGOAP, Log, Format, ##__VA_ARGS__)
 #define AI_WARN(Format, ...) UE_PRIVATE_LOG(PREPROCESSOR_NOTHING, constexpr, LogGOAP, Warning, Format, ##__VA_ARGS__)
 #endif
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-namespace GoalPriorities
-{
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	const TRange<float> PriorityScaleCollect(0.1f, 0.6f);
-	const TRange<float> PriorityScaleDeposit( 0.1f, 0.7f);
-	const TRange<float> PriorityScaleConstruct( 0.1f, 0.75);
-}
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()

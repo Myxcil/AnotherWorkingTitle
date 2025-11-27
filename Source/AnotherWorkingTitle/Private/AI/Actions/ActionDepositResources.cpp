@@ -9,8 +9,8 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionDepositResources::UActionDepositResources()
 {
-	Preconditions.Set(EWorldPropertyKey::AtNode, EWorldPropertyKey::Harvest);
-	Results.Set(EWorldPropertyKey::Harvest, EWorldPropertyKey::Harvest);
+	Preconditions.Set(EWorldPropertyKey::AtNode, EWorldPropertyKey::Transfer);
+	Results.Set(EWorldPropertyKey::Transfer, EWorldPropertyKey::Transfer);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 
 #include "AI/Goals/GoalConstructBuilding.h"
 
+#include "AI/AIGoalMapping.h"
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
 #include "AI/Planning/WorldState.h"
