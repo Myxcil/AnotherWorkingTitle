@@ -30,7 +30,8 @@ void FAnotherWorkingTitleEdittorModule::RegisterComponentVisualizer(const FName&
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void FAnotherWorkingTitleEdittorModule::ShutdownModule()
 {
-	if (GEngine)
+	// Ensure the editor engine is available before attempting to unregister visualizers.
+	if (GUnrealEd)
 	{
 		// Iterate over all class names we registered for
 		for (const FName ClassName : RegisteredComponentClassNames)
