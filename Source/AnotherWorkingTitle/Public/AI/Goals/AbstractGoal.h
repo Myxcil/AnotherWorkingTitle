@@ -8,14 +8,6 @@
 class IAgent;
 class FWorldState;
 
-namespace GoalPriorities
-{
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	const TRange<float> PriorityScaleCollect(0.1f, 0.7f);
-	const TRange<float> PriorityScaleDeposit( 0.1f, 0.6f);
-	const TRange<float> PriorityScaleConstruct( 0.15f, 0.75);
-}
-
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(Abstract)
 class UAbstractGoal : public UObject

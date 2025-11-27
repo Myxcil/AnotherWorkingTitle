@@ -14,7 +14,16 @@ ANOTHERWORKINGTITLE_API DECLARE_LOG_CATEGORY_EXTERN(LogGOAP, Log, All);
 #define AI_WARN(Format, ...) UE_PRIVATE_LOG(PREPROCESSOR_NOTHING, constexpr, LogGOAP, Warning, Format, ##__VA_ARGS__)
 #endif
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+namespace GoalPriorities
+{
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	const TRange<float> PriorityScaleCollect(0.1f, 0.6f);
+	const TRange<float> PriorityScaleDeposit( 0.1f, 0.7f);
+	const TRange<float> PriorityScaleConstruct( 0.1f, 0.75);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()
 enum class EFactType : uint8
 {
@@ -24,7 +33,7 @@ enum class EFactType : uint8
 };
 constexpr int32 NumFactTypes = static_cast<int32>(EFactType::Count);
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()
 enum class ENodeType : uint8
 {
@@ -39,7 +48,7 @@ enum class ENodeType : uint8
 };
 constexpr int32 NumNodeTypes = static_cast<int32>(ENodeType::Count);
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()
 enum class EWorldPropertyKey : uint8
 {
@@ -59,7 +68,7 @@ FString GetWorldPropertyKeyName(const EWorldPropertyKey Key);
 
 #define WORLD_PROPERTY_KEY_FLAG(_f) (1 << static_cast<uint32>(_f))
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()
 enum class EWorldPropertyType : uint8
 {
@@ -75,7 +84,7 @@ enum class EWorldPropertyType : uint8
 constexpr int32 WorldPropertyTypeCount = static_cast<int32>(EWorldPropertyType::Count);
 FString GetWorldPropertyTypeName(EWorldPropertyType Type);
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()
 enum class EFactMask : uint8
 {
@@ -92,4 +101,3 @@ enum class EFactMask : uint8
 };
 constexpr int32 FactMaskCount = static_cast<int32>(EFactMask::Count);
 FString GetFactMaskName(EFactMask FactMask);
- 
