@@ -98,7 +98,7 @@ bool ASettlerAIController::HandleAIRequestMoveToLocation(const FVector& Location
 	{
 		// Ziel ist komplett außerhalb jedes NavMesh – MoveRequest nicht ausführen,
 		// GOAP informieren, damit die aktuelle Action/Goal scheitern kann.
-		AI_WARN(TEXT("%s failed to sample position at %s"), *CachedSettler->GetName(), *Location.ToString());
+		AI_WARN(TEXT("%s failed to sample position at %s"), *Settler->GetName(), *Location.ToString());
 		GOAP->OnMovementComplete(false);
 		return false;
 	}
@@ -111,13 +111,13 @@ bool ASettlerAIController::HandleAIRequestMoveToLocation(const FVector& Location
 	const EPathFollowingRequestResult::Type Result = MoveTo(MoveRequest); 
 	if (Result == EPathFollowingRequestResult::Failed)
 	{
-		AI_WARN(TEXT("%s failed to move to %s, result=%d"), *CachedSettler->GetName(), *ProjectedLocation.Location.ToString(), Result);
+		AI_WARN(TEXT("%s failed to move to %s, result=%d"), *Settler->GetName(), *ProjectedLocation.Location.ToString(), Result);
 		return false;
 	}
 
 	if (Result == EPathFollowingRequestResult::AlreadyAtGoal)
 	{
-		AI_WARN(TEXT("%s already at %s"), *CachedSettler->GetName(), *ProjectedLocation.Location.ToString());
+		AI_WARN(TEXT("%s already at %s, diff=%f"), *Settler->GetName(), *ProjectedLocation.Location.ToString(), FVector::Distance(Settler->GetFeetPosition(), ProjectedLocation.Location));;
 		return true;
 	}
 

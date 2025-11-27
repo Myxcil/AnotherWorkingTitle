@@ -37,7 +37,7 @@ public:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void SetSprinting(const bool bEnable) = 0;
 	virtual bool IsNear(const UObject* Object) const = 0;
-	virtual FVector GetGroundPosition() const = 0;
+	virtual FVector GetFeetPosition() const = 0;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void SearchNodePosition(const ENodeType Node) = 0;

@@ -39,6 +39,9 @@ public:
 	virtual void BeginInteraction_Implementation(ASettlerCharacter* SettlerCharacter) override;
 	virtual bool TickInteraction_Implementation(ASettlerCharacter* SettlerCharacter, float DeltaTime) override;
 	virtual void EndInteraction_Implementation(ASettlerCharacter* SettlerCharacter) override;
+
+	float GetCurrentProgress() const { return BuildProgress; }
+	bool CanConstruct() const;
 	
 	bool HasResourcesForBuild() const;
 	bool ApplyWork(const float Amount);

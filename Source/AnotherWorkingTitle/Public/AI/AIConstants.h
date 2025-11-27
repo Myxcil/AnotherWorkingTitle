@@ -48,6 +48,8 @@ enum class EWorldPropertyKey : uint8
 	Interact,
 	Wait,
 
+	Construct,
+	
 	Count,
 };
 constexpr int32 WorldPropertyKeyCount = static_cast<int32>(EWorldPropertyKey::Count);
@@ -88,3 +90,4 @@ enum class EFactMask : uint8
 };
 constexpr int32 FactMaskCount = static_cast<int32>(EFactMask::Count);
 FString GetFactMaskName(EFactMask FactMask);
+ 

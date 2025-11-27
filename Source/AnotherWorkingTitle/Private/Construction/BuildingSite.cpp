@@ -66,6 +66,16 @@ void ABuildingSite::EndInteraction_Implementation(ASettlerCharacter* SettlerChar
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ABuildingSite::CanConstruct() const
+{
+	if (!bIsBuildStarted)
+	{
+		return HasResourcesForBuild();
+	}
+	return BuildProgress < 1.0f;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool ABuildingSite::HasResourcesForBuild() const
 {
 	if (!BuildingDefinition)
@@ -90,13 +100,14 @@ bool ABuildingSite::ApplyWork(const float Amount)
 	{
 		if (!bIsBuildStarted)
 		{
+			bIsBuildStarted = true;
+			
 			if (!TryConsumeBuildResources())
 			{
 				UE_LOG(LogAWT, Log, TEXT("%s not enough resources"), *GetName());
+				bIsBuildStarted = false;
 				return false;
 			}
-			
-			bIsBuildStarted = true;
 			
 			UE_LOG(LogAWT, Log, TEXT("%s begin build"), *GetName());
 		}
@@ -206,6 +217,9 @@ void ABuildingSite::OnBuildCompleted()
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABuildingSite::OnStockpileUpdated()
 {
+	if (bIsBuildStarted)
+		return;
+	
 	TArray<FResourceAmount> Requirements = BuildingDefinition->BuildCost.Requirements;
 	for (int32 I=Requirements.Num()-1; I >= 0; --I)
 	{
@@ -223,5 +237,6 @@ void ABuildingSite::OnStockpileUpdated()
 			Requirements.RemoveAt(I);
 		}
 	}
+	
 	OnBuildCostUpdated.Broadcast(Requirements);
 }

@@ -18,7 +18,7 @@ float UAbstractGoalCollectResource::Evaluate(IAgent& Agent) const
 	if (!Resource)
 		return 0;
 	
-	const AResourceNode* ResourceNode = FAIHelper::FindNearestResourceNode(Agent.GetGroundPosition(), Resource);
+	const AResourceNode* ResourceNode = FAIHelper::FindNearestResourceNode(Agent.GetFeetPosition(), Resource);
 	if (!ResourceNode)
 		return 0;
 
@@ -26,9 +26,10 @@ float UAbstractGoalCollectResource::Evaluate(IAgent& Agent) const
 		return 0;
 	
 	const float Scarcity = FAIHelper::CalculateResourceScarcity(Resource);
-	const float DistanceWeight = FAIHelper::CalculateDistanceWeight(Agent.GetGroundPosition(), ResourceNode->GetActorLocation());
+	const float DistanceWeight = FAIHelper::CalculateDistanceWeight(Agent.GetFeetPosition(), ResourceNode->GetActorLocation());
+	const float NormalizedPriority = Scarcity * DistanceWeight;
 		
-	return Scarcity * DistanceWeight;
+	return FMath::GetRangeValue(GoalPriorities::PriorityScaleCollect, NormalizedPriority);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,7 +38,7 @@ bool UAbstractGoalCollectResource::Init(IAgent& Agent, FWorldState& WorldState, 
 	const UResourceDefinition* Resource = GetResource(Agent);
 	check(Resource);
 	
-	AResourceNode* ResourceNode = FAIHelper::FindNearestResourceNode(Agent.GetGroundPosition(), Resource);
+	AResourceNode* ResourceNode = FAIHelper::FindNearestResourceNode(Agent.GetFeetPosition(), Resource);
 	if (!ResourceNode)
 		return false;
 	

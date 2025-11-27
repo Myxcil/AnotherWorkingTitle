@@ -4,6 +4,7 @@
 #include "AI/AIHelper.h"
 
 #include "AI/AIConstants.h"
+#include "Construction/BuildingSite.h"
 #include "Inventory/Stockpile.h"
 #include "Resources/ResourceNode.h"
 #include "Resources/ResourceRegistrySubsystem.h"
@@ -159,4 +160,30 @@ float FAIHelper::CalculateDistanceWeight(const FVector& From, const FVector& To,
 	const float Distance = FVector::Distance(From, To);
 	const float Weight = Scale * Distance;
 	return FMath::Max(1.0f - Clamp01(Weight), Scale);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+ABuildingSite* FAIHelper::FindNearestUnfinishedBuilding(const FVector& RefPosition)
+{
+	ABuildingSite* NearestSite = nullptr;
+	float SqMinDist = std::numeric_limits<float>::max();
+	
+	const TArray<ABuildingSite*>& AlLBuildingSites = ABuildingSite::GetInstances();
+	for (ABuildingSite* BuildingSite : AlLBuildingSites)
+	{
+		if (!BuildingSite)
+			continue;
+		
+		if (!BuildingSite->CanConstruct())
+			continue;
+		
+		const float SqDist = FVector::DistSquared(RefPosition, BuildingSite->GetActorLocation());
+		if (SqDist < SqMinDist)
+		{
+			SqMinDist = SqDist;
+			NearestSite = BuildingSite;
+		}
+	}
+	
+	return NearestSite;
 }

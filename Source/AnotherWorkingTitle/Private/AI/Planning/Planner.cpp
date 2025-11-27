@@ -83,7 +83,7 @@ bool FPlanner::FindValidPlan(IAgent& Agent, const UAbstractGoal* Goal, FWorldSta
 
 			const FNode* Iter = FinalNode;
 			Cost = 0;
-			FVector PlannedLocation = Agent.GetGroundPosition();
+			FVector PlannedLocation = Agent.GetFeetPosition();
 			while (Iter->Action)
 			{
 				const FNode* Parent = Iter->Parent;

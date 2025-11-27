@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+class ABuildingSite;
 class AStockpile;
 class AResourceNode;
 class UResourceRegistrySubsystem;
@@ -13,7 +14,7 @@ class UResourceDefinition;
 class ANOTHERWORKINGTITLE_API FAIHelper
 {
 public:
-	FORCEINLINE static float Clamp01(const float InValue) { return FMath::Clamp(InValue, 0.0f, 1.0f); } 
+	FORCEINLINE static float Clamp01(const float InValue) { return FMath::Clamp(InValue, 0.0f, 1.0f); }
 	
 	static bool GetObjectTransform(const UObject* Object, FTransform& Result);
 	
@@ -26,4 +27,6 @@ public:
 	static float CalculateResourceScarcity(const UResourceDefinition* Resource);
 
 	static float CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale = 0.00001f);
+	
+	static ABuildingSite* FindNearestUnfinishedBuilding(const FVector& RefPosition);
 };

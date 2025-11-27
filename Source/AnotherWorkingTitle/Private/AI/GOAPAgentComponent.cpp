@@ -7,12 +7,11 @@
 #include "AI/AISettings.h"
 #include "AI/Actions/AbstractAction.h"
 #include "AI/Goals/AbstractGoal.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Interactive/Interaction.h"
 #include "Inventory/InventoryComponent.h"
-#include "Settlers/SettlerCharacter.h"
 #include "Resources/ResourceRegistrySubsystem.h"
 #include "Settlers/NeedsComponent.h"
+#include "Settlers/SettlerCharacter.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UGOAPAgentComponent::UGOAPAgentComponent()
@@ -436,7 +435,6 @@ void UGOAPAgentComponent::OnMovementComplete(bool bSuccess)
 {
 	bMoveRequestDone = true;
 	bMoveRequestFailed = !bSuccess;
-	SetDirty();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -457,15 +455,15 @@ bool UGOAPAgentComponent::IsNear(const UObject* Object) const
 	if (!FAIHelper::GetObjectTransform(Object, ObjecTransform))
 		return false;
 	
-	return FVector::Distance(ObjecTransform.GetLocation(), GetGroundPosition()) <= SettingsPtr->NearRadius;
+	return FVector::Distance(ObjecTransform.GetLocation(), GetFeetPosition()) <= SettingsPtr->NearRadius;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-FVector UGOAPAgentComponent::GetGroundPosition() const
+FVector UGOAPAgentComponent::GetFeetPosition() const
 {
 	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
 	{
-		return Settler->GetCharacterMovement()->GetActorFeetLocation();
+		return Settler->GetFeetPosition();
 	}
 	return FVector::ZeroVector;
 }

@@ -53,7 +53,7 @@ public:
 	virtual void SetSprinting(const bool bEnable) override;
 	virtual bool IsNear(const UObject* Object) const override;
 
-	virtual FVector GetGroundPosition() const override;
+	virtual FVector GetFeetPosition() const override;
 
 	virtual void SearchNodePosition(const ENodeType Node) override;
 	virtual bool IsSearchDone() const override;

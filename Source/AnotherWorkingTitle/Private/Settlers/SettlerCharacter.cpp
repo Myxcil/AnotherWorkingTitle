@@ -4,6 +4,7 @@
 #include "Settlers/SettlerCharacter.h"
 
 #include "AI/GOAPAgentComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Interactive/Interaction.h"
 #include "Inventory//InventoryComponent.h"
 #include "Settlers/NeedsComponent.h"
@@ -43,6 +44,12 @@ void ASettlerCharacter::Tick(float DeltaTime)
 bool ASettlerCharacter::IsBusy() const
 {
 	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+FVector ASettlerCharacter::GetFeetPosition() const
+{
+	return GetMovementComponent()->GetFeetLocation();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
