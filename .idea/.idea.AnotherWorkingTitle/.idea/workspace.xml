@@ -12,13 +12,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e96cb596-fb4c-4d80-8572-2f93042fb76d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Content/Characters/BP_SettlerNPC.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Characters/BP_SettlerNPC.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/DefaultMap.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/DefaultMap.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/World/BP_RN_Stone.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/World/BP_RN_Stone.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/World/BP_RN_Wood.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/World/BP_RN_Wood.uasset" afterDir="false" />
-    </list>
+    <list default="true" id="e96cb596-fb4c-4d80-8572-2f93042fb76d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -574,6 +568,7 @@
       <workItem from="1755078985039" duration="734000" />
       <workItem from="1755179840406" duration="774000" />
       <workItem from="1764156810564" duration="587000" />
+      <workItem from="1764226563917" duration="453000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <option name="closed" value="true" />
@@ -599,6 +594,17 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="initial commit" />
