@@ -47,6 +47,6 @@ bool UActionInteract::Activate(IAgent& Agent, FAIState& AIState, const FWorldSta
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 EActionResult UActionInteract::IsComplete(IAgent& Agent, FAIState& AIState) const
 {
-	return Agent.IsInteractionDone() ? EActionResult::Complete : EActionResult::Incomplete;
+	return EActionResult::Complete;
 }
 
