@@ -7,8 +7,8 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 FSettlementStock::AddResource(const UResourceDefinition* Resource, const int32 Amount)
 {
-	if (!Resource || Amount <= 0)
-		return 0;
+	check(Resource);
+	check(Amount > 0);
 	
 	int32 RemainingAmount = Amount;
 	while (RemainingAmount > 0)
@@ -28,7 +28,7 @@ int32 FSettlementStock::AddResource(const UResourceDefinition* Resource, const i
 		RemainingAmount = ExistingStack->Add(RemainingAmount);
 	}
 	
-	OnInventoryChanged.Broadcast();
+	OnInventoryBaseChanged.Broadcast();
 	
 	return Amount;
 }

@@ -33,8 +33,8 @@ int32 FInventory::GetNumUsedSlots() const
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 FInventory::AddResource(const UResourceDefinition* Resource, const int32 Amount)
 {
-	if (!Resource || Amount <= 0)
-		return 0;
+	check(Resource);
+	check(Amount > 0);
 	
 	int32 FreeSlots = GetNumFreeSlots();
 	int32 RemainingAmount = Amount;
@@ -62,7 +62,7 @@ int32 FInventory::AddResource(const UResourceDefinition* Resource, const int32 A
 	const int32 AddedTotal = Amount - RemainingAmount;
 	if (AddedTotal > 0)
 	{
-		OnInventoryChanged.Broadcast();
+		OnInventoryBaseChanged.Broadcast();
 	}
 	
 	return AddedTotal;

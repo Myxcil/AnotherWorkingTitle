@@ -7,7 +7,9 @@
 UENUM(BlueprintType)
 enum class EResourceCategory : uint8
 {
-	Material,
+	RawMaterial,
+	
 	Food,
-	Tool,
+	Water,
+	Medicine,
 };

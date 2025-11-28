@@ -32,7 +32,7 @@ void UGOAPAgentComponent::BeginPlay()
 	State = EInternalState::Idle;
 	bWorldIsDirty = true;
 	
-	HandleGlobalInventoryChanged = FInventoryBase::OnInventoryChanged.AddUObject(this, &ThisClass::SetDirty);
+	HandleGlobalInventoryChanged = FInventoryBase::OnInventoryBaseChanged.AddUObject(this, &ThisClass::SetDirty);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ void UGOAPAgentComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (HandleGlobalInventoryChanged.IsValid())
 	{
-		FInventoryBase::OnInventoryChanged.Remove(HandleGlobalInventoryChanged);
+		FInventoryBase::OnInventoryBaseChanged.Remove(HandleGlobalInventoryChanged);
 		HandleGlobalInventoryChanged.Reset();
 	}
 	

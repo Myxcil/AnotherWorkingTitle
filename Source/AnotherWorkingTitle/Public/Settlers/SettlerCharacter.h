@@ -12,6 +12,9 @@ class UInventoryComponent;
 class UNeedsComponent;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSettlerDied);
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
 class ANOTHERWORKINGTITLE_API ASettlerCharacter : public ACharacter
 {
@@ -24,6 +27,7 @@ public:
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,8 +46,17 @@ public:
 	void TryBeginInteract(AActor* Target);
 	UFUNCTION(BlueprintCallable)
 	void TryEndInteract();
+	UFUNCTION(BlueprintCallable)
+	void UseItemInSlot(const int32 SlotIndex);
+
+	bool IsDead() const { return bIsDead; }
+	UPROPERTY(BlueprintAssignable)
+	FSettlerDied OnSettlerDied;
 	
 protected:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	void OnDamagedReachedMaximum();
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UNeedsComponent> NeedsComponent;
@@ -53,4 +66,7 @@ protected:
 	TObjectPtr<UGOAPAgentComponent> GOAPAgentComponent;
 	
 	TWeakObjectPtr<AActor> CurrentHoldInteraction;
+	
+	float BusyTimerAfterUse = 0.0f;
+	bool bIsDead = false;
 };

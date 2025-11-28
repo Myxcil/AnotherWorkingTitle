@@ -38,7 +38,7 @@ public:
 	virtual void Interact_Implementation(ASettlerCharacter* InstigatorCharacter) override;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	bool HasResource(const UResourceDefinition* InResource) const { return Stack.Resource == InResource && Stack.Amount > 0; }
+	bool HasResource(const UResourceDefinition* InResource) const { return Stack.Resource == InResource && (bIsUnlimited || Stack.Amount > 0); }
 	const UResourceDefinition* GetResource() const { return Stack.Resource; }
 	
 	UPROPERTY(BlueprintAssignable)
@@ -46,9 +46,11 @@ public:
 	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	int32 Harvest(const int32 RequestedAmount);
+	int32 RemoveAmountFromStack(const int32 RequestedAmount);
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FResourceStack Stack;
+	
+	bool bIsUnlimited = false;
 };

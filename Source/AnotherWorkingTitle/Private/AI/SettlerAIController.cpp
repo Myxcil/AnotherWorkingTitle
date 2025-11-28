@@ -69,6 +69,12 @@ void ASettlerAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	if (const ASettlerCharacter* Settler = CachedSettler.Get())
+	{
+		if (Settler->IsDead())
+			return;
+	}
+	
 	if (UGOAPAgentComponent* GOAP = CachedGOAP.Get())
 	{
 		GOAP->TickGOAP(DeltaTime);

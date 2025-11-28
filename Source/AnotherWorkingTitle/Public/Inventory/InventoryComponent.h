@@ -26,6 +26,7 @@ protected:
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void AddResource(const UResourceDefinition* Resource, const int32 Amount);
+	void RemoveResource(const int32 SlotIndex, const int32 Amount);
 	void TransferAll(FSettlementStock& Destination);
 
 	UPROPERTY(BlueprintAssignable)
@@ -35,6 +36,6 @@ public:
 	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	UPROPERTY(EditAnywhere, Category="Inventory", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess=true))
 	FInventory Inventory;
 };

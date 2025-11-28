@@ -23,7 +23,7 @@ void UInventoryComponent::BeginPlay()
 void UInventoryComponent::AddResource(const UResourceDefinition* Resource, const int32 Amount)
 {
 	const int32 NumAdded = Inventory.AddResource(Resource, Amount);
-	if (NumAdded == Amount)
+	if (NumAdded > 0)
 	{
 		OnInventoryChanged.Broadcast();
 	}
@@ -31,8 +31,22 @@ void UInventoryComponent::AddResource(const UResourceDefinition* Resource, const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UInventoryComponent::RemoveResource(const int32 SlotIndex, const int32 Amount)
+{
+	check(Inventory.Stacks.IsValidIndex(SlotIndex));
+	const int32 NumRemoved = Inventory.RemoveResourceAtIndex(SlotIndex, Amount);
+	if (NumRemoved > 0)
+	{
+		OnInventoryChanged.Broadcast();
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UInventoryComponent::TransferAll(FSettlementStock& Destination)
 {
+	if (Inventory.Stacks.IsEmpty())
+		return;
+	
 	for (const FResourceStack& Stack : Inventory.Stacks)
 	{
 		if (Stack.IsValid())

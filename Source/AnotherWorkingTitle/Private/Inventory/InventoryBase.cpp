@@ -4,7 +4,7 @@
 #include "Inventory/InventoryBase.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-FGlobalInventoryChanged FInventoryBase::OnInventoryChanged;
+FGlobalInventoryChanged FInventoryBase::OnInventoryBaseChanged;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void FInventoryBase::SanityCheck() const
@@ -18,8 +18,8 @@ void FInventoryBase::SanityCheck() const
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 FInventoryBase::RemoveResource(const UResourceDefinition* Resource, const int32 Amount)
 {
-	if (!Resource || Amount <= 0)
-		return 0;
+	check(Resource);
+	check(Amount > 0);
 	
 	int32 RemovedTotal = 0;
 	int32 RemainingAmount = Amount;
@@ -46,10 +46,31 @@ int32 FInventoryBase::RemoveResource(const UResourceDefinition* Resource, const 
 	
 	if (RemovedTotal != 0)
 	{
-		OnInventoryChanged.Broadcast();
+		OnInventoryBaseChanged.Broadcast();
 	}
 	
 	return RemovedTotal;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 FInventoryBase::RemoveResourceAtIndex(const int32 SlotIndex, const int32 Amount)
+{
+	check(Stacks.IsValidIndex(SlotIndex));
+	check(Amount > 0);
+	
+	FResourceStack& Stack = Stacks[SlotIndex];
+	
+	const int32 ToRemove = FMath::Min(Stack.Amount, Amount);
+	Stack.Amount -= ToRemove;
+
+	if (Stack.Amount == 0)
+	{
+		Stacks.RemoveAt(SlotIndex);
+	}
+	
+	OnInventoryBaseChanged.Broadcast();
+	
+	return ToRemove;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

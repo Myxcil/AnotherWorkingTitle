@@ -22,25 +22,42 @@ void UNeedsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
+	if (Needs.Damage >= 1.0f)
+		return;
+	
 	constexpr float SecondsPerInGameHour = 60.0f;
 	const float DeltaTimeInGame = DeltaTime / SecondsPerInGameHour;
 	
 	Needs.Hunger = FAIHelper::Clamp01( Needs.Hunger + HungerRatePerHour * DeltaTimeInGame);
 	Needs.Thirst = FAIHelper::Clamp01( Needs.Thirst + ThirstRatePerHour * DeltaTimeInGame);
+	Needs.Cold = FAIHelper::Clamp01( Needs.Cold + ColdRatePerHour * DeltaTimeInGame);
 	Needs.Fatigue = FAIHelper::Clamp01( Needs.Fatigue + FatigueRatePerHour * DeltaTimeInGame);
 
 	float TotalDamage = 0;
-	if (Needs.Hunger >= 1.0f)
+	if (IsNeedCritical(ENeedType::Hunger))
 	{
 		TotalDamage += DamageForCriticalHunger;
 	}
-	if (Needs.Thirst >= 1.0f)
+	if (IsNeedCritical(ENeedType::Thirst))
 	{
 		TotalDamage += DamageForCriticalThirst;
 	}
+	if (IsNeedCritical(ENeedType::Cold))
+	{
+		TotalDamage += DamageForCriticalCold;
+	}
+	if (IsNeedCritical(ENeedType::Fatigue))
+	{
+		TotalDamage += DamageForCriticalFatigue;
+	}
+	
 	if (TotalDamage > 0)
 	{
 		Needs.Damage = FAIHelper::Clamp01( Needs.Damage + TotalDamage * DeltaTimeInGame);
+		if (Needs.Damage >= 1.0f)
+		{
+			OnDamagedReachedMaximum.ExecuteIfBound();
+		}
 	}
 }
 
@@ -84,12 +101,26 @@ float UNeedsComponent::GetNeedValue(const ENeedType NeedType) const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNeedsComponent::ChangeNeedValue(const ENeedType NeedType, const float Delta)
+bool UNeedsComponent::ChangeNeedValue(const ENeedType NeedType, const float Delta)
 {
 	const float OldValue = GetNeedValue(NeedType);
 	const float NewValue = OldValue + Delta;
 	const float ClampedValue = FAIHelper::Clamp01(NewValue);
 	SetNeedValue(NeedType, ClampedValue);
+	return OldValue != GetNeedValue(NeedType);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UNeedsComponent::IsAnyNeedUncomfortable() const
+{
+	for (const ENeedType Type : TEnumRange<ENeedType>())
+	{
+		if (IsNeedUncomfortable(Type))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

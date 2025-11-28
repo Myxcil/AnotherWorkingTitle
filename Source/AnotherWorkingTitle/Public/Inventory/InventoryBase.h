@@ -41,6 +41,7 @@ struct FInventoryBase
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	int32 RemoveResource(const UResourceDefinition* Resource, const int32 Amount);
+	int32 RemoveResourceAtIndex(const int32 SlotIndex, const int32 Amount);
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void Collect(TMap<const UResourceDefinition*, int32>& ResourceMap) const;
@@ -50,12 +51,12 @@ struct FInventoryBase
 	void Clear()
 	{
 		Stacks.Reset();
-		OnInventoryChanged.Broadcast();
+		OnInventoryBaseChanged.Broadcast();
 	}
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void SanityCheck() const;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	static FGlobalInventoryChanged OnInventoryChanged;
+	static FGlobalInventoryChanged OnInventoryBaseChanged;
 };

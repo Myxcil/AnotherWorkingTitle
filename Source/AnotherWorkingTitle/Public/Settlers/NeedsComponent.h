@@ -9,6 +9,9 @@
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+DECLARE_DELEGATE(FDamagedReachedMaximum)
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ANOTHERWORKINGTITLE_API UNeedsComponent : public UActorComponent
 {
@@ -33,14 +36,17 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetNeedValue(const ENeedType NeedType) const;
 	
-	void ChangeNeedValue(const ENeedType NeedType, const float Delta);
+	bool ChangeNeedValue(const ENeedType NeedType, const float Delta);
 
 	UFUNCTION(BlueprintPure)
 	bool IsNeedUncomfortable(const ENeedType NeedType) const { return GetNeedValue(NeedType) >= UncomfortableThreshold; }
 	UFUNCTION(BlueprintPure)
 	bool IsNeedCritical(const ENeedType NeedType) const { return GetNeedValue(NeedType) >= CriticalThreshold; }
 	
+	bool IsAnyNeedUncomfortable() const;
 	bool IsAnyNeedCritical() const;
+	
+	FDamagedReachedMaximum OnDamagedReachedMaximum;
 
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,12 +58,18 @@ private:
 	UPROPERTY(EditAnywhere, Category="Needs|Config", meta=(AllowPrivateAccess=true))
 	float ThirstRatePerHour = 0.2f;
 	UPROPERTY(EditAnywhere, Category="Needs|Config", meta=(AllowPrivateAccess=true))
+	float ColdRatePerHour = 0.3f;
+	UPROPERTY(EditAnywhere, Category="Needs|Config", meta=(AllowPrivateAccess=true))
 	float FatigueRatePerHour = 0.15f;
 	
 	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
 	float DamageForCriticalHunger = 0.1f;
 	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
 	float DamageForCriticalThirst = 0.1f;
+	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
+	float DamageForCriticalCold = 0.1f;
+	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
+	float DamageForCriticalFatigue = 0.1f;
 
 	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
 	float UncomfortableThreshold = 0.4f;

@@ -24,12 +24,30 @@ ASettlerCharacter::ASettlerCharacter()
 void ASettlerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	NeedsComponent->OnDamagedReachedMaximum.BindUObject(this, &ThisClass::OnDamagedReachedMaximum);	
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ASettlerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	NeedsComponent->OnDamagedReachedMaximum.Unbind();
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ASettlerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (bIsDead)
+		return;
+	
+	if (BusyTimerAfterUse > 0)
+	{
+		BusyTimerAfterUse = FMath::Max(0.0f, BusyTimerAfterUse - DeltaTime);
+	}
 	
 	if (AActor* Target = CurrentHoldInteraction.Get())
 	{
@@ -43,6 +61,9 @@ void ASettlerCharacter::Tick(float DeltaTime)
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool ASettlerCharacter::IsBusy() const
 {
+	if (BusyTimerAfterUse > 0)
+		return true;
+	
 	return false;
 }
 
@@ -82,4 +103,43 @@ void ASettlerCharacter::TryEndInteract()
 	IHoldInteraction::Execute_EndInteraction(Target, this);
 	
 	CurrentHoldInteraction.Reset();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ASettlerCharacter::UseItemInSlot(const int32 SlotIndex)
+{
+	check(InventoryComponent);
+	check(NeedsComponent);
+	
+	const FInventory& Inventory = InventoryComponent->GetInventory();
+	if (!Inventory.Stacks.IsValidIndex(SlotIndex))
+		return;
+	
+	const FResourceStack& Stack = Inventory.Stacks[SlotIndex];
+	check(Stack.Resource);
+	const UResourceDefinition* Resource = Stack.Resource;
+	if (Resource->UseTimeInSeconds <= 0)
+		return;
+
+	BusyTimerAfterUse = Resource->UseTimeInSeconds;
+	
+	bool bConsumeResource = false;
+	
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Hunger, Resource->HungerChange);
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Thirst, Resource->ThirstChange);
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Cold, Resource->ColdChange);
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Fatigue, Resource->FatigueChange);
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Damage, Resource->DamageChange);
+	
+	if (bConsumeResource)
+	{
+		InventoryComponent->RemoveResource(SlotIndex, 1);
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ASettlerCharacter::OnDamagedReachedMaximum()
+{
+	bIsDead = true;
+	OnSettlerDied.Broadcast();
 }

@@ -29,6 +29,7 @@ void AResourceNode::BeginPlay()
 {
 	Super::BeginPlay();
 	AllResourceNodes.Add(this);
+	bIsUnlimited = Stack.Amount <= 0;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -41,18 +42,26 @@ void AResourceNode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AResourceNode::Harvest(ASettlerCharacter* InstigatorCharacter)
 {
+	check(Stack.Resource);
+		
 	if (!InstigatorCharacter)
 		return;
-	
+
 	if (UInventoryComponent* InventoryComponent = InstigatorCharacter->GetInventoryComponent())
 	{
-		const int32 NumHarvested = Harvest(1);
-		if (NumHarvested > 0)
+		constexpr int32 NumToHarvest = 1;
+
+		const FInventory& Inventory = InventoryComponent->GetInventory();
+		if (Inventory.CanCarryMore(Stack.Resource, NumToHarvest))
 		{
-			InventoryComponent->AddResource(Stack.Resource, NumHarvested);
-			if (Stack.Amount == 0)
+			const int32 NumHarvested = RemoveAmountFromStack(NumToHarvest);
+			if (NumHarvested > 0)
 			{
-				OnResourceDepleted.Broadcast();			
+				InventoryComponent->AddResource(Stack.Resource, NumHarvested);
+				if (!bIsUnlimited && Stack.Amount == 0)
+				{
+					OnResourceDepleted.Broadcast();			
+				}
 			}
 		}
 	}
@@ -65,12 +74,17 @@ void AResourceNode::Interact_Implementation(ASettlerCharacter* InstigatorCharact
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-int32 AResourceNode::Harvest(const int32 RequestedAmount)
+int32 AResourceNode::RemoveAmountFromStack(const int32 RequestedAmount)
 {
-	if (!Stack.Resource || Stack.Amount <= 0 || RequestedAmount <= 0)
-		return 0;
-	
-	const int32 Harvested = FMath::Min(Stack.Amount, RequestedAmount);
-	Stack.Amount -= Harvested;
-	return Harvested;
+	check(Stack.Resource);
+	if (bIsUnlimited)
+	{
+		return RequestedAmount;
+	}
+	else
+	{
+		const int32 Harvested = FMath::Min(Stack.Amount, RequestedAmount);
+		Stack.Amount -= Harvested;
+		return Harvested;
+	}
 }
