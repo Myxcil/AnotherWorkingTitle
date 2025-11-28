@@ -25,13 +25,10 @@ void UNeedsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	if (Needs.Damage >= 1.0f)
 		return;
 	
-	constexpr float SecondsPerInGameHour = 60.0f;
-	const float DeltaTimeInGame = DeltaTime / SecondsPerInGameHour;
-	
-	Needs.Hunger = FAIHelper::Clamp01( Needs.Hunger + HungerRatePerHour * DeltaTimeInGame);
-	Needs.Thirst = FAIHelper::Clamp01( Needs.Thirst + ThirstRatePerHour * DeltaTimeInGame);
-	Needs.Cold = FAIHelper::Clamp01( Needs.Cold + ColdRatePerHour * DeltaTimeInGame);
-	Needs.Fatigue = FAIHelper::Clamp01( Needs.Fatigue + FatigueRatePerHour * DeltaTimeInGame);
+	Needs.Hunger = FAIHelper::Clamp01( Needs.Hunger + HungerRate * DeltaTime);
+	Needs.Thirst = FAIHelper::Clamp01( Needs.Thirst + ThirstRate * DeltaTime);
+	Needs.Cold = FAIHelper::Clamp01( Needs.Cold + ColdRate * DeltaTime);
+	Needs.Fatigue = FAIHelper::Clamp01( Needs.Fatigue + FatigueRate * DeltaTime);
 
 	float TotalDamage = 0;
 	if (IsNeedCritical(ENeedType::Hunger))
@@ -53,7 +50,7 @@ void UNeedsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	
 	if (TotalDamage > 0)
 	{
-		Needs.Damage = FAIHelper::Clamp01( Needs.Damage + TotalDamage * DeltaTimeInGame);
+		Needs.Damage = FAIHelper::Clamp01( Needs.Damage + TotalDamage * DeltaTime);
 		if (Needs.Damage >= 1.0f)
 		{
 			OnDamagedReachedMaximum.ExecuteIfBound();
