@@ -4,6 +4,7 @@
 #include "Settlers/SettlerCharacter.h"
 
 #include "AI/GOAPAgentComponent.h"
+#include "AnotherWorkingTitle/AnotherWorkingTitle.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Interactive/Interaction.h"
 #include "Inventory//InventoryComponent.h"
@@ -140,6 +141,7 @@ void ASettlerCharacter::UseItemInSlot(const int32 SlotIndex)
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ASettlerCharacter::OnDamagedReachedMaximum()
 {
+	UE_LOG(LogAWT, Warning, TEXT("%s is DEAD!"), *GetName());
 	bIsDead = true;
 	OnSettlerDied.Broadcast();
 }
