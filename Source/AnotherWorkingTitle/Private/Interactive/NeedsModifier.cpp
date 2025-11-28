@@ -3,6 +3,7 @@
 
 #include "Interactive/NeedsModifier.h"
 
+#include "GameTimeSubsystem.h"
 #include "AI/AIHelper.h"
 #include "Components/SphereComponent.h"
 #include "Settlers/NeedsComponent.h"
@@ -15,6 +16,7 @@ ANeedsModifier::ANeedsModifier()
 	PrimaryActorTick.bCanEverTick = true;
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("InfluenceSphere");
 	SphereComponent->SetSphereRadius(100.0f);
+	SetRootComponent(SphereComponent);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,20 +24,30 @@ void ANeedsModifier::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GameTimeSubsystemPtr = GetWorld()->GetSubsystem<UGameTimeSubsystem>();
+	
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnComponentBeginOverlap);
 	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnComponentEndOverlap);
-	
-	Radius = FMath::Max(1.0f, SphereComponent->GetScaledSphereRadius());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ANeedsModifier::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	for (int32 I=0; I < OverlappingNeedsComponents.Num(); ++I)
+	{
+		if (UNeedsComponent* NeedsComponent = OverlappingNeedsComponents[I].Get())
+		{
+			NeedsComponent->OnNeedsModifierChanged.Broadcast(this, false);
+		}
+	}
+	OverlappingNeedsComponents.Reset();
+	
 	if (SphereComponent)
 	{
 		SphereComponent->OnComponentBeginOverlap.RemoveDynamic(this, &ThisClass::OnComponentBeginOverlap);
 		SphereComponent->OnComponentEndOverlap.RemoveDynamic(this, &ThisClass::OnComponentEndOverlap);
 	}
+	
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -44,7 +56,12 @@ void ANeedsModifier::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	const float DeltaValue = NeedsValueDelta * DeltaTime;
+	const UGameTimeSubsystem* GameTimeSubsystem = GameTimeSubsystemPtr.Get();
+	if (!GameTimeSubsystem)
+		return;
+	
+	const float Radius = FMath::Max(1.0f, SphereComponent->GetScaledSphereRadius());
+	const float DeltaValue = NeedsValueDelta * GameTimeSubsystem->GetGameDeltaHour();
 	for (int32 I=OverlappingNeedsComponents.Num()-1; I >= 0; --I)
 	{
 		if (UNeedsComponent* NeedsComponent = OverlappingNeedsComponents[I].Get())

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "SettlerCharacter.generated.h"
 
+class UGameTimeSubsystem;
 class IHoldInteraction;
 class UGOAPAgentComponent;
 class UInventoryComponent;
@@ -58,12 +59,14 @@ protected:
 	void OnDamagedReachedMaximum();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNeedsComponent> NeedsComponent;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UInventoryComponent> InventoryComponent;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UGOAPAgentComponent> GOAPAgentComponent;
+	
+	TWeakObjectPtr<const UGameTimeSubsystem> GameTimeSubsystemPtr;
 	
 	TWeakObjectPtr<AActor> CurrentHoldInteraction;
 	

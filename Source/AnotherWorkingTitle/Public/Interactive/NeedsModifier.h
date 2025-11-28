@@ -7,6 +7,7 @@
 #include "Settlers/Needs.h"
 #include "NeedsModifier.generated.h"
 
+class UGameTimeSubsystem;
 class UNeedsComponent;
 class USphereComponent;
 
@@ -50,6 +51,6 @@ private:
 	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	float Radius = 1.0f;
+	TWeakObjectPtr<const UGameTimeSubsystem> GameTimeSubsystemPtr;
 	TArray<TWeakObjectPtr<UNeedsComponent>> OverlappingNeedsComponents;
 };

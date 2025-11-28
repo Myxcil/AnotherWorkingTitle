@@ -8,27 +8,22 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UNeedsComponent::UNeedsComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNeedsComponent::BeginPlay()
+void UNeedsComponent::TickNeeds(const float DeltaGameHour)
 {
-	Super::BeginPlay();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNeedsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (DeltaGameHour == 0)
+		return;
 	
 	if (Needs.Damage >= 1.0f)
 		return;
-	
-	Needs.Hunger = FAIHelper::Clamp01( Needs.Hunger + HungerRate * DeltaTime);
-	Needs.Thirst = FAIHelper::Clamp01( Needs.Thirst + ThirstRate * DeltaTime);
-	Needs.Cold = FAIHelper::Clamp01( Needs.Cold + ColdRate * DeltaTime);
-	Needs.Fatigue = FAIHelper::Clamp01( Needs.Fatigue + FatigueRate * DeltaTime);
+		
+	Needs.Hunger = FAIHelper::Clamp01( Needs.Hunger + HungerRatePerHour * DeltaGameHour);
+	Needs.Thirst = FAIHelper::Clamp01( Needs.Thirst + ThirstRatePerHour * DeltaGameHour);
+	Needs.Cold = FAIHelper::Clamp01( Needs.Cold + ColdRatePerHour * DeltaGameHour);
+	Needs.Fatigue = FAIHelper::Clamp01( Needs.Fatigue + FatigueRatePerHour * DeltaGameHour);
 
 	float TotalDamage = 0;
 	if (IsNeedCritical(ENeedType::Hunger))
@@ -50,7 +45,7 @@ void UNeedsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	
 	if (TotalDamage > 0)
 	{
-		Needs.Damage = FAIHelper::Clamp01( Needs.Damage + TotalDamage * DeltaTime);
+		Needs.Damage = FAIHelper::Clamp01( Needs.Damage + TotalDamage * DeltaGameHour);
 		if (Needs.Damage >= 1.0f)
 		{
 			OnDamagedReachedMaximum.ExecuteIfBound();

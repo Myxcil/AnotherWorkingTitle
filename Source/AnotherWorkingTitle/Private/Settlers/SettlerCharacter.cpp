@@ -3,6 +3,7 @@
 
 #include "Settlers/SettlerCharacter.h"
 
+#include "GameTimeSubsystem.h"
 #include "AI/GOAPAgentComponent.h"
 #include "AnotherWorkingTitle/AnotherWorkingTitle.h"
 #include "GameFramework/PawnMovementComponent.h"
@@ -26,6 +27,8 @@ void ASettlerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GameTimeSubsystemPtr = GetWorld()->GetSubsystem<UGameTimeSubsystem>();
+	
 	NeedsComponent->OnDamagedReachedMaximum.BindUObject(this, &ThisClass::OnDamagedReachedMaximum);	
 }
 
@@ -45,9 +48,20 @@ void ASettlerCharacter::Tick(float DeltaTime)
 	if (bIsDead)
 		return;
 	
+	const UGameTimeSubsystem* GameTimeSubsystem = GameTimeSubsystemPtr.Get();
+	if (!GameTimeSubsystem)
+		return;
+	
+	const float GameDeltaTime = GameTimeSubsystem->GetGameDeltaHour();
+	
 	if (BusyTimerAfterUse > 0)
 	{
 		BusyTimerAfterUse = FMath::Max(0.0f, BusyTimerAfterUse - DeltaTime);
+	}
+	
+	if (NeedsComponent)
+	{
+		NeedsComponent->TickNeeds(GameDeltaTime);
 	}
 	
 	if (AActor* Target = CurrentHoldInteraction.Get())
