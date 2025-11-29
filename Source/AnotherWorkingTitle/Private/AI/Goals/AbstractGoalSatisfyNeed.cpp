@@ -3,6 +3,7 @@
 
 #include "AI/Goals/AbstractGoalSatisfyNeed.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/IAgent.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,4 +24,7 @@ bool UAbstractGoalSatisfyNeed::Init(IAgent& Agent, FWorldState& WorldState, bool
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UAbstractGoalSatisfyNeed::DeInit(IAgent& Agent, bool bIsSuccess) const
 {
+	Agent.GetBlackboard().Clear(EBlackboardMask::SlotIndex);
+	Agent.GetBlackboard().Clear(EBlackboardMask::ResourceNode);
+	Agent.GetBlackboard().Clear(EBlackboardMask::Stockpile);
 }

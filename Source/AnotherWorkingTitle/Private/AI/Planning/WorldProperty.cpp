@@ -29,7 +29,5 @@ FString FWorldProperty::ToString() const
 		return GetEnumValueName(NeedType);
 	case EWorldPropertyType::WorldPropertyKey:
 		return GetWorldPropertyKeyName(WorldPropertyKey);
-	case EWorldPropertyType::Object:
-		return Object ? Object->GetName() : TEXT("nullptr");
 	}
 }

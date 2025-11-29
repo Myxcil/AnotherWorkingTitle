@@ -3,6 +3,7 @@
 
 #include "AI/Goals/GoalConstructBuilding.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/AIGoalMapping.h"
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
@@ -32,7 +33,9 @@ bool UGoalConstructBuilding::Init(IAgent& Agent, FWorldState& WorldState, bool b
 	if (!BuildingSite)
 		return false;
 	
-	WorldState.Set(EWorldPropertyKey::Construct, BuildingSite);
+	Agent.GetBlackboard().SetBuildingSite(BuildingSite);
+	
+	WorldState.Set(EWorldPropertyKey::Construct, ENodeType::BuildingSite);
 	
 	return true;
 }
@@ -40,5 +43,5 @@ bool UGoalConstructBuilding::Init(IAgent& Agent, FWorldState& WorldState, bool b
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UGoalConstructBuilding::DeInit(IAgent& Agent, bool bIsSuccess) const
 {
-	
+	Agent.GetBlackboard().Clear(EBlackboardMask::BuildingSite);
 }

@@ -18,29 +18,28 @@ bool UActionSearchPath::AreContextPreconditionsSatisfied(IAgent& Agent, const FW
 		return false;
 
 	const FWorldProperty* PropAtNode = CurrentWorldState.Get(EWorldPropertyKey::AtNode);
-	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Object || !PropAtNode->Object)
+	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node)
 		return false;
-
-	FTransform Transform;
-	if (!FAIHelper::GetObjectTransform(PropAtNode->Object, Transform))
+	
+	if (!FAIHelper::HasValidTransform(Agent, PropAtNode->NodeType))
 		return false;
 	
 	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionSearchPath::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionSearchPath::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionSearchPath::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UActionSearchPath::Deactivate(IAgent& Agent) const
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionSearchPath::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionSearchPath::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }

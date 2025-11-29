@@ -3,6 +3,7 @@
 
 #include "AI/Goals/GoalDropItemsAtStockpile.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/AIGoalMapping.h"
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
@@ -37,7 +38,9 @@ bool UGoalDropItemsAtStockpile::Init(IAgent& Agent, FWorldState& WorldState, boo
 	if (!NearestStockpile)
 		return false;
 	
-	WorldState.Set(EWorldPropertyKey::Transfer, NearestStockpile);
+	Agent.GetBlackboard().SetStockpile(NearestStockpile);
+	
+	WorldState.Set(EWorldPropertyKey::Transfer, ENodeType::Stockpile);
 	
 	return true;
 }
@@ -45,5 +48,5 @@ bool UGoalDropItemsAtStockpile::Init(IAgent& Agent, FWorldState& WorldState, boo
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UGoalDropItemsAtStockpile::DeInit(IAgent& Agent, bool bIsSuccess) const
 {
-	
+	Agent.GetBlackboard().Clear(EBlackboardMask::Stockpile);
 }

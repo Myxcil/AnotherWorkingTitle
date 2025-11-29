@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AIBlackboard.h"
 #include "IAgent.h"
 #include "Components/ActorComponent.h"
 #include "Planning/Planner.h"
@@ -46,19 +47,17 @@ public:
 	// IAgent
 	virtual FString GetActorName() const override { return GetOwner()->GetName(); }
 	virtual UResourceRegistrySubsystem* GetResourceRegistry() const override;
+	virtual FAIBlackboard& GetBlackboard() const override { return *Blackboard; }
 	
 	virtual const FWorldState& GetWorldState() const override { return WorldState; }
 	virtual const TArray<const UAbstractAction*>& GetActions(EWorldPropertyKey Key) const override { return ActionList[static_cast<uint32>(Key)]; }
 	
 	virtual void SetSprinting(const bool bEnable) override;
-	virtual bool IsNear(const UObject* Object) const override;
+	virtual bool IsNear(const ENodeType NodeType) const override;
 
 	virtual FVector GetFeetPosition() const override;
 
-	virtual void SearchNodePosition(const ENodeType Node) override;
-	virtual bool IsSearchDone() const override;
-	
-	virtual bool Goto(UObject* Object) override;
+	virtual bool Goto(const ENodeType NodeType) override;
 	virtual void Stop() override;
 	virtual bool HasMovingFailed() const override;
 	virtual bool HasFinishedMoving() const override;
@@ -134,6 +133,7 @@ private:
 	
 	FWorldState WorldState;
 	FWorkingMemory Memory;
+	FAIBlackboard* Blackboard = nullptr;
 
 	FPlanner Planner;
 	EInternalState State;
@@ -147,7 +147,6 @@ private:
 	bool bActionActivated = false;
 	FAIState AIState;
 
-	bool bEQSRunning = false;
 	bool bMoveRequestDone = false;
 	bool bMoveRequestFailed = false;
 	

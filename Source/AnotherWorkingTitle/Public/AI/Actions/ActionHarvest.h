@@ -20,6 +20,6 @@ public:
 	virtual bool AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const override;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual bool Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const override;
-	virtual EActionResult IsComplete(IAgent& Agent, FAIState& AIState) const override;
+	virtual bool Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const override;
+	virtual EActionResult IsComplete(IAgent& Agent) const override;
 };

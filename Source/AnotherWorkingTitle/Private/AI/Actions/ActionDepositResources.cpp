@@ -3,6 +3,7 @@
 
 #include "AI/Actions/ActionDepositResources.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/IAgent.h"
 #include "Inventory/Stockpile.h"
 
@@ -20,38 +21,35 @@ bool UActionDepositResources::AreContextPreconditionsSatisfied(IAgent& Agent, co
 		return false;
 	
 	const FWorldProperty* PropDeposit = CurrentWorldState.Get(EWorldPropertyKey::Transfer);
-	if (!PropDeposit || PropDeposit->Type != EWorldPropertyType::Object || !PropDeposit->Object)
+	if (!PropDeposit || PropDeposit->Type != EWorldPropertyType::Node || PropDeposit->NodeType != ENodeType::Stockpile)
 		return false;
-	
-	const AStockpile* Stockpile = Cast<AStockpile>(PropDeposit->Object);
-	if (!Stockpile)
-		return false;
+
+	if (!bIsPlanning)
+	{
+		const AStockpile* Stockpile = Agent.GetBlackboard().GetStockpile();
+		if (!Stockpile)
+			return false;
+	}
 	
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionDepositResources::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionDepositResources::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
-	const FWorldProperty* PropDeposit = CurrentWorldState.Get(EWorldPropertyKey::Transfer);
-	check(PropDeposit);
-	check(PropDeposit->Type == EWorldPropertyType::Object);
-	check(PropDeposit->Object);
-	
-	AStockpile* Stockpile = Cast<AStockpile>(PropDeposit->Object);
+	AStockpile* Stockpile = Agent.GetBlackboard().GetStockpile();
 	Agent.DepositByCategory(Stockpile, EResourceCategory::RawMaterial);
-	
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionDepositResources::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UActionDepositResources::Deactivate(IAgent& Agent) const
 {
 
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionDepositResources::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionDepositResources::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }

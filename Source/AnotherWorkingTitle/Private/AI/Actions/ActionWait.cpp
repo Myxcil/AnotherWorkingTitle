@@ -30,19 +30,19 @@ bool UActionWait::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldSt
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionWait::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionWait::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionWait::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UActionWait::Deactivate(IAgent& Agent) const
 {
-	Super::Deactivate(Agent, AIState);
+	Super::Deactivate(Agent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionWait::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionWait::IsComplete(IAgent& Agent) const
 {
-	return Super::IsComplete(Agent, AIState);
+	return Super::IsComplete(Agent);
 }

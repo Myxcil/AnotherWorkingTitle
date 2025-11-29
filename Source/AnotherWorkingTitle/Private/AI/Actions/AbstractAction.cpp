@@ -171,18 +171,18 @@ bool UAbstractAction::ArePreconditionsSatisfied(const FWorldState& CurrentWorldS
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UAbstractAction::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UAbstractAction::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UAbstractAction::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UAbstractAction::Deactivate(IAgent& Agent) const
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UAbstractAction::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UAbstractAction::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Incomplete;
 }

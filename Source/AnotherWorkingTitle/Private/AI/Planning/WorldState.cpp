@@ -73,15 +73,6 @@ void FWorldState::Set(const EWorldPropertyKey Key, const EWorldPropertyKey World
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void FWorldState::Set(const EWorldPropertyKey Key, UObject* Object)
-{
-	const uint32 KeyIndex = static_cast<uint32>(Key);
-	Flags |= 1 << KeyIndex;
-	Property[KeyIndex].Type = EWorldPropertyType::Object;
-	Property[KeyIndex].Object = Object;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
 void FWorldState::Set(const EWorldPropertyKey Key, const EWorldPropertyType Type, const int64 Value)
 {
 	const uint32 KeyIndex = static_cast<uint32>(Key);
@@ -104,7 +95,6 @@ void FWorldState::Clear()
 	{
 		Property[KeyIndex].Type = EWorldPropertyType::Unknown;
 		Property[KeyIndex].Value = 0;
-		Property[KeyIndex].Object = nullptr;
 	}
 }
 
@@ -115,7 +105,6 @@ void FWorldState::Clear(const EWorldPropertyKey Key)
 	Flags &= ~(1 << KeyIndex);
 	Property[KeyIndex].Type = EWorldPropertyType::Unknown;
 	Property[KeyIndex].Value = 0;
-	Property[KeyIndex].Object = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -128,12 +117,11 @@ bool FWorldState::Matches(const FWorldState& WorldState, const uint32 MatchFlags
 
 	for (int32 KeyIndex = 0; KeyIndex < WorldPropertyKeyCount; ++KeyIndex)
 	{
-		const uint32 Flag = WORLD_PROPERTY_KEY_FLAG(KeyIndex);
+		const uint32 Flag = AI_ENUM_TO_FLAG(KeyIndex);
 		if ((ThisFlags & Flag) != 0)
 		{
 			if (Property[KeyIndex].Type != WorldState.Property[KeyIndex].Type ||
-				Property[KeyIndex].Value != WorldState.Property[KeyIndex].Value ||
-				Property[KeyIndex].Object != WorldState.Property[KeyIndex].Object)
+				Property[KeyIndex].Value != WorldState.Property[KeyIndex].Value)
 			{
 				return false;
 			}
@@ -148,14 +136,13 @@ int32 FWorldState::CountDifferences(const FWorldState& WorldState) const
 	int32 Count = 0;
 	for (int32 KeyIndex = 0; KeyIndex < WorldPropertyKeyCount; ++KeyIndex)
 	{
-		const uint32 Flag = WORLD_PROPERTY_KEY_FLAG(KeyIndex);
+		const uint32 Flag = AI_ENUM_TO_FLAG(KeyIndex);
 		const bool bIsSet = (Flags & Flag) != 0;
 		const bool bIsOtherSet = (WorldState.Flags & Flag) != 0;
 		if (bIsSet && bIsOtherSet)
 		{
 			if (Property[KeyIndex].Type != WorldState.Property[KeyIndex].Type ||
-				Property[KeyIndex].Value != WorldState.Property[KeyIndex].Value ||
-				Property[KeyIndex].Object != WorldState.Property[KeyIndex].Object)
+				Property[KeyIndex].Value != WorldState.Property[KeyIndex].Value)
 			{
 				++Count;
 			}
@@ -174,14 +161,13 @@ int32 FWorldState::CountUnsatisfied(const FWorldState& WorldState) const
 	int32 Count = 0;
 	for (int32 KeyIndex = 0; KeyIndex < WorldPropertyKeyCount; ++KeyIndex)
 	{
-		const uint32 Flag = WORLD_PROPERTY_KEY_FLAG(KeyIndex);
+		const uint32 Flag = AI_ENUM_TO_FLAG(KeyIndex);
 		if ((Flags & Flag) != 0)
 		{
 			if ((WorldState.Flags & Flag) != 0)
 			{
 				if (Property[KeyIndex].Type != WorldState.Property[KeyIndex].Type ||
-					Property[KeyIndex].Value != WorldState.Property[KeyIndex].Value ||
-					Property[KeyIndex].Object != WorldState.Property[KeyIndex].Object)
+					Property[KeyIndex].Value != WorldState.Property[KeyIndex].Value)
 				{
 					++Count;
 				}

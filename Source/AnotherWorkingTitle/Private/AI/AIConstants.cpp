@@ -21,3 +21,9 @@ FString GetFactMaskName(EFactMask FactMask)
 {
 	return StaticEnum<EFactMask>()->GetNameStringByValue(static_cast<int64>(FactMask));
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+FString GetBlackboardMaskName(EBlackboardMask BlackboardMask)
+{
+	return StaticEnum<EBlackboardMask>()->GetNameStringByValue(static_cast<int64>(BlackboardMask));
+}

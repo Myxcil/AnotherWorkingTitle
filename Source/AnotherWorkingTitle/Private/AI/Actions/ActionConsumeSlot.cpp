@@ -3,6 +3,7 @@
 
 #include "AI/Actions/ActionConsumeSlot.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/IAgent.h"
 #include "Settlers/Needs.h"
 
@@ -26,22 +27,29 @@ bool UActionConsumeSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const F
 	if (!StaticEnum<ENeedType>()->IsValidEnumValue(PropSatisfyNeed->Value))
 		return false;
 	
+	if (!bIsPlanning)
+	{
+		if (!Agent.GetBlackboard().IsSet(EBlackboardMask::SlotIndex))
+			return false;
+	}
+	
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionConsumeSlot::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionConsumeSlot::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
-	return Agent.UseSlot(AIState.Index);
+	const int32 SlotIndex = Agent.GetBlackboard().GetSlotIndex();
+	return Agent.UseSlot(SlotIndex);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionConsumeSlot::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UActionConsumeSlot::Deactivate(IAgent& Agent) const
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionConsumeSlot::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionConsumeSlot::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }

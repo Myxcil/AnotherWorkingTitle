@@ -8,7 +8,6 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionGoto::UActionGoto()
 {
-	Preconditions.Set(EWorldPropertyKey::Harvest, static_cast<UObject*>(nullptr));
 	Preconditions.Set(EWorldPropertyKey::PathExists, EWorldPropertyKey::AtNode);
 	Results.Set(EWorldPropertyKey::AtNode, EWorldPropertyKey::AtNode);
 }
@@ -26,10 +25,10 @@ float UActionGoto::CalculateRuntimeCost(IAgent& Agent, const FWorldState& WorldS
 	float Cost = Super::CalculateRuntimeCost(Agent, WorldState, PlannedLocation);
 
 	const FWorldProperty* PropAtNode = WorldState.Get(EWorldPropertyKey::AtNode);
-	check(PropAtNode && PropAtNode->Type == EWorldPropertyType::Object && PropAtNode->Object);
+	check(PropAtNode && PropAtNode->Type == EWorldPropertyType::Node);
 
 	FTransform Transform;
-	FAIHelper::GetObjectTransform(PropAtNode->Object, Transform);
+	FAIHelper::GetObjectTransform(Agent, PropAtNode->NodeType, Transform);
 
 	const FVector Location = Transform.GetLocation();
 	float Distance = FVector::Distance(PlannedLocation, Location);
@@ -48,20 +47,20 @@ bool UActionGoto::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldSt
 		return false;
 
 	const FWorldProperty* PropAtNode = CurrentWorldState.Get(EWorldPropertyKey::AtNode);
-	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Object || !PropAtNode->Object)
+	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node)
 		return false;
 
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionGoto::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionGoto::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	const FWorldProperty* PropAtNode = CurrentWorldState.Get(EWorldPropertyKey::AtNode);
-	check(PropAtNode->Type == EWorldPropertyType::Object);
-	check(PropAtNode->Object != nullptr);
+	check(PropAtNode);
+	check(PropAtNode->Type == EWorldPropertyType::Node);
 
-	if (!Agent.Goto(PropAtNode->Object))
+	if (!Agent.Goto(PropAtNode->NodeType))
 	{
 		return false;
 	}
@@ -70,12 +69,12 @@ bool UActionGoto::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& 
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionGoto::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UActionGoto::Deactivate(IAgent& Agent) const
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionGoto::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionGoto::IsComplete(IAgent& Agent) const
 {
 	if (Agent.HasMovingFailed())
 	{
@@ -85,5 +84,5 @@ EActionResult UActionGoto::IsComplete(IAgent& Agent, FAIState& AIState) const
 	{
 		return EActionResult::Complete;
 	}
-	return Super::IsComplete(Agent, AIState);
+	return Super::IsComplete(Agent);
 }

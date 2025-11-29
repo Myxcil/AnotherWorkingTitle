@@ -3,6 +3,7 @@
 
 #include "AI/Actions/ActionHarvest.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/IAgent.h"
 #include "Resources/ResourceNode.h"
 
@@ -20,30 +21,28 @@ bool UActionHarvest::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorl
 		return false;
 	
 	const FWorldProperty* PropHarvest = CurrentWorldState.Get(EWorldPropertyKey::Harvest);
-	if (!PropHarvest || PropHarvest->Type != EWorldPropertyType::Object || !PropHarvest->Object)
+	if (!PropHarvest || PropHarvest->Type != EWorldPropertyType::Node)
 		return false;
 	
-	const AResourceNode* ResourceNode = Cast<AResourceNode>(PropHarvest->Object);
-	if (!ResourceNode)
-		return false;
+	if (!bIsPlanning)
+	{
+		const AResourceNode* ResourceNode = Agent.GetBlackboard().GetResourceNode();
+		if (!ResourceNode)
+			return false;
+	}
 	
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionHarvest::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionHarvest::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
-	const FWorldProperty* PropHarvest = CurrentWorldState.Get(EWorldPropertyKey::Harvest);
-	check(PropHarvest);
-	check(PropHarvest->Type == EWorldPropertyType::Object);
-	check(PropHarvest->Object);
-	
-	AResourceNode* ResourceNode = Cast<AResourceNode>(PropHarvest->Object);
+	AResourceNode* ResourceNode = Agent.GetBlackboard().GetResourceNode();
 	return Agent.Harvest(ResourceNode);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionHarvest::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionHarvest::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }

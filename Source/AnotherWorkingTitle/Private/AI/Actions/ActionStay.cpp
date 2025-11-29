@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionStay::UActionStay()
 {
-	Preconditions.Set(EWorldPropertyKey::Harvest, static_cast<UObject*>(nullptr));
 	Results.Set(EWorldPropertyKey::AtNode, EWorldPropertyKey::AtNode);
 }
 
@@ -20,29 +19,29 @@ bool UActionStay::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldSt
 		return false;
 
 	const FWorldProperty* PropAtNode = CurrentWorldState.Get(EWorldPropertyKey::AtNode);
-	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Object || !PropAtNode->Object)
+	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node)
 		return false;
 
-	if (!Agent.IsNear(PropAtNode->Object))
+	if (!Agent.IsNear(PropAtNode->NodeType))
 		return false;
 
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionStay::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionStay::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
-	return Super::Activate(Agent, AIState, CurrentWorldState);
+	return Super::Activate(Agent, CurrentWorldState);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionStay::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UActionStay::Deactivate(IAgent& Agent) const
 {
-	Super::Deactivate(Agent, AIState);
+	Super::Deactivate(Agent);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionStay::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionStay::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }

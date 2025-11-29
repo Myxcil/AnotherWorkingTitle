@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "AIConstants.h"
 #include "Actions/AbstractAction.h"
+#include "BehaviorTree/Blackboard/BlackboardKey.h"
 #include "Inventory/Stockpile.h"
 #include "Settlers/Needs.h"
 
+class FAIBlackboard;
 class AResourceNode;
 class IInteraction;
 class UResourceDefinition;
@@ -33,6 +35,7 @@ public:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual FString GetActorName() const = 0;
 	virtual UResourceRegistrySubsystem* GetResourceRegistry() const = 0;
+	virtual FAIBlackboard& GetBlackboard() const = 0;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual const FWorldState& GetWorldState() const = 0;
@@ -40,15 +43,11 @@ public:
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void SetSprinting(const bool bEnable) = 0;
-	virtual bool IsNear(const UObject* Object) const = 0;
+	virtual bool IsNear(const ENodeType NodeType) const = 0;
 	virtual FVector GetFeetPosition() const = 0;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual void SearchNodePosition(const ENodeType Node) = 0;
-	virtual bool IsSearchDone() const = 0;
-	
-	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual bool Goto(UObject* Object) = 0;
+	virtual bool Goto(const ENodeType NodeType) = 0;
 	virtual void Stop() = 0;
 	virtual bool HasMovingFailed() const = 0;
 	virtual bool HasFinishedMoving() const = 0;

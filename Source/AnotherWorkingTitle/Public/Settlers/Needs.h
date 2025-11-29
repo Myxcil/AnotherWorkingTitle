@@ -7,6 +7,7 @@
 UENUM(BlueprintType)
 enum class ENeedType : uint8
 {
+	Unknown UMETA(Hidden),
 	Hunger,
 	Thirst,
 	Cold,

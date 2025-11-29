@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AIConstants.h"
 #include "Settlers/Needs.h"
 
 class IAgent;
@@ -18,7 +19,8 @@ class ANOTHERWORKINGTITLE_API FAIHelper
 public:
 	FORCEINLINE static float Clamp01(const float InValue) { return FMath::Clamp(InValue, 0.0f, 1.0f); }
 	
-	static bool GetObjectTransform(const UObject* Object, FTransform& Result);
+	static bool HasValidTransform(const IAgent& Agent, const ENodeType NodeType);
+	static bool GetObjectTransform(const IAgent& Agent, const ENodeType NodeType, FTransform& Result);
 	
 	static const UResourceDefinition* FindMinResourceInStockpiles(const UResourceRegistrySubsystem* ResourceRegistry);
 	static AResourceNode* FindNearestResourceNode(const FVector& RefPosition, const UResourceDefinition* Resource);

@@ -25,6 +25,8 @@ void UGOAPAgentComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	Blackboard = new FAIBlackboard();
+
 	SettingsPtr = GetDefault<UAISettings>();
 	SettlerPtr = Cast<ASettlerCharacter>(GetOwner());
 	ResourceRegistry = GetWorld()->GetGameInstance()->GetSubsystem<UResourceRegistrySubsystem>();
@@ -44,6 +46,9 @@ void UGOAPAgentComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		FInventoryBase::OnInventoryBaseChanged.Remove(HandleGlobalInventoryChanged);
 		HandleGlobalInventoryChanged.Reset();
 	}
+
+	delete Blackboard;
+	Blackboard = nullptr;
 	
 	Super::EndPlay(EndPlayReason);
 }
@@ -107,7 +112,7 @@ void UGOAPAgentComponent::ResetPlan(bool bSuccess)
 	
 	if (bActionActivated && Plan.IsValidIndex(PlanStep))
 	{
-		Plan[PlanStep].Action->Deactivate(*this, AIState);
+		Plan[PlanStep].Action->Deactivate(*this);
 	}
 
 	Plan.Empty();
@@ -217,26 +222,9 @@ void UGOAPAgentComponent::InitWorldState(ASettlerCharacter* SettlerCharacter)
 	for(int32 KeyIndex = 0; KeyIndex < WorldPropertyKeyCount; ++KeyIndex)
 	{
 		const EWorldPropertyKey PropertyKey = static_cast<EWorldPropertyKey>(KeyIndex);
-		switch (PropertyKey)
-		{
-		case EWorldPropertyKey::Harvest:
-			WorldState.Set(PropertyKey, static_cast<UObject*>(nullptr));
-			break;
-			
-		case EWorldPropertyKey::SatisfyNeed:
-			WorldState.Set(PropertyKey, -1);
-			break;
-			
-		case EWorldPropertyKey::HasResource:	
-			WorldState.Set(PropertyKey, false);
-			break;
-			
-		default:
-			WorldState.Set(PropertyKey, 0);
-			break;
-		}
+		WorldState.Set(PropertyKey, 0);
 	}
-	
+		
 	SetSprinting(false);
 }
 
@@ -294,7 +282,7 @@ bool UGOAPAgentComponent::ExecutePlan(ASettlerCharacter* SettlerCharacter)
 				return false;
 			}
 
-			if (!Action->Activate(*this, AIState, CurrentWorldState))
+			if (!Action->Activate(*this, CurrentWorldState))
 			{
 				AI_WARN(TEXT("%s %s: failed activation %s"), *SettlerCharacter->GetName(), *CurrentGoal->GetTypeName(), *Action->GetTypeName())
 				return false;
@@ -303,7 +291,7 @@ bool UGOAPAgentComponent::ExecutePlan(ASettlerCharacter* SettlerCharacter)
 			bActionActivated = true;
 		}
 
-		const EActionResult Result = Action->IsComplete(*this, AIState);
+		const EActionResult Result = Action->IsComplete(*this);
 		if (Result == EActionResult::Failed)
 		{
 			AI_WARN(TEXT("%s %s: failed %s"), *SettlerCharacter->GetName(), *CurrentGoal->GetTypeName(), *Action->GetTypeName())
@@ -313,7 +301,7 @@ bool UGOAPAgentComponent::ExecutePlan(ASettlerCharacter* SettlerCharacter)
 		if (Result == EActionResult::Complete)
 		{
 			AI_LOG(TEXT("%s %s: finished %s"), *SettlerCharacter->GetName(), *CurrentGoal->GetTypeName(), *Action->GetTypeName())
-			Action->Deactivate(*this, AIState);
+			Action->Deactivate(*this);
 			Action->ApplyResults(*this, WorldState, CurrentWorldState);
 			bActionActivated = false;
 			if (++PlanStep == Plan.Num())
@@ -460,13 +448,13 @@ void UGOAPAgentComponent::SetSprinting(const bool bEnable)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGOAPAgentComponent::IsNear(const UObject* Object) const
+bool UGOAPAgentComponent::IsNear(const ENodeType NodeType) const
 {
-	FTransform ObjecTransform;
-	if (!FAIHelper::GetObjectTransform(Object, ObjecTransform))
+	FTransform Transform;
+	if (!FAIHelper::GetObjectTransform(*this, NodeType, Transform))
 		return false;
 	
-	return FVector::Distance(ObjecTransform.GetLocation(), GetFeetPosition()) <= SettingsPtr->NearRadius;
+	return FVector::Distance(Transform.GetLocation(), GetFeetPosition()) <= SettingsPtr->NearRadius;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -480,23 +468,12 @@ FVector UGOAPAgentComponent::GetFeetPosition() const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UGOAPAgentComponent::SearchNodePosition(const ENodeType Node)
-{
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGOAPAgentComponent::IsSearchDone() const
-{
-	return !bEQSRunning;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGOAPAgentComponent::Goto(UObject* Object)
+bool UGOAPAgentComponent::Goto(const ENodeType NodeType)
 {
 	if (OnAIRequestMoveToLocation.IsBound())
 	{
 		FTransform Transform;
-		if (FAIHelper::GetObjectTransform(Object, Transform))
+		if (FAIHelper::GetObjectTransform(*this, NodeType, Transform))
 		{
 			bMoveRequestDone = false;
 			bMoveRequestFailed = false;

@@ -44,9 +44,9 @@ public:
 	virtual bool AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const { return true; }
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual bool Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const;
-	virtual void Deactivate(IAgent& Agent, FAIState& AIState) const;
-	virtual EActionResult IsComplete(IAgent& Agent, FAIState& AIState) const;
+	virtual bool Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const;
+	virtual void Deactivate(IAgent& Agent) const;
+	virtual EActionResult IsComplete(IAgent& Agent) const;
 
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 
 #include "AI/Actions/ActionConstruct.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/IAgent.h"
 #include "Construction/BuildingSite.h"
 
@@ -20,15 +21,15 @@ bool UActionConstruct::AreContextPreconditionsSatisfied(IAgent& Agent, const FWo
 		return false;
 	
 	const FWorldProperty* PropConstruct = CurrentWorldState.Get(EWorldPropertyKey::Construct);
-	if (!PropConstruct || PropConstruct->Type != EWorldPropertyType::Object || !PropConstruct->Object)
-		return false;
-	
-	const ABuildingSite* BuildingSite = Cast<ABuildingSite>(PropConstruct->Object);
-	if (!BuildingSite)
+	if (!PropConstruct || PropConstruct->Type != EWorldPropertyType::Node || PropConstruct->NodeType != ENodeType::BuildingSite)
 		return false;
 	
 	if (!bIsPlanning)
 	{
+		const ABuildingSite* BuildingSite = Agent.GetBlackboard().GetBuildingSite();
+		if (!BuildingSite)
+			return false;
+				
 		if (!BuildingSite->CanConstruct())
 			return false;
 	}
@@ -38,26 +39,20 @@ bool UActionConstruct::AreContextPreconditionsSatisfied(IAgent& Agent, const FWo
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionConstruct::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionConstruct::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
-	const FWorldProperty* PropInteract = CurrentWorldState.Get(EWorldPropertyKey::Construct);
-	check(PropInteract);
-	check(PropInteract->Type == EWorldPropertyType::Object);
-	check(PropInteract->Object);
-	
-	ABuildingSite* BuildingSite = Cast<ABuildingSite>(PropInteract->Object);
+	ABuildingSite* BuildingSite = Agent.GetBlackboard().GetBuildingSite();
 	BuildingSite->ApplyWork(0.1f);
-	
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionConstruct::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UActionConstruct::Deactivate(IAgent& Agent) const
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionConstruct::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionConstruct::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }

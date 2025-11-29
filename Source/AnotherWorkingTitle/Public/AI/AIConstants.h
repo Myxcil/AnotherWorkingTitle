@@ -28,21 +28,6 @@ constexpr int32 NumFactTypes = static_cast<int32>(EFactType::Count);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()
-enum class ENodeType : uint8
-{
-	Unknown,
-	Actor,
-	Component,
-	Object,
-	ObjectClass,
-	FreePosition,
-	
-	Count,
-};
-constexpr int32 NumNodeTypes = static_cast<int32>(ENodeType::Count);
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-UENUM()
 enum class EWorldPropertyKey : uint8
 {
 	Wait,
@@ -61,18 +46,20 @@ enum class EWorldPropertyKey : uint8
 constexpr int32 WorldPropertyKeyCount = static_cast<int32>(EWorldPropertyKey::Count);
 FString GetWorldPropertyKeyName(const EWorldPropertyKey Key);
 
-#define WORLD_PROPERTY_KEY_FLAG(_f) (1 << static_cast<uint32>(_f))
+#define AI_ENUM_TO_FLAG(_f) (1 << static_cast<uint32>(_f))
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM()
 enum class EWorldPropertyType : uint8
 {
 	Unknown,
+	
 	Int,
 	Bool,
+	
 	Node,
 	Need,
-	Object,
+	
 	WorldPropertyKey,
 
 	Count,
@@ -97,3 +84,30 @@ enum class EFactMask : uint8
 };
 constexpr int32 FactMaskCount = static_cast<int32>(EFactMask::Count);
 FString GetFactMaskName(EFactMask FactMask);
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+UENUM()
+enum class ENodeType : uint8
+{
+	Unknown,
+	
+	ResourceNode,
+	Stockpile,
+	BuildingSite,
+	
+	Query,
+	
+	Count,
+};
+constexpr int32 NumNodeTypes = static_cast<int32>(ENodeType::Count);
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+UENUM()
+enum class EBlackboardMask : uint8
+{
+	ResourceNode,
+	Stockpile,
+	BuildingSite,
+	SlotIndex,
+};
+FString GetBlackboardMaskName(EBlackboardMask BlackboardMask);

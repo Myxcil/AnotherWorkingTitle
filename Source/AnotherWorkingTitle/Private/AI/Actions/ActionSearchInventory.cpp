@@ -3,6 +3,7 @@
 
 #include "AI/Actions/ActionSearchInventory.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
 
@@ -36,7 +37,7 @@ bool UActionSearchInventory::AreContextPreconditionsSatisfied(IAgent& Agent, con
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionSearchInventory::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionSearchInventory::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	const FWorldProperty* PropSatisfyNeed = CurrentWorldState.Get(EWorldPropertyKey::SatisfyNeed);
 	check(PropSatisfyNeed);
@@ -46,18 +47,18 @@ bool UActionSearchInventory::Activate(IAgent& Agent, FAIState& AIState, const FW
 	if (SlotIndex == INDEX_NONE)
 		return false;
 	
-	AIState.Index = SlotIndex;
+	Agent.GetBlackboard().SetSlotIndex(SlotIndex);
 	
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionSearchInventory::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UActionSearchInventory::Deactivate(IAgent& Agent) const
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionSearchInventory::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionSearchInventory::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }

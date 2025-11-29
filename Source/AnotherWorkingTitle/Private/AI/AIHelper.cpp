@@ -3,6 +3,7 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "AI/AIHelper.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/AIConstants.h"
 #include "AI/IAgent.h"
 #include "Construction/BuildingSite.h"
@@ -11,23 +12,55 @@
 #include "Resources/ResourceRegistrySubsystem.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool FAIHelper::GetObjectTransform(const UObject* Object, FTransform& Result)
+bool FAIHelper::HasValidTransform(const IAgent& Agent, const ENodeType NodeType)
 {
-	check(Object);
+	switch (NodeType)
+	{
+	case ENodeType::ResourceNode:
+		return Agent.GetBlackboard().IsSet(EBlackboardMask::ResourceNode);
+	case ENodeType::Stockpile:
+		return Agent.GetBlackboard().IsSet(EBlackboardMask::Stockpile);
+	case ENodeType::BuildingSite:
+		return Agent.GetBlackboard().IsSet(EBlackboardMask::BuildingSite);		
+	default: 
+		break;
+	}
+	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool FAIHelper::GetObjectTransform(const IAgent& Agent, const ENodeType NodeType, FTransform& Result)
+{
+	switch (NodeType)
+	{
+		
+	case ENodeType::ResourceNode:
+		if (const AResourceNode* ResourceNode = Agent.GetBlackboard().GetResourceNode())
+		{
+			Result = ResourceNode->GetActorTransform();
+			return true;
+		}
+		break;
+	case ENodeType::Stockpile:
+		if (const AStockpile* Stockpile = Agent.GetBlackboard().GetStockpile())
+		{
+			Result = Stockpile->GetActorTransform();
+			return true;
+		}
+		break;
+	case ENodeType::BuildingSite:
+		if (const ABuildingSite* BuildingSite = Agent.GetBlackboard().GetBuildingSite())
+		{
+			Result = BuildingSite->GetActorTransform();
+			return true;
+		}
+		break;
+		
+	default: 
+		break;
+	}
 	
-	if (const AActor* Actor = Cast<AActor>(Object))
-	{
-		Result = Actor->GetActorTransform();
-		return true;
-	}
-
-	if (const USceneComponent* SceneComponent = Cast<USceneComponent>(Object))
-	{
-		Result = SceneComponent->GetComponentTransform();
-		return true;
-	}
-
-	AI_WARN(TEXT("GetObjectTransform, unhandled object %s (%s)"), *Object->GetName(), *Object->GetClass()->GetName());
+	AI_WARN(TEXT("GetObjectTransform, unhandled object"));
 	Result = FTransform::Identity;
 	return false;
 }

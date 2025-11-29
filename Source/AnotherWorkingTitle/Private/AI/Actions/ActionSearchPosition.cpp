@@ -19,33 +19,29 @@ bool UActionSearchPosition::AreContextPreconditionsSatisfied(IAgent& Agent, cons
 		return false;
 
 	const FWorldProperty* PropAtNode = CurrentWorldState.Get(EWorldPropertyKey::AtNode);
-	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node)
+	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node || PropAtNode->NodeType != ENodeType::Query)
 		return false;
 	
 	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionSearchPosition::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
+bool UActionSearchPosition::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	const FWorldProperty* PropAtNode = CurrentWorldState.Get(EWorldPropertyKey::AtNode);
 	check(PropAtNode);
 	check(PropAtNode->Type == EWorldPropertyType::Node);
-	Agent.SearchNodePosition(PropAtNode->NodeType);
-	return true;
+	check(PropAtNode->NodeType == ENodeType::Query);
+	return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionSearchPosition::Deactivate(IAgent& Agent, FAIState& AIState) const
+void UActionSearchPosition::Deactivate(IAgent& Agent) const
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionSearchPosition::IsComplete(IAgent& Agent, FAIState& AIState) const
+EActionResult UActionSearchPosition::IsComplete(IAgent& Agent) const
 {
-	if (Agent.IsSearchDone())
-	{
-		return EActionResult::Complete;
-	}
-	return Super::IsComplete(Agent, AIState);
+	return EActionResult::Complete;
 }

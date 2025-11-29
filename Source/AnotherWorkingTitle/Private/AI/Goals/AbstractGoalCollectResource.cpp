@@ -3,6 +3,7 @@
 
 #include "AI/Goals/AbstractGoalCollectResource.h"
 
+#include "AI/AIBlackboard.h"
 #include "AI/AIGoalMapping.h"
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
@@ -49,7 +50,9 @@ bool UAbstractGoalCollectResource::Init(IAgent& Agent, FWorldState& WorldState, 
 	if (!Agent.CanPickup(Resource))
 		return false;
 	
-	WorldState.Set(EWorldPropertyKey::Harvest, ResourceNode);
+	Agent.GetBlackboard().SetResourceNode(ResourceNode);
+	
+	WorldState.Set(EWorldPropertyKey::Harvest, ENodeType::ResourceNode);
 	
 	return true;
 }
@@ -57,4 +60,5 @@ bool UAbstractGoalCollectResource::Init(IAgent& Agent, FWorldState& WorldState, 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UAbstractGoalCollectResource::DeInit(IAgent& Agent, bool bIsSuccess) const
 {
+	Agent.GetBlackboard().Clear(EBlackboardMask::ResourceNode);
 }

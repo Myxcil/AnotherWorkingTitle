@@ -13,7 +13,6 @@ struct FWorldProperty
 		bool				bValue;
 		ENodeType			NodeType;
 		ENeedType			NeedType;
-		UObject*			Object;
 		EWorldPropertyKey	WorldPropertyKey;
 	};
 
