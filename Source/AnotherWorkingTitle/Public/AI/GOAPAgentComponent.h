@@ -66,11 +66,18 @@ public:
 	virtual bool CanPickup(const UResourceDefinition* Resource, const int32 Amount = 1) const override;
 	virtual int32 GetTotalAmountInInventory() const override;
 	virtual int32 GetAmountInInventory(const UResourceDefinition* Resource) const override;
-	
+	virtual int32 GetTotalAmountInInventoryByCategory(const EResourceCategory ResourceCategory) const override;
+	virtual int32 GetNumInventorySlots() const override;
+	virtual const FResourceStack& GetInventorySlot(const int32 SlotIndex) const override;
+
 	virtual void Harvest(AResourceNode* ResourceNode) override;
 	virtual void DepositAll(AStockpile* Stockpile) override;
+	virtual void DepositByCategory(AStockpile* Stockpile, const EResourceCategory ResourceCategory) override;
+	
+	virtual bool UseSlot(const int32 SlotIndex) override;
 
 	virtual bool IsInCriticalState() const override;
+	virtual float GetNeedValue(const ENeedType NeedType) const override;
 	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

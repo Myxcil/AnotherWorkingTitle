@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Stockpile.h"
 #include "Components/ActorComponent.h"
 #include "Inventory/Inventory.h"
 #include "InventoryComponent.generated.h"
@@ -27,7 +28,9 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void AddResource(const UResourceDefinition* Resource, const int32 Amount);
 	void RemoveResource(const int32 SlotIndex, const int32 Amount);
+	
 	void TransferAll(FSettlementStock& Destination);
+	void TransferByCategory(FSettlementStock& Destination, EResourceCategory ResourceCategory);
 
 	UPROPERTY(BlueprintAssignable)
 	FInventoryChanged OnInventoryChanged;

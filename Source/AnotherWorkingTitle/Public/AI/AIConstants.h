@@ -53,7 +53,8 @@ enum class EWorldPropertyKey : uint8
 	Harvest,
 	Transfer,
 	Construct,
-	
+	SatisfyNeed,
+		
 	Count,
 };
 constexpr int32 WorldPropertyKeyCount = static_cast<int32>(EWorldPropertyKey::Count);

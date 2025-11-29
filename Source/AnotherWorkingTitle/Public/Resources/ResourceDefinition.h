@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ResourceCategory.h"
 #include "Engine/DataAsset.h"
+#include "Settlers/Needs.h"
 #include "ResourceDefinition.generated.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -54,4 +55,6 @@ public:
 	{
 		return FPrimaryAssetId(AssetType, GetFName());
 	}
+
+	float GetNeedChange(ENeedType NeedType) const;
 };

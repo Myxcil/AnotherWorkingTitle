@@ -43,6 +43,12 @@ public:
 	UInventoryComponent* GetInventoryComponent() const		{ return InventoryComponent; }
 	UGOAPAgentComponent* GetGOAPAgentComponent() const		{ return GOAPAgentComponent; }
 
+	bool UseSlot(const int32 SlotIndex);
+	
+	bool IsDead() const { return bIsDead; }
+	
+protected:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintCallable)
 	void TryBeginInteract(AActor* Target);
 	UFUNCTION(BlueprintCallable)
@@ -50,11 +56,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UseItemInSlot(const int32 SlotIndex);
 
-	bool IsDead() const { return bIsDead; }
 	UPROPERTY(BlueprintAssignable)
 	FSettlerDied OnSettlerDied;
 	
-protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void OnDamagedReachedMaximum();
 	

@@ -26,4 +26,6 @@ struct FResourceStack
 		Amount += MaxToAdd;
 		return AmountToAdd - MaxToAdd;
 	}
+	
+	static const FResourceStack Invalid;
 };

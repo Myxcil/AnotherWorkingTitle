@@ -105,3 +105,30 @@ void FInventoryBase::Collect(TArray<FResourceStack>& ResourceStacks) const
 		}
 	}
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void FInventoryBase::Clear()
+{
+	Stacks.Reset();
+	OnInventoryBaseChanged.Broadcast();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void FInventoryBase::ClearByCategory(const EResourceCategory ResourceCategory)
+{
+	bool bChanged = false;
+	for (int32 I=Stacks.Num()-1; I >= 0; --I)
+	{
+		const FResourceStack& Stack = Stacks[I];
+		check(Stack.IsValid());
+		if (Stack.Resource->Category == ResourceCategory)
+		{
+			Stacks.RemoveAt(I);
+			bChanged = true;
+		}
+	}
+	if (bChanged)
+	{
+		OnInventoryBaseChanged.Broadcast();
+	}
+}

@@ -71,6 +71,19 @@ void AStockpile::TransferWholeInventory(ASettlerCharacter* InstigatorCharacter)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AStockpile::TransferByCategory(ASettlerCharacter* InstigatorCharacter, const EResourceCategory ResourceCategory)
+{
+	if (!InstigatorCharacter)
+		return;
+	
+	if (UInventoryComponent* InventoryComponent = InstigatorCharacter->GetInventoryComponent())
+	{
+		InventoryComponent->TransferByCategory(SettlementStock, ResourceCategory);
+		OnInventoryChanged.Broadcast();
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AStockpile::Interact_Implementation(ASettlerCharacter* InstigatorCharacter)
 {
 	TransferWholeInventory(InstigatorCharacter);

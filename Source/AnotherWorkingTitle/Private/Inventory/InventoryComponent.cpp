@@ -58,3 +58,21 @@ void UInventoryComponent::TransferAll(FSettlementStock& Destination)
 	Inventory.Clear();
 	OnInventoryChanged.Broadcast();
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UInventoryComponent::TransferByCategory(FSettlementStock& Destination, EResourceCategory ResourceCategory)
+{
+	if (Inventory.Stacks.IsEmpty())
+		return;
+	
+	for (const FResourceStack& Stack : Inventory.Stacks)
+	{
+		if (Stack.IsValid() && Stack.Resource->Category == ResourceCategory)
+		{
+			Destination.AddResource(Stack.Resource, Stack.Amount);
+			UE_LOG(LogAWT, Log, TEXT("%s inventory transfer %s (%dx)"), *GetOwner()->GetName(), *Stack.Resource->Id.ToString(), Stack.Amount);
+		}
+	}
+	Inventory.ClearByCategory(ResourceCategory);
+	OnInventoryChanged.Broadcast();
+}

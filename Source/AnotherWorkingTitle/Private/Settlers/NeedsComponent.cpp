@@ -17,7 +17,7 @@ void UNeedsComponent::TickNeeds(const float DeltaGameHour)
 	if (DeltaGameHour == 0)
 		return;
 	
-	if (Needs.Damage >= 1.0f)
+	if (!bUndead && Needs.Damage >= 1.0f)
 		return;
 	
 	if (bInvincible)
@@ -59,7 +59,7 @@ void UNeedsComponent::TickNeeds(const float DeltaGameHour)
 	if (TotalDamage > 0)
 	{
 		Needs.Damage = FAIHelper::Clamp01( Needs.Damage + TotalDamage * DeltaGameHour);
-		if (Needs.Damage >= 1.0f)
+		if (!bUndead && Needs.Damage >= 1.0f)
 		{
 			OnDamagedReachedMaximum.ExecuteIfBound();
 		}

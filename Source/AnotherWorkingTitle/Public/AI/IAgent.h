@@ -6,6 +6,7 @@
 #include "AIConstants.h"
 #include "Actions/AbstractAction.h"
 #include "Inventory/Stockpile.h"
+#include "Settlers/Needs.h"
 
 class AResourceNode;
 class IInteraction;
@@ -55,12 +56,19 @@ public:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual bool CanPickup(const UResourceDefinition* Resource, const int32 Amount = 1) const = 0;
 	virtual int32 GetTotalAmountInInventory() const = 0;
+	virtual int32 GetTotalAmountInInventoryByCategory(const EResourceCategory ResourceCategory) const = 0;
 	virtual int32 GetAmountInInventory(const UResourceDefinition* Resource) const = 0;
+	virtual int32 GetNumInventorySlots() const = 0;
+	virtual const FResourceStack& GetInventorySlot(const int32 SlotIndex) const = 0;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void Harvest(AResourceNode* ResourceNode) = 0;
 	virtual void DepositAll(AStockpile* Stockpile) = 0;
+	virtual void DepositByCategory(AStockpile* Stockpile, const EResourceCategory ResourceCategory) = 0;
 	
+	virtual bool UseSlot(const int32 SlotIndex) = 0;
+
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual bool IsInCriticalState() const = 0;
+	virtual float GetNeedValue(const ENeedType NeedType) const = 0;
 };

@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Settlers/Needs.h"
 
+class IAgent;
 class ABuildingSite;
 class AStockpile;
 class AResourceNode;
@@ -29,4 +31,6 @@ public:
 	static float CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale = 0.0001f);
 	
 	static ABuildingSite* FindNearestUnfinishedBuilding(const FVector& RefPosition);
+	
+	static int32 FindBestNeedSatisfactionInInventory(const IAgent& Agent, const ENeedType NeedType);
 };

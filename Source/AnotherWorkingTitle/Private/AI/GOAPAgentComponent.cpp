@@ -3,6 +3,7 @@
 
 #include "AI/GOAPAgentComponent.h"
 
+#include "AWTHelperFunctions.h"
 #include "AI/AIHelper.h"
 #include "AI/AISettings.h"
 #include "AI/Actions/AbstractAction.h"
@@ -220,6 +221,10 @@ void UGOAPAgentComponent::InitWorldState(ASettlerCharacter* SettlerCharacter)
 		{
 		case EWorldPropertyKey::Harvest:
 			WorldState.Set(PropertyKey, static_cast<UObject*>(nullptr));
+			break;
+			
+		case EWorldPropertyKey::SatisfyNeed:
+			WorldState.Set(PropertyKey, -1);
 			break;
 			
 		default:
@@ -564,12 +569,58 @@ int32 UGOAPAgentComponent::GetAmountInInventory(const UResourceDefinition* Resou
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 UGOAPAgentComponent::GetTotalAmountInInventoryByCategory(const EResourceCategory ResourceCategory) const
+{
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (const UInventoryComponent* InventoryComponent = Settler->GetInventoryComponent())
+		{
+			const FInventory& Inventory = InventoryComponent->GetInventory();
+			return Inventory.GetAmountByCategory(ResourceCategory);
+		}
+	}
+	return 0;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 UGOAPAgentComponent::GetNumInventorySlots() const
+{
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (const UInventoryComponent* InventoryComponent = Settler->GetInventoryComponent())
+		{
+			const FInventory& Inventory = InventoryComponent->GetInventory();
+			return Inventory.MaxStacks;
+		}
+	}
+	return 0;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+const FResourceStack& UGOAPAgentComponent::GetInventorySlot(const int32 SlotIndex) const
+{
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (const UInventoryComponent* InventoryComponent = Settler->GetInventoryComponent())
+		{
+			const FInventory& Inventory = InventoryComponent->GetInventory();
+			if (Inventory.Stacks.IsValidIndex(SlotIndex))
+			{
+				return Inventory.Stacks[SlotIndex];
+			}
+		}
+	}
+	return FResourceStack::Invalid;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UGOAPAgentComponent::Harvest(AResourceNode* ResourceNode)
 {
 	if (ResourceNode)
 	{
 		if (ASettlerCharacter* Settler = SettlerPtr.Get())
 		{
+			AI_LOG(TEXT("%s harvest %s"), *Settler->GetName(), *ResourceNode->GetName());
 			ResourceNode->Harvest(Settler);
 			BusyTimer = 0.5f;
 			SetDirty();
@@ -584,11 +635,38 @@ void UGOAPAgentComponent::DepositAll(AStockpile* Stockpile)
 	{
 		if (ASettlerCharacter* Settler = SettlerPtr.Get())
 		{
+			AI_LOG(TEXT("%s deposit all in %s"), *Settler->GetName(), *Stockpile->GetName());
 			Stockpile->TransferWholeInventory(Settler);
 			BusyTimer = 0.5f;
 			SetDirty();
 		}
 	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UGOAPAgentComponent::DepositByCategory(AStockpile* Stockpile, const EResourceCategory ResourceCategory)
+{
+	if (Stockpile)
+	{
+		if (ASettlerCharacter* Settler = SettlerPtr.Get())
+		{
+			AI_LOG(TEXT("%s deposit %s in %s"), *Settler->GetName(), *UAWTHelperFunctions::GetEnumValueName(ResourceCategory), *Stockpile->GetName());
+			Stockpile->TransferByCategory(Settler, ResourceCategory);
+			BusyTimer = 0.5f;
+			SetDirty();
+		}
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UGOAPAgentComponent::UseSlot(const int32 SlotIndex)
+{
+	if (ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		AI_LOG(TEXT("%s use slot %d"), *Settler->GetName(), SlotIndex);
+		return Settler->UseSlot(SlotIndex);
+	}
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -602,4 +680,17 @@ bool UGOAPAgentComponent::IsInCriticalState() const
 		}
 	}
 	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+float UGOAPAgentComponent::GetNeedValue(const ENeedType NeedType) const
+{
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (const UNeedsComponent* NeedsComponent = Settler->GetNeedsComponent())
+		{
+			return NeedsComponent->GetNeedValue(NeedType);
+		}
+	}
+	return 0;
 }

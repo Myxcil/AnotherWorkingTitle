@@ -39,7 +39,7 @@ bool UActionDepositResources::Activate(IAgent& Agent, FAIState& AIState, const F
 	check(PropDeposit->Object);
 	
 	AStockpile* Stockpile = Cast<AStockpile>(PropDeposit->Object);
-	Agent.DepositAll(Stockpile);
+	Agent.DepositByCategory(Stockpile, EResourceCategory::RawMaterial);
 	
 	return true;
 }

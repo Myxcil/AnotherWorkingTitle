@@ -25,6 +25,7 @@ struct FInventoryBase
 	{
 		return Algo::Accumulate(Stacks, 0, [](const int32 Total, const FResourceStack& Stack )
 		{
+			check(Stack.Resource);
 			return Total + Stack.Amount;
 		});
 	}
@@ -35,7 +36,18 @@ struct FInventoryBase
 		check(Resource);
 		return Algo::Accumulate(Stacks, 0, [Resource](const int32 Total, const FResourceStack& Stack )
 		{
+			check(Stack.Resource);
 			return Total + (Stack.Resource == Resource ? Stack.Amount : 0);
+		});
+	}
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	int32 GetAmountByCategory(const EResourceCategory ResourceCategory) const
+	{
+		return Algo::Accumulate(Stacks, 0, [ResourceCategory](const int32 Total, const FResourceStack& Stack )
+		{
+			check(Stack.Resource);
+			return Total + (Stack.Resource->Category == ResourceCategory ? Stack.Amount : 0);
 		});
 	}
 	
@@ -48,12 +60,9 @@ struct FInventoryBase
 	void Collect(TArray<FResourceStack>& ResourceStacks) const;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	void Clear()
-	{
-		Stacks.Reset();
-		OnInventoryBaseChanged.Broadcast();
-	}
-	
+	void Clear();
+	void ClearByCategory(const EResourceCategory ResourceCategory);
+
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void SanityCheck() const;
 	

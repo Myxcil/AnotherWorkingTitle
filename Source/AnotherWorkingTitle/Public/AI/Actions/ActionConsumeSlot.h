@@ -1,29 +1,26 @@
+﻿// (c) 2025 MK
+
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/AIConstants.h"
-#include "AbstractGoal.generated.h"
+#include "AbstractAction.h"
+#include "ActionConsumeSlot.generated.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-class IAgent;
-class FWorldState;
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-UCLASS(Abstract)
-class UAbstractGoal : public UObject
+UCLASS()
+class ANOTHERWORKINGTITLE_API UActionConsumeSlot : public UAbstractAction
 {
 	GENERATED_BODY()
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	ANOTHERWORKINGTITLE_API FString GetTypeName() const;
+	UActionConsumeSlot();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual bool CanSkipApproval() const { return true; }
-	virtual uint32 GetMatchFlags() const { return 0xffffffff; }
-
+	virtual bool AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const override;
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual float Evaluate(IAgent& Agent) const;
-	virtual bool Init(IAgent& Agent, FWorldState& WorldState, bool bIsPlanning) const;
-	virtual void DeInit(IAgent& Agent, bool bIsSuccess) const;
+	virtual bool Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const override;
+	virtual void Deactivate(IAgent& Agent, FAIState& AIState) const override;
+	virtual EActionResult IsComplete(IAgent& Agent, FAIState& AIState) const override;
 };

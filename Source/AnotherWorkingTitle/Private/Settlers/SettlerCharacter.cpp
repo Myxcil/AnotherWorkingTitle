@@ -89,6 +89,40 @@ FVector ASettlerCharacter::GetFeetPosition() const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ASettlerCharacter::UseSlot(const int32 SlotIndex)
+{
+	check(InventoryComponent);
+	check(NeedsComponent);
+	
+	const FInventory& Inventory = InventoryComponent->GetInventory();
+	if (!Inventory.Stacks.IsValidIndex(SlotIndex))
+		return false;
+	
+	const FResourceStack& Stack = Inventory.Stacks[SlotIndex];
+	check(Stack.Resource);
+	const UResourceDefinition* Resource = Stack.Resource;
+	if (Resource->UseTimeInSeconds <= 0)
+		return false;
+
+	BusyTimerAfterUse = Resource->UseTimeInSeconds;
+	
+	bool bConsumeResource = false;
+	
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Hunger, Resource->HungerChange);
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Thirst, Resource->ThirstChange);
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Cold, Resource->ColdChange);
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Fatigue, Resource->FatigueChange);
+	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Damage, Resource->DamageChange);
+	
+	if (bConsumeResource)
+	{
+		InventoryComponent->RemoveResource(SlotIndex, 1);
+	}
+	
+	return true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ASettlerCharacter::TryBeginInteract(AActor* Target)
 {
 	if (!Target)
@@ -123,33 +157,7 @@ void ASettlerCharacter::TryEndInteract()
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ASettlerCharacter::UseItemInSlot(const int32 SlotIndex)
 {
-	check(InventoryComponent);
-	check(NeedsComponent);
-	
-	const FInventory& Inventory = InventoryComponent->GetInventory();
-	if (!Inventory.Stacks.IsValidIndex(SlotIndex))
-		return;
-	
-	const FResourceStack& Stack = Inventory.Stacks[SlotIndex];
-	check(Stack.Resource);
-	const UResourceDefinition* Resource = Stack.Resource;
-	if (Resource->UseTimeInSeconds <= 0)
-		return;
-
-	BusyTimerAfterUse = Resource->UseTimeInSeconds;
-	
-	bool bConsumeResource = false;
-	
-	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Hunger, Resource->HungerChange);
-	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Thirst, Resource->ThirstChange);
-	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Cold, Resource->ColdChange);
-	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Fatigue, Resource->FatigueChange);
-	bConsumeResource |= NeedsComponent->ChangeNeedValue(ENeedType::Damage, Resource->DamageChange);
-	
-	if (bConsumeResource)
-	{
-		InventoryComponent->RemoveResource(SlotIndex, 1);
-	}
+	UseSlot(SlotIndex);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

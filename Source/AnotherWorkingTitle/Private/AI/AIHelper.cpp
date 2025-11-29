@@ -4,6 +4,7 @@
 #include "AI/AIHelper.h"
 
 #include "AI/AIConstants.h"
+#include "AI/IAgent.h"
 #include "Construction/BuildingSite.h"
 #include "Inventory/Stockpile.h"
 #include "Resources/ResourceNode.h"
@@ -192,3 +193,25 @@ ABuildingSite* FAIHelper::FindNearestUnfinishedBuilding(const FVector& RefPositi
 	
 	return NearestSite;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 FAIHelper::FindBestNeedSatisfactionInInventory(const IAgent& Agent, const ENeedType NeedType)
+{
+	int32 BestSlot = INDEX_NONE;
+	float BestChange = std::numeric_limits<float>::max();
+	for (int32 SlotIndex = 0; SlotIndex < Agent.GetNumInventorySlots(); ++SlotIndex)
+	{
+		const FResourceStack& Stack = Agent.GetInventorySlot(SlotIndex);
+		if (Stack.IsValid())
+		{
+			const float NeedChange = Stack.Resource->GetNeedChange(NeedType);
+			if (NeedChange != 0 && NeedChange < BestChange)
+			{
+				BestSlot = SlotIndex;
+				BestChange = NeedChange;
+			}
+		}
+	}
+	return BestSlot;
+}
+

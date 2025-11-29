@@ -36,6 +36,7 @@ public:
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void TransferWholeInventory(ASettlerCharacter* InstigatorCharacter);
+	void TransferByCategory(ASettlerCharacter* InstigatorCharacter, const EResourceCategory ResourceCategory);
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// IInteraction
