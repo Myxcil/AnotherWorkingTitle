@@ -39,9 +39,7 @@ bool UActionHarvest::Activate(IAgent& Agent, FAIState& AIState, const FWorldStat
 	check(PropHarvest->Object);
 	
 	AResourceNode* ResourceNode = Cast<AResourceNode>(PropHarvest->Object);
-	Agent.Harvest(ResourceNode);
-	
-	return true;
+	return Agent.Harvest(ResourceNode);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

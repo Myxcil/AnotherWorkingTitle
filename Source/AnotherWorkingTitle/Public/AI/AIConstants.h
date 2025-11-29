@@ -54,6 +54,7 @@ enum class EWorldPropertyKey : uint8
 	Transfer,
 	Construct,
 	SatisfyNeed,
+	HasResource,
 		
 	Count,
 };

@@ -57,12 +57,13 @@ public:
 	virtual bool CanPickup(const UResourceDefinition* Resource, const int32 Amount = 1) const = 0;
 	virtual int32 GetTotalAmountInInventory() const = 0;
 	virtual int32 GetTotalAmountInInventoryByCategory(const EResourceCategory ResourceCategory) const = 0;
+	virtual int32 FindResourceSlot(const UResourceDefinition* Resource) const = 0;
 	virtual int32 GetAmountInInventory(const UResourceDefinition* Resource) const = 0;
 	virtual int32 GetNumInventorySlots() const = 0;
 	virtual const FResourceStack& GetInventorySlot(const int32 SlotIndex) const = 0;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual void Harvest(AResourceNode* ResourceNode) = 0;
+	virtual bool Harvest(AResourceNode* ResourceNode) = 0;
 	virtual void DepositAll(AStockpile* Stockpile) = 0;
 	virtual void DepositByCategory(AStockpile* Stockpile, const EResourceCategory ResourceCategory) = 0;
 	

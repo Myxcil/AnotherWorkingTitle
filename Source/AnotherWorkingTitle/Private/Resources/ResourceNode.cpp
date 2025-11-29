@@ -40,12 +40,12 @@ void AResourceNode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void AResourceNode::Harvest(ASettlerCharacter* InstigatorCharacter)
+bool AResourceNode::Harvest(ASettlerCharacter* InstigatorCharacter)
 {
 	check(Stack.Resource);
 		
 	if (!InstigatorCharacter)
-		return;
+		return false;
 
 	if (UInventoryComponent* InventoryComponent = InstigatorCharacter->GetInventoryComponent())
 	{
@@ -62,9 +62,12 @@ void AResourceNode::Harvest(ASettlerCharacter* InstigatorCharacter)
 				{
 					OnResourceDepleted.Broadcast();			
 				}
+				return true;
 			}
 		}
 	}
+	
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

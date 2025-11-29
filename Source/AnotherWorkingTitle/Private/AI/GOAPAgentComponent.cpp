@@ -227,6 +227,10 @@ void UGOAPAgentComponent::InitWorldState(ASettlerCharacter* SettlerCharacter)
 			WorldState.Set(PropertyKey, -1);
 			break;
 			
+		case EWorldPropertyKey::HasResource:	
+			WorldState.Set(PropertyKey, false);
+			break;
+			
 		default:
 			WorldState.Set(PropertyKey, 0);
 			break;
@@ -569,6 +573,20 @@ int32 UGOAPAgentComponent::GetAmountInInventory(const UResourceDefinition* Resou
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 UGOAPAgentComponent::FindResourceSlot(const UResourceDefinition* Resource) const
+{
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (const UInventoryComponent* InventoryComponent = Settler->GetInventoryComponent())
+		{
+			const FInventory& Inventory = InventoryComponent->GetInventory();
+			return Inventory.FindFirstSlot(Resource);
+		}
+	}
+	return INDEX_NONE;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 int32 UGOAPAgentComponent::GetTotalAmountInInventoryByCategory(const EResourceCategory ResourceCategory) const
 {
 	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
@@ -614,18 +632,22 @@ const FResourceStack& UGOAPAgentComponent::GetInventorySlot(const int32 SlotInde
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UGOAPAgentComponent::Harvest(AResourceNode* ResourceNode)
+bool UGOAPAgentComponent::Harvest(AResourceNode* ResourceNode)
 {
 	if (ResourceNode)
 	{
 		if (ASettlerCharacter* Settler = SettlerPtr.Get())
 		{
 			AI_LOG(TEXT("%s harvest %s"), *Settler->GetName(), *ResourceNode->GetName());
-			ResourceNode->Harvest(Settler);
-			BusyTimer = 0.5f;
-			SetDirty();
+			if (ResourceNode->Harvest(Settler))
+			{
+				BusyTimer = 0.5f;
+				SetDirty();
+				return true;
+			}
 		}
 	}
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -667,6 +689,7 @@ bool UGOAPAgentComponent::UseSlot(const int32 SlotIndex)
 		if (Settler->UseSlot(SlotIndex))
 		{
 			SetDirty();
+			return true;
 		}
 	}
 	return false;

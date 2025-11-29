@@ -3,13 +3,13 @@
 
 #include "AI/Actions/ActionConsumeSlot.h"
 
-#include "AI/AIHelper.h"
 #include "AI/IAgent.h"
 #include "Settlers/Needs.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionConsumeSlot::UActionConsumeSlot()
 {
+	Preconditions.Set(EWorldPropertyKey::HasResource, EWorldPropertyKey::SatisfyNeed);
 	Results.Set(EWorldPropertyKey::SatisfyNeed, EWorldPropertyKey::SatisfyNeed);
 }
 
@@ -26,28 +26,13 @@ bool UActionConsumeSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const F
 	if (!StaticEnum<ENeedType>()->IsValidEnumValue(PropSatisfyNeed->Value))
 		return false;
 	
-	const ENeedType NeedType = static_cast<ENeedType>(PropSatisfyNeed->Value);
-	const int32 Slot = FAIHelper::FindBestNeedSatisfactionInInventory(Agent, NeedType);
-	if (Slot == INDEX_NONE)
-		return false;
-	
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool UActionConsumeSlot::Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const
 {
-	const FWorldProperty* PropSatisfyNeed = CurrentWorldState.Get(EWorldPropertyKey::SatisfyNeed);
-	check(PropSatisfyNeed);
-	check(PropSatisfyNeed->Type == EWorldPropertyType::Int);
-	check(StaticEnum<ENeedType>()->IsValidEnumValue(PropSatisfyNeed->Value));
-	
-	const ENeedType NeedType = static_cast<ENeedType>(PropSatisfyNeed->Value);
-	const int32 Slot = FAIHelper::FindBestNeedSatisfactionInInventory(Agent, NeedType);
-	if (Slot == INDEX_NONE)
-		return false;
-	
-	return Agent.UseSlot(Slot);
+	return Agent.UseSlot(AIState.Index);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

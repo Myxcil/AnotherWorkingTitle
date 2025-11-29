@@ -21,6 +21,21 @@ struct FInventoryBase
 	TArray<FResourceStack> Stacks;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	int32 FindFirstSlot(const UResourceDefinition* Resource) const
+	{
+		for (int32 I=0; I < Stacks.Num(); ++I)
+		{
+			const FResourceStack& Stack = Stacks[I];
+			check(Stack.IsValid());
+			if (Stack.Resource == Resource)
+			{
+				return I;
+			}
+		}
+		return INDEX_NONE;
+	}
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	int32 GetTotalAmount() const
 	{
 		return Algo::Accumulate(Stacks, 0, [](const int32 Total, const FResourceStack& Stack )

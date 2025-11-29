@@ -32,5 +32,6 @@ public:
 	
 	static ABuildingSite* FindNearestUnfinishedBuilding(const FVector& RefPosition);
 	
+	static int32 FindFirstNeedSatisfactionInInventory(const IAgent& Agent, const ENeedType NeedType);
 	static int32 FindBestNeedSatisfactionInInventory(const IAgent& Agent, const ENeedType NeedType);
 };
