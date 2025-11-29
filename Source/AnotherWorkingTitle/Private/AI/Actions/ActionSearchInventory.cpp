@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionSearchInventory::UActionSearchInventory()
 {
-	Preconditions.Set(EWorldPropertyKey::SatisfyNeed, EWorldPropertyKey::SatisfyNeed);
 	Results.Set(EWorldPropertyKey::HasResource, EWorldPropertyKey::HasResource);
 }
 
