@@ -71,6 +71,7 @@ enum class EWorldPropertyType : uint8
 	Int,
 	Bool,
 	Node,
+	Need,
 	Object,
 	WorldPropertyKey,
 

@@ -110,6 +110,38 @@ AResourceNode* FAIHelper::FindNearestResourceNode(const FVector& RefPosition, co
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+AResourceNode* FAIHelper::FindNearestResourceNodeByNeed(const FVector& RefPosition, const ENeedType NeedType)
+{
+	const TArray<AResourceNode*>& AllResourceNodes = AResourceNode::GetInstances();
+	if (AllResourceNodes.Num() == 0)
+		return nullptr;
+	
+	AResourceNode* NearestNode = nullptr;
+	float SqMinDist = std::numeric_limits<float>::max();
+	
+	for (AResourceNode* ResourceNode : AllResourceNodes)
+	{
+		if (!ResourceNode)
+			continue;
+		
+		const UResourceDefinition* Resource = ResourceNode->GetResource();
+		check(Resource);
+		
+		if (Resource->GetNeedChange(NeedType) >= 0)
+			continue;
+		
+		const float SqDist = FVector::DistSquared(ResourceNode->GetActorLocation(), RefPosition);
+		if (SqDist < SqMinDist)
+		{
+			SqMinDist = SqDist;
+			NearestNode = ResourceNode;
+		}
+	}
+	
+	return NearestNode;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 AStockpile* FAIHelper::FindNearestStockpile(const FVector& RefPosition)
 {
 	AStockpile* NearestPile = nullptr;

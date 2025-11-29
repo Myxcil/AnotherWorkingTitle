@@ -20,7 +20,7 @@ bool UActionConsumeSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const F
 		return false;
 	
 	const FWorldProperty* PropSatisfyNeed = CurrentWorldState.Get(EWorldPropertyKey::SatisfyNeed);
-	if (!PropSatisfyNeed || PropSatisfyNeed->Type != EWorldPropertyType::Int)
+	if (!PropSatisfyNeed || PropSatisfyNeed->Type != EWorldPropertyType::Need)
 		return false;
 	
 	if (!StaticEnum<ENeedType>()->IsValidEnumValue(PropSatisfyNeed->Value))

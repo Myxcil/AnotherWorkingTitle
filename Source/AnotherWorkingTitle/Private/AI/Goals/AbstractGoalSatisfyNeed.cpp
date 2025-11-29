@@ -16,7 +16,7 @@ float UAbstractGoalSatisfyNeed::Evaluate(IAgent& Agent) const
 bool UAbstractGoalSatisfyNeed::Init(IAgent& Agent, FWorldState& WorldState, bool bIsPlanning) const
 {
 	const ENeedType NeedType = GetNeedType(); 
-	WorldState.Set(EWorldPropertyKey::SatisfyNeed, static_cast<int32>(NeedType));
+	WorldState.Set(EWorldPropertyKey::SatisfyNeed, NeedType);
 	return true;
 }
 

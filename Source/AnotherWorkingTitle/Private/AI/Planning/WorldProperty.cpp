@@ -25,6 +25,8 @@ FString FWorldProperty::ToString() const
 		return bValue ? TEXT("true") : TEXT("false");
 	case EWorldPropertyType::Node:
 		return GetEnumValueName(NodeType);
+	case EWorldPropertyType::Need:
+		return GetEnumValueName(NeedType);
 	case EWorldPropertyType::WorldPropertyKey:
 		return GetWorldPropertyKeyName(WorldPropertyKey);
 	case EWorldPropertyType::Object:

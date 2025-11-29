@@ -5,7 +5,6 @@
 
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
-#include "Settlers/Needs.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionSearchInventory::UActionSearchInventory()
@@ -26,14 +25,10 @@ bool UActionSearchInventory::AreContextPreconditionsSatisfied(IAgent& Agent, con
 		return false;
 	
 	const FWorldProperty* PropSatisfyNeed = CurrentWorldState.Get(EWorldPropertyKey::SatisfyNeed);
-	if (!PropSatisfyNeed || PropSatisfyNeed->Type != EWorldPropertyType::Int)
+	if (!PropSatisfyNeed || PropSatisfyNeed->Type != EWorldPropertyType::Need)
 		return false;
 	
-	if (!StaticEnum<ENeedType>()->IsValidEnumValue(PropSatisfyNeed->Value))
-		return false;
-
-	const ENeedType NeedType = static_cast<ENeedType>(PropSatisfyNeed->Value);
-	const int32 SlotIndex = FAIHelper::FindBestNeedSatisfactionInInventory(Agent, NeedType);
+	const int32 SlotIndex = FAIHelper::FindFirstNeedSatisfactionInInventory(Agent, PropSatisfyNeed->NeedType);
 	if (SlotIndex == INDEX_NONE)
 		return false;
 	
@@ -45,11 +40,9 @@ bool UActionSearchInventory::Activate(IAgent& Agent, FAIState& AIState, const FW
 {
 	const FWorldProperty* PropSatisfyNeed = CurrentWorldState.Get(EWorldPropertyKey::SatisfyNeed);
 	check(PropSatisfyNeed);
-	check(PropSatisfyNeed->Type == EWorldPropertyType::Int);
-	check(StaticEnum<ENeedType>()->IsValidEnumValue(PropSatisfyNeed->Value));
+	check(PropSatisfyNeed->Type == EWorldPropertyType::Need);
 	
-	const ENeedType NeedType = static_cast<ENeedType>(PropSatisfyNeed->Value);
-	const int32 SlotIndex = FAIHelper::FindBestNeedSatisfactionInInventory(Agent, NeedType);
+	const int32 SlotIndex = FAIHelper::FindBestNeedSatisfactionInInventory(Agent, PropSatisfyNeed->NeedType);
 	if (SlotIndex == INDEX_NONE)
 		return false;
 	

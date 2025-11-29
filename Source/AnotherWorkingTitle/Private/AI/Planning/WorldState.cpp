@@ -55,6 +55,15 @@ void FWorldState::Set(const EWorldPropertyKey Key, const ENodeType NodeType)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
+void FWorldState::Set(const EWorldPropertyKey Key, ENeedType NeedType)
+{
+	const uint32 KeyIndex = static_cast<uint32>(Key);
+	Flags |= 1 << KeyIndex;
+	Property[KeyIndex].Type = EWorldPropertyType::Need;
+	Property[KeyIndex].NeedType = NeedType;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
 void FWorldState::Set(const EWorldPropertyKey Key, const EWorldPropertyKey WorldPropertyKey)
 {
 	const uint32 KeyIndex = static_cast<uint32>(Key);
