@@ -40,3 +40,11 @@ TStatId UGameTimeSubsystem::GetStatId() const
 {
 	RETURN_QUICK_DECLARE_CYCLE_STAT(UGameTimeSubsystem, STATGROUP_Tickables);
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+FText UGameTimeSubsystem::GetGameTimeFormatted() const
+{
+	const int32 Hours = FMath::FloorToInt(AccumulatedDayTimeHours);
+	const int32 Minutes = FMath::FloorToInt((AccumulatedDayTimeHours - Hours) * 60.0f);
+	return FText::FromString(FString::Printf(TEXT("%02d:%02d"), Hours, Minutes));
+}

@@ -133,6 +133,8 @@ AStockpile* FAIHelper::FindNearestStockpile(const FVector& RefPosition)
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 float FAIHelper::CalculateResourceScarcity(const UResourceDefinition* Resource)
 {
+	constexpr int32 TestingHardLimit = 100;
+	
 	TMap<const UResourceDefinition*, int32> ResourceMap;
 	for (AStockpile* Stockpile : AStockpile::GetInstances())
 	{
@@ -148,6 +150,9 @@ float FAIHelper::CalculateResourceScarcity(const UResourceDefinition* Resource)
 	}
 	if (TotalAmount == 0)
 		return 1.0f;
+	
+	if (TotalAmount >= TestingHardLimit)
+		return 0.0f;
 	
 	const float RcpScale = 1.0f / TotalAmount;
 	const float Scarcity = 1.0f - Clamp01(RcpScale * ResourceMap[Resource]);

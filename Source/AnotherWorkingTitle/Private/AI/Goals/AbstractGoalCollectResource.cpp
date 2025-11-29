@@ -27,6 +27,9 @@ float UAbstractGoalCollectResource::Evaluate(IAgent& Agent) const
 		return 0;
 	
 	const float Scarcity = FAIHelper::CalculateResourceScarcity(Resource);
+	if (Scarcity == 0)
+		return 0;
+	
 	const float DistanceWeight = FAIHelper::CalculateDistanceWeight(Agent.GetFeetPosition(), ResourceNode->GetActorLocation());
 	const float NormalizedPriority = Scarcity * DistanceWeight;
 		

@@ -19,12 +19,25 @@ void UNeedsComponent::TickNeeds(const float DeltaGameHour)
 	
 	if (Needs.Damage >= 1.0f)
 		return;
-		
-	Needs.Hunger = FAIHelper::Clamp01( Needs.Hunger + HungerRatePerHour * DeltaGameHour);
-	Needs.Thirst = FAIHelper::Clamp01( Needs.Thirst + ThirstRatePerHour * DeltaGameHour);
-	Needs.Cold = FAIHelper::Clamp01( Needs.Cold + ColdRatePerHour * DeltaGameHour);
-	Needs.Fatigue = FAIHelper::Clamp01( Needs.Fatigue + FatigueRatePerHour * DeltaGameHour);
-
+	
+	if (bInvincible)
+	{
+		for (const ENeedType NeedType : TEnumRange<ENeedType>())
+		{
+			if (GetNeedValue(NeedType) > 0.0f)
+			{
+				SetNeedValue(NeedType, 0.0f);
+			}
+		}
+	}
+	else
+	{
+		Needs.Hunger = FAIHelper::Clamp01( Needs.Hunger + HungerRatePerHour * DeltaGameHour);
+		Needs.Thirst = FAIHelper::Clamp01( Needs.Thirst + ThirstRatePerHour * DeltaGameHour);
+		Needs.Cold = FAIHelper::Clamp01( Needs.Cold + ColdRatePerHour * DeltaGameHour);
+		Needs.Fatigue = FAIHelper::Clamp01( Needs.Fatigue + FatigueRatePerHour * DeltaGameHour);
+	}
+	
 	float TotalDamage = 0;
 	if (IsNeedCritical(ENeedType::Hunger))
 	{

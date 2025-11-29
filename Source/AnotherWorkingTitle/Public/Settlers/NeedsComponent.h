@@ -75,6 +75,9 @@ private:
 	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
 	float CriticalThreshold = 0.8f;
 	
+	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	bool bInvincible = false;
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void SetNeedValue(const ENeedType NeedType, const float InValue);
 };

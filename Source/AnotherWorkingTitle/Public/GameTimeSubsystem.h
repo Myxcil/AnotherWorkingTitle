@@ -26,7 +26,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetGameDeltaHour() const { return LastGameDeltaHour; } 
 	UFUNCTION(BlueprintPure)
-	float GetNormalizedGameTime() const { return FMath::Clamp(AccumulatedDayTimeHours / 24.0f, 0.0f, 1.0f); }; 
+	float GetNormalizedGameTime() const { return FMath::Clamp(AccumulatedDayTimeHours / 24.0f, 0.0f, 1.0f); };
+	UFUNCTION(BlueprintCallable)
+	FText GetGameTimeFormatted() const;
 	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
