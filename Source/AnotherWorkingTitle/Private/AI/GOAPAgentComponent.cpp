@@ -637,7 +637,7 @@ void UGOAPAgentComponent::DepositAll(AStockpile* Stockpile)
 		{
 			AI_LOG(TEXT("%s deposit all in %s"), *Settler->GetName(), *Stockpile->GetName());
 			Stockpile->TransferWholeInventory(Settler);
-			BusyTimer = 0.5f;
+			BusyTimer = 1.0f;
 			SetDirty();
 		}
 	}
@@ -652,7 +652,7 @@ void UGOAPAgentComponent::DepositByCategory(AStockpile* Stockpile, const EResour
 		{
 			AI_LOG(TEXT("%s deposit %s in %s"), *Settler->GetName(), *UAWTHelperFunctions::GetEnumValueName(ResourceCategory), *Stockpile->GetName());
 			Stockpile->TransferByCategory(Settler, ResourceCategory);
-			BusyTimer = 0.5f;
+			BusyTimer = 1.0f;
 			SetDirty();
 		}
 	}
@@ -664,7 +664,10 @@ bool UGOAPAgentComponent::UseSlot(const int32 SlotIndex)
 	if (ASettlerCharacter* Settler = SettlerPtr.Get())
 	{
 		AI_LOG(TEXT("%s use slot %d"), *Settler->GetName(), SlotIndex);
-		return Settler->UseSlot(SlotIndex);
+		if (Settler->UseSlot(SlotIndex))
+		{
+			SetDirty();
+		}
 	}
 	return false;
 }

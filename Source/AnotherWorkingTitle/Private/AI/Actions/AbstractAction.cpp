@@ -49,48 +49,6 @@ bool UAbstractAction::CanSolveWorldState(const FWorldState& CurrentWorldState, c
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UAbstractAction::ArePreconditionsSatisfied(const FWorldState& CurrentWorldState, const FWorldState& GoalState, EWorldPropertyKey& FailedKey) const
-{
-	for (int32 KeyIndex = 0; KeyIndex < WorldPropertyKeyCount; ++KeyIndex)
-	{
-		const EWorldPropertyKey Key = static_cast<EWorldPropertyKey>(KeyIndex);
-
-		const FWorldProperty* Precondition = Preconditions.Get(Key);
-		if (Precondition == nullptr)
-			continue;
-
-		const FWorldProperty* WorldPropertyCurrent = CurrentWorldState.Get(Key);
-
-		if (Precondition->Type != EWorldPropertyType::WorldPropertyKey)
-		{
-			if (WorldPropertyCurrent != nullptr)
-			{
-				if (WorldPropertyCurrent->Type != Precondition->Type ||
-					WorldPropertyCurrent->Value != Precondition->Value)
-				{
-					if (&FailedKey != nullptr) FailedKey = Key;
-					return false;
-				}
-			}
-		}
-		else
-		{
-			const FWorldProperty* WorldPropertyGoal = GoalState.Get(Precondition->WorldPropertyKey);
-			if (WorldPropertyCurrent != nullptr && WorldPropertyGoal != nullptr)
-			{
-				if (WorldPropertyCurrent->Type != WorldPropertyGoal->Type ||
-					WorldPropertyCurrent->Value != WorldPropertyGoal->Value)
-				{
-					if (&FailedKey != nullptr) FailedKey = Key;
-					return false;
-				}
-			}
-		}
-	}
-	return true;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UAbstractAction::ApplyPreconditions(IAgent& Agent, FWorldState& GoalState) const
 {
 	for (int32 KeyIndex = 0; KeyIndex < WorldPropertyKeyCount; ++KeyIndex)
@@ -168,6 +126,48 @@ void UAbstractAction::SolveWorldState(FWorldState& CurrentWorldState, const FWor
 			CurrentWorldState.Set(Key, WorldProperty);
 		}
 	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UAbstractAction::ArePreconditionsSatisfied(const FWorldState& CurrentWorldState, const FWorldState& GoalState, EWorldPropertyKey& FailedKey) const
+{
+	for (int32 KeyIndex = 0; KeyIndex < WorldPropertyKeyCount; ++KeyIndex)
+	{
+		const EWorldPropertyKey Key = static_cast<EWorldPropertyKey>(KeyIndex);
+
+		const FWorldProperty* Precondition = Preconditions.Get(Key);
+		if (Precondition == nullptr)
+			continue;
+
+		const FWorldProperty* WorldPropertyCurrent = CurrentWorldState.Get(Key);
+
+		if (Precondition->Type != EWorldPropertyType::WorldPropertyKey)
+		{
+			if (WorldPropertyCurrent != nullptr)
+			{
+				if (WorldPropertyCurrent->Type != Precondition->Type ||
+					WorldPropertyCurrent->Value != Precondition->Value)
+				{
+					if (&FailedKey != nullptr) FailedKey = Key;
+					return false;
+				}
+			}
+		}
+		else
+		{
+			const FWorldProperty* WorldPropertyGoal = GoalState.Get(Precondition->WorldPropertyKey);
+			if (WorldPropertyCurrent != nullptr && WorldPropertyGoal != nullptr)
+			{
+				if (WorldPropertyCurrent->Type != WorldPropertyGoal->Type ||
+					WorldPropertyCurrent->Value != WorldPropertyGoal->Value)
+				{
+					if (&FailedKey != nullptr) FailedKey = Key;
+					return false;
+				}
+			}
+		}
+	}
+	return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -36,12 +36,12 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool CanSolveWorldState(const FWorldState& CurrentWorldState, const FWorldState& GoalWorldState) const;
 
-	virtual bool ArePreconditionsSatisfied(const FWorldState& CurrentWorldState, const FWorldState& GoalState, EWorldPropertyKey& FailedKey) const;
-	virtual bool AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const { return true; }
-
 	virtual void ApplyPreconditions(IAgent& Agent, FWorldState& GoalState) const;
 	virtual void ApplyResults(IAgent& Agent, FWorldState& CurrentWorldState, const FWorldState& GoalWorldState) const;
 	virtual void SolveWorldState(FWorldState& CurrentWorldState, const FWorldState& GoalWorldState) const;
+
+	virtual bool ArePreconditionsSatisfied(const FWorldState& CurrentWorldState, const FWorldState& GoalState, EWorldPropertyKey& FailedKey) const;
+	virtual bool AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const { return true; }
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual bool Activate(IAgent& Agent, FAIState& AIState, const FWorldState& CurrentWorldState) const;
