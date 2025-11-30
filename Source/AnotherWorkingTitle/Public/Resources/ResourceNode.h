@@ -9,6 +9,7 @@
 #include "ResourceNode.generated.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+DECLARE_MULTICAST_DELEGATE(FGlobalResourceNodeChanged)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResourceDepleted);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,6 +44,8 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FResourceDepleted OnResourceDepleted;
+	
+	static FGlobalResourceNodeChanged OnGlobalResourceNodeChanged;
 	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

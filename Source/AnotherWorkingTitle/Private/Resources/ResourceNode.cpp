@@ -6,11 +6,14 @@
 #include "Inventory//InventoryComponent.h"
 #include "Settlers/SettlerCharacter.h"
 
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 namespace 
 {
 	TArray<AResourceNode*> AllResourceNodes;
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+FGlobalResourceNodeChanged AResourceNode::OnGlobalResourceNodeChanged;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 const TArray<AResourceNode*>& AResourceNode::GetInstances()
@@ -62,6 +65,7 @@ bool AResourceNode::Harvest(ASettlerCharacter* InstigatorCharacter)
 				{
 					OnResourceDepleted.Broadcast();			
 				}
+				OnGlobalResourceNodeChanged.Broadcast();
 				return true;
 			}
 		}

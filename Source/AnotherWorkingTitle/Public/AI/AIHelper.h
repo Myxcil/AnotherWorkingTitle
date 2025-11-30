@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIConstants.h"
+#include "Resources/ResourceCategory.h"
 #include "Settlers/Needs.h"
 
 class IAgent;
@@ -34,6 +35,9 @@ public:
 	
 	static ABuildingSite* FindNearestUnfinishedBuilding(const FVector& RefPosition);
 	
-	static int32 FindFirstNeedSatisfactionInInventory(const IAgent& Agent, const ENeedType NeedType);
-	static int32 FindBestNeedSatisfactionInInventory(const IAgent& Agent, const ENeedType NeedType);
+	static int32 FindFirstInInventoryByNeedChange(const IAgent& Agent, const ENeedType NeedType);
+	static int32 FindBestInInventoryByNeedChange(const IAgent& Agent, const ENeedType NeedType);
+	
+	static int32 FindFirstInInventoryByCategory(const IAgent& Agent, const EResourceCategory ResourceCategory);
+	static int32 FindFirstInInventoryByRuntimeId(const IAgent& Agent, const int32 ResourceId);
 };

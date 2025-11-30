@@ -59,8 +59,17 @@ void FWorldState::Set(const EWorldPropertyKey Key, ENeedType NeedType)
 {
 	const uint32 KeyIndex = static_cast<uint32>(Key);
 	Flags |= 1 << KeyIndex;
-	Property[KeyIndex].Type = EWorldPropertyType::Need;
+	Property[KeyIndex].Type = EWorldPropertyType::NeedType;
 	Property[KeyIndex].NeedType = NeedType;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void FWorldState::Set(const EWorldPropertyKey Key, EResourceCategory ResourceCategory)
+{
+	const uint32 KeyIndex = static_cast<uint32>(Key);
+	Flags |= 1 << KeyIndex;
+	Property[KeyIndex].Type = EWorldPropertyType::ResourceCategory;
+	Property[KeyIndex].ResourceCategory = ResourceCategory;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------

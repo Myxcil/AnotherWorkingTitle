@@ -82,7 +82,7 @@ struct FInventoryBase
 	void SanityCheck() const;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	static FGlobalInventoryChanged OnInventoryBaseChanged;
+	static FGlobalInventoryChanged OnGlobalInventoryChanged;
 	
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);

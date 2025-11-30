@@ -23,31 +23,33 @@ bool UActionFindResourceInInventory::AreContextPreconditionsSatisfied(IAgent& Ag
 	if (!PropHasResource)
 		return false;
 	
-	if (PropHasResource->Type == EWorldPropertyType::Need)
+	if (PropHasResource->Type == EWorldPropertyType::NeedType)
 	{
-		const int32 SlotIndex = FAIHelper::FindFirstNeedSatisfactionInInventory(Agent, PropHasResource->NeedType);
+		const int32 SlotIndex = FAIHelper::FindFirstInInventoryByNeedChange(Agent, PropHasResource->NeedType);
+		if (SlotIndex == INDEX_NONE)
+			return false;
+		
+		return true;
+	}
+	if (PropHasResource->Type == EWorldPropertyType::ResourceCategory)
+	{
+		const int32 SlotIndex = FAIHelper::FindFirstInInventoryByCategory(Agent, PropHasResource->ResourceCategory);
 		if (SlotIndex == INDEX_NONE)
 			return false;
 		
 		return true;
 	}
 		
-	return false;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionFindResourceInInventory::ApplyPreconditions(IAgent& Agent, FWorldState& GoalState) const
-{
-	Super::ApplyPreconditions(Agent, GoalState);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionFindResourceInInventory::ArePreconditionsSatisfied(const FWorldState& CurrentWorldState, const FWorldState& GoalState, EWorldPropertyKey& FailedKey) const
-{
-	if (!Super::ArePreconditionsSatisfied(CurrentWorldState, GoalState, FailedKey))
-		return false;
+	if (PropHasResource->Type == EWorldPropertyType::Int)
+	{
+		const int32 SlotIndex = FAIHelper::FindFirstInInventoryByRuntimeId(Agent, PropHasResource->Value);
+		if (SlotIndex == INDEX_NONE)
+			return false;
+		
+		return true;
+	}
 	
-	return true;
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -55,16 +57,24 @@ bool UActionFindResourceInInventory::Activate(IAgent& Agent, const FWorldState& 
 {
 	if (const FWorldProperty* PropHasResource = CurrentWorldState.Get(EWorldPropertyKey::HasResource))
 	{
-		if (PropHasResource->Type == EWorldPropertyType::Need)
+		int32 SlotIndex = INDEX_NONE;
+		if (PropHasResource->Type == EWorldPropertyType::NeedType)
 		{
-			const int32 SlotIndex = FAIHelper::FindBestNeedSatisfactionInInventory(Agent, PropHasResource->NeedType);
-			if (SlotIndex == INDEX_NONE)
-				return false;
-		
-			Agent.GetBlackboard().SetSlotIndex(SlotIndex);
-		
-			return true;
+			SlotIndex = FAIHelper::FindBestInInventoryByNeedChange(Agent, PropHasResource->NeedType);
 		}
+		else if (PropHasResource->Type == EWorldPropertyType::ResourceCategory)
+		{
+			SlotIndex = FAIHelper::FindFirstInInventoryByCategory(Agent, PropHasResource->ResourceCategory);
+		}
+		else if (PropHasResource->Type == EWorldPropertyType::Int)
+		{
+			SlotIndex = FAIHelper::FindFirstInInventoryByRuntimeId(Agent, PropHasResource->Value);
+		}
+		if (SlotIndex == INDEX_NONE)
+			return false;
+
+		Agent.GetBlackboard().SetSlotIndex(SlotIndex);
+		return true;
 	}
 	return false;
 }

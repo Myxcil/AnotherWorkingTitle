@@ -17,6 +17,7 @@ public:
 	void Set(const EWorldPropertyKey Key, bool bValue);
 	void Set(const EWorldPropertyKey Key, ENodeType NodeType);
 	void Set(const EWorldPropertyKey Key, ENeedType NeedType);
+	void Set(const EWorldPropertyKey Key, EResourceCategory ResourceCategory);
 	void Set(const EWorldPropertyKey Key, EWorldPropertyKey WorldPropertyKey);
 
 	void Set(const EWorldPropertyKey Key, const FWorldProperty* WorldProperty);

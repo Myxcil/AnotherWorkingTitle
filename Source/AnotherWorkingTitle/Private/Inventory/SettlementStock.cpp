@@ -28,7 +28,7 @@ int32 FSettlementStock::AddResource(const UResourceDefinition* Resource, const i
 		RemainingAmount = ExistingStack->Add(RemainingAmount);
 	}
 	
-	OnInventoryBaseChanged.Broadcast();
+	OnGlobalInventoryChanged.Broadcast();
 	
 	return Amount;
 }

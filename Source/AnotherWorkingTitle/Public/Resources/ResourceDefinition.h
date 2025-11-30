@@ -9,6 +9,9 @@
 #include "ResourceDefinition.generated.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+enum { InvalidRuntimeId = 0 };
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
 class ANOTHERWORKINGTITLE_API UResourceDefinition : public UPrimaryDataAsset
 {
@@ -50,6 +53,9 @@ public:
 	TSubclassOf<AActor> WorldPickupClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Resource")
 	TSubclassOf<AActor> PlaceableActorClass;
+
+	UPROPERTY(Transient)
+	int32 RuntimeId = InvalidRuntimeId;
 	
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override
 	{

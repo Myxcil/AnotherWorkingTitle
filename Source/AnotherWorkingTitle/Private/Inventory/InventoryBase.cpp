@@ -4,7 +4,7 @@
 #include "Inventory/InventoryBase.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-FGlobalInventoryChanged FInventoryBase::OnInventoryBaseChanged;
+FGlobalInventoryChanged FInventoryBase::OnGlobalInventoryChanged;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void FInventoryBase::SanityCheck() const
@@ -46,7 +46,7 @@ int32 FInventoryBase::RemoveResource(const UResourceDefinition* Resource, const 
 	
 	if (RemovedTotal != 0)
 	{
-		OnInventoryBaseChanged.Broadcast();
+		OnGlobalInventoryChanged.Broadcast();
 	}
 	
 	return RemovedTotal;
@@ -68,7 +68,7 @@ int32 FInventoryBase::RemoveResourceAtIndex(const int32 SlotIndex, const int32 A
 		Stacks.RemoveAt(SlotIndex);
 	}
 	
-	OnInventoryBaseChanged.Broadcast();
+	OnGlobalInventoryChanged.Broadcast();
 	
 	return ToRemove;
 }
@@ -110,7 +110,7 @@ void FInventoryBase::Collect(TArray<FResourceStack>& ResourceStacks) const
 void FInventoryBase::Clear()
 {
 	Stacks.Reset();
-	OnInventoryBaseChanged.Broadcast();
+	OnGlobalInventoryChanged.Broadcast();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ void FInventoryBase::ClearByCategory(const EResourceCategory ResourceCategory)
 	}
 	if (bChanged)
 	{
-		OnInventoryBaseChanged.Broadcast();
+		OnGlobalInventoryChanged.Broadcast();
 	}
 }
 

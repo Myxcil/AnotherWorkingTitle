@@ -137,7 +137,11 @@ private:
 
 	FPlanner Planner;
 	EInternalState State;
+
 	bool bWorldIsDirty;
+	FDelegateHandle HandleGlobalInventoryChanged;
+	FDelegateHandle HandleGlobalBuildingSiteChanged;
+	FDelegateHandle HandleGlobalRsourceNodeChanged;
 
 	TWeakObjectPtr<const UAbstractGoal> CurrentGoal;
 	FWorldState CurrentGoalState;
@@ -151,5 +155,4 @@ private:
 	bool bMoveRequestFailed = false;
 	
 	float BusyTimer = 0;
-	FDelegateHandle HandleGlobalInventoryChanged;
 };

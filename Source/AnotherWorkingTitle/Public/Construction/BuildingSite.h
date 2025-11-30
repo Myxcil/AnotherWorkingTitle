@@ -12,6 +12,8 @@ class UBuildingDefinition;
 struct FResourceAmount;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+DECLARE_MULTICAST_DELEGATE(FGlobalBuildingSiteChanged)
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBuildingProgress, float, Progress);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBuildCostUpdated, const TArray<FResourceAmount>&, Missing);
 
@@ -50,6 +52,8 @@ public:
 	FBuildingProgress OnBuildingProgress;
 	UPROPERTY(BlueprintAssignable)
 	FBuildCostUpdated OnBuildCostUpdated; 
+	
+	static FGlobalBuildingSiteChanged OnGlobalBuildingSiteChanged;
 	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

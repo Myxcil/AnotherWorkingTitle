@@ -8,6 +8,7 @@
 #include "AI/AISettings.h"
 #include "AI/Actions/AbstractAction.h"
 #include "AI/Goals/AbstractGoal.h"
+#include "Construction/BuildingSite.h"
 #include "Inventory/InventoryComponent.h"
 #include "Resources/ResourceNode.h"
 #include "Resources/ResourceRegistrySubsystem.h"
@@ -35,7 +36,9 @@ void UGOAPAgentComponent::BeginPlay()
 	State = EInternalState::Idle;
 	bWorldIsDirty = true;
 	
-	HandleGlobalInventoryChanged = FInventoryBase::OnInventoryBaseChanged.AddUObject(this, &ThisClass::SetDirty);
+	HandleGlobalInventoryChanged = FInventoryBase::OnGlobalInventoryChanged.AddUObject(this, &ThisClass::SetDirty);
+	HandleGlobalBuildingSiteChanged = ABuildingSite::OnGlobalBuildingSiteChanged.AddUObject(this, &UGOAPAgentComponent::SetDirty);
+	HandleGlobalRsourceNodeChanged = AResourceNode::OnGlobalResourceNodeChanged.AddUObject(this, &UGOAPAgentComponent::SetDirty);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,8 +46,14 @@ void UGOAPAgentComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (HandleGlobalInventoryChanged.IsValid())
 	{
-		FInventoryBase::OnInventoryBaseChanged.Remove(HandleGlobalInventoryChanged);
+		FInventoryBase::OnGlobalInventoryChanged.Remove(HandleGlobalInventoryChanged);
 		HandleGlobalInventoryChanged.Reset();
+		
+		ABuildingSite::OnGlobalBuildingSiteChanged.Remove(HandleGlobalBuildingSiteChanged);
+		HandleGlobalBuildingSiteChanged.Reset();
+		
+		AResourceNode::OnGlobalResourceNodeChanged.Remove(HandleGlobalRsourceNodeChanged);
+		HandleGlobalRsourceNodeChanged.Reset();
 	}
 
 	delete Blackboard;

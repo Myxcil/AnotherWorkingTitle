@@ -259,7 +259,7 @@ ABuildingSite* FAIHelper::FindNearestUnfinishedBuilding(const FVector& RefPositi
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-int32 FAIHelper::FindFirstNeedSatisfactionInInventory(const IAgent& Agent, const ENeedType NeedType)
+int32 FAIHelper::FindFirstInInventoryByNeedChange(const IAgent& Agent, const ENeedType NeedType)
 {
 	for (int32 SlotIndex = 0; SlotIndex < Agent.GetNumInventorySlots(); ++SlotIndex)
 	{
@@ -277,7 +277,7 @@ int32 FAIHelper::FindFirstNeedSatisfactionInInventory(const IAgent& Agent, const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-int32 FAIHelper::FindBestNeedSatisfactionInInventory(const IAgent& Agent, const ENeedType NeedType)
+int32 FAIHelper::FindBestInInventoryByNeedChange(const IAgent& Agent, const ENeedType NeedType)
 {
 	int32 BestSlot = INDEX_NONE;
 	float BestChange = std::numeric_limits<float>::max();
@@ -297,3 +297,38 @@ int32 FAIHelper::FindBestNeedSatisfactionInInventory(const IAgent& Agent, const 
 	return BestSlot;
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 FAIHelper::FindFirstInInventoryByCategory(const IAgent& Agent, const EResourceCategory ResourceCategory)
+{
+	for (int32 SlotIndex = 0; SlotIndex < Agent.GetNumInventorySlots(); ++SlotIndex)
+	{
+		const FResourceStack& Stack = Agent.GetInventorySlot(SlotIndex);
+		if (Stack.IsValid())
+		{
+			const float NeedChange = Stack.Resource->Category == ResourceCategory;
+			if (NeedChange < 0)
+			{
+				return SlotIndex;
+			}
+		}
+	}
+	return INDEX_NONE;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 FAIHelper::FindFirstInInventoryByRuntimeId(const IAgent& Agent, const int32 ResourceId)
+{
+	for (int32 SlotIndex = 0; SlotIndex < Agent.GetNumInventorySlots(); ++SlotIndex)
+	{
+		const FResourceStack& Stack = Agent.GetInventorySlot(SlotIndex);
+		if (Stack.IsValid())
+		{
+			const float NeedChange = Stack.Resource->RuntimeId == ResourceId;
+			if (NeedChange < 0)
+			{
+				return SlotIndex;
+			}
+		}
+	}
+	return INDEX_NONE;
+}

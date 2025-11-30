@@ -18,8 +18,6 @@ public:
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual bool AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const override;
-	virtual void ApplyPreconditions(IAgent& Agent, FWorldState& GoalState) const override;
-	virtual bool ArePreconditionsSatisfied(const FWorldState& CurrentWorldState, const FWorldState& GoalState, EWorldPropertyKey& FailedKey) const override;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual bool Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const override;

@@ -19,12 +19,14 @@ void UResourceRegistrySubsystem::Initialize(FSubsystemCollectionBase& Collection
 	
 	ResourceMapByCategory.Reset();
 	
+	int32 NextRuntimeId = 1;
 	for (const FPrimaryAssetId& Id : ResourceIds)
 	{
-		if (const UObject* Asset = UAssetManager::Get().GetPrimaryAssetObject(Id))
+		if (UObject* Asset = UAssetManager::Get().GetPrimaryAssetObject(Id))
 		{
-			if (const UResourceDefinition* Resource = Cast<UResourceDefinition>(Asset))
+			if (UResourceDefinition* Resource = Cast<UResourceDefinition>(Asset))
 			{
+				Resource->RuntimeId = NextRuntimeId++;
 				Resources.Add(Resource);
 				
 				TArray<const UResourceDefinition*>& ResourceMap = ResourceMapByCategory.FindOrAdd(Resource->Category);

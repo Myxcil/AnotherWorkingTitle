@@ -15,6 +15,9 @@ namespace
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+FGlobalBuildingSiteChanged ABuildingSite::OnGlobalBuildingSiteChanged;
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 const TArray<ABuildingSite*>& ABuildingSite::GetInstances()
 {
 	return AllBuildingSites;
@@ -212,6 +215,8 @@ void ABuildingSite::OnBuildCompleted()
 	}
 	
 	World->DestroyActor(this);
+	
+	OnGlobalBuildingSiteChanged.Broadcast();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
