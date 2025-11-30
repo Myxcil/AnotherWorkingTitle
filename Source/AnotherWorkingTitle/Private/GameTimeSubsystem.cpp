@@ -48,3 +48,9 @@ FText UGameTimeSubsystem::GetGameTimeFormatted() const
 	const int32 Minutes = FMath::FloorToInt((AccumulatedDayTimeHours - Hours) * 60.0f);
 	return FText::FromString(FString::Printf(TEXT("%02d:%02d"), Hours, Minutes));
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+float UGameTimeSubsystem::GetGameHourToRealSeconds(const float InGameHour) const
+{
+	return InGameHour / GameHoursPerRealSecond;
+}

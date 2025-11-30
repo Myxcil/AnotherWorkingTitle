@@ -49,7 +49,7 @@ EActionResult UActionSatisfyNeedAtModifier::IsComplete(IAgent& Agent) const
 	if (const ANeedsModifier* NeedsModifier = Agent.GetBlackboard().GetNeedsModifier())
 	{
 		const ENeedType NeedType = NeedsModifier->GetAffectedType();
-		if (Agent.GetNeedSeverity(NeedType) != ENeedSeverity::Normal)
+		if (Agent.GetNeedValue(NeedType) > 0)
 		{
 			return EActionResult::Incomplete;
 		}

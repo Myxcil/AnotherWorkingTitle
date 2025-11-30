@@ -30,6 +30,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FText GetGameTimeFormatted() const;
 	
+	float GetGameHourToRealSeconds(const float InGameHour) const;
+	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="GameTime")

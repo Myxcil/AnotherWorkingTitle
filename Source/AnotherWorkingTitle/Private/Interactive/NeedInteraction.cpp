@@ -60,15 +60,29 @@ bool ANeedInteraction::TickInteraction_Implementation(ASettlerCharacter* Settler
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool ANeedInteraction::StartInteraction(ASettlerCharacter* Settler)
+float ANeedInteraction::StartInteraction(ASettlerCharacter* Settler)
 {
 	if (CurrentUser.IsValid())
+		return false;
+	
+	const UGameTimeSubsystem* GameTimeSubsystem = GameTimeSubsystemPtr.Get();
+	if (!GameTimeSubsystem)
 		return false;
 	
 	CurrentUser = Settler;
 	SetActorTickEnabled(true);
 
-	return true;
+	float DurationRealTime = 0;;
+	if (NeedsValueDelta < 0)
+	{
+		if (const UNeedsComponent* NeedsComponent = Settler->GetNeedsComponent())
+		{
+			const float NeedValue = NeedsComponent->GetNeedValue(AffectedType);
+			const float DurationToFull = NeedValue / -NeedsValueDelta;
+			DurationRealTime = GameTimeSubsystem->GetGameHourToRealSeconds(DurationToFull);
+		}
+	}
+	return FMath::Max(5.0f, DurationRealTime);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

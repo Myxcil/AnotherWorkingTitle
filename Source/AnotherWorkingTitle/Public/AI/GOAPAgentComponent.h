@@ -18,6 +18,8 @@ class UAbstractGoal;
 DECLARE_DELEGATE_RetVal_ThreeParams(bool, FAIRequestMoveToLocation, const FVector& /*Location*/, const float /*LocationThreshold*/, const float /*AcceptanceRadius*/);
 DECLARE_DELEGATE(FAIRequestStopMovement);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoalListUpdated, FText, GoalList);
+
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ANOTHERWORKINGTITLE_API UGOAPAgentComponent : public UActorComponent, public IAgent
@@ -33,7 +35,7 @@ protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
+	
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void InitializeAgent();
@@ -83,6 +85,9 @@ public:
 
 	virtual ENeedSeverity GetNeedSeverity(const ENeedType NeedType) const override;
 	virtual float GetNeedValue(const ENeedType NeedType) const override;
+	
+	UPROPERTY(BlueprintAssignable)
+	FGoalListUpdated OnGoalListUpdated;
 	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

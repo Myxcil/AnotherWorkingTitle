@@ -11,7 +11,6 @@
 #include "Construction/BuildingSite.h"
 #include "Interactive/NeedInteraction.h"
 #include "Inventory/InventoryComponent.h"
-#include "rapidjson/rapidjson.h"
 #include "Resources/ResourceNode.h"
 #include "Resources/ResourceRegistrySubsystem.h"
 #include "Settlers/NeedsComponent.h"
@@ -410,6 +409,16 @@ const UAbstractGoal* UGOAPAgentComponent::ChooseTopGoal()
 			AI_LOG(TEXT(" %.4f %s"), GoalList[I].Priority, *GoalList[I].Goal->GetTypeName())
 		}
 		
+		if (OnGoalListUpdated.IsBound())
+		{
+			FString Desc;
+			for (int32 I=0; I < NumGoals; ++I)
+			{
+				Desc += FString::Printf(TEXT("%.4f %s\n"), GoalList[I].Priority, *GoalList[I].Goal->GetTypeName());
+			}
+			OnGoalListUpdated.Broadcast(FText::FromString(Desc));
+		}
+		
 		bWorldIsDirty = false;
 	}
 
@@ -725,7 +734,12 @@ bool UGOAPAgentComponent::StartInteraction(ANeedInteraction* Interaction)
 {
 	if (ASettlerCharacter* Settler = SettlerPtr.Get())
 	{
-		return Interaction->StartInteraction(Settler);
+		const float Duration = Interaction->StartInteraction(Settler);
+		if (Duration > 0)
+		{
+			BusyTimer = Duration;
+			return true;
+		}
 	}
 	return false;
 }

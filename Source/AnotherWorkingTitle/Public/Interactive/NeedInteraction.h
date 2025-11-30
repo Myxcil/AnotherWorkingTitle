@@ -41,7 +41,7 @@ public:
 	float GetNeedDelta() const { return NeedsValueDelta; }
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	bool StartInteraction(ASettlerCharacter* Settler);
+	float StartInteraction(ASettlerCharacter* Settler);
 	void StopInteraction();
 	bool IsInteracting() const { return CurrentUser.IsValid();}
 	
