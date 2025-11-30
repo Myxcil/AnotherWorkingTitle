@@ -1,35 +1,33 @@
 ﻿// (c) 2025 MK
 
 
-#include "AI/Actions/ActionConsumeSlot.h"
+#include "AI/Actions/ActionUseSlot.h"
 
 #include "AI/AIBlackboard.h"
 #include "AI/IAgent.h"
-#include "Settlers/Needs.h"
+
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-UActionConsumeSlot::UActionConsumeSlot()
+UActionUseSlot::UActionUseSlot()
 {
-	Preconditions.Set(EWorldPropertyKey::HasResource, EWorldPropertyKey::SatisfyNeed);
-	Results.Set(EWorldPropertyKey::SatisfyNeed, EWorldPropertyKey::SatisfyNeed);
+	Preconditions.Set(EWorldPropertyKey::HasResource, EWorldPropertyKey::UseSlot);
+	Results.Set(EWorldPropertyKey::UseSlot, EWorldPropertyKey::UseSlot);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionConsumeSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
+bool UActionUseSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
 {
 	if (!Super::AreContextPreconditionsSatisfied(Agent, CurrentWorldState, bIsPlanning))
 		return false;
 	
-	const FWorldProperty* PropSatisfyNeed = CurrentWorldState.Get(EWorldPropertyKey::SatisfyNeed);
-	if (!PropSatisfyNeed || PropSatisfyNeed->Type != EWorldPropertyType::Need)
-		return false;
-	
-	if (!StaticEnum<ENeedType>()->IsValidEnumValue(PropSatisfyNeed->Value))
+	const FWorldProperty* PropUseSlot = CurrentWorldState.Get(EWorldPropertyKey::UseSlot);
+	if (!PropUseSlot)
 		return false;
 	
 	if (!bIsPlanning)
 	{
-		if (!Agent.GetBlackboard().IsSet(EBlackboardMask::SlotIndex))
+		const int32 SlotIndex = Agent.GetBlackboard().GetSlotIndex();
+		if (SlotIndex == INDEX_NONE)
 			return false;
 	}
 	
@@ -37,19 +35,20 @@ bool UActionConsumeSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const F
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionConsumeSlot::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
+bool UActionUseSlot::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	const int32 SlotIndex = Agent.GetBlackboard().GetSlotIndex();
 	return Agent.UseSlot(SlotIndex);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionConsumeSlot::Deactivate(IAgent& Agent) const
+void UActionUseSlot::Deactivate(IAgent& Agent) const
 {
+	Agent.GetBlackboard().Clear(EBlackboardMask::SlotIndex);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionConsumeSlot::IsComplete(IAgent& Agent) const
+EActionResult UActionUseSlot::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }

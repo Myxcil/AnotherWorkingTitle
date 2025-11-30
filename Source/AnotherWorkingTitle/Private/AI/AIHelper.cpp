@@ -17,11 +17,10 @@ bool FAIHelper::HasValidTransform(const IAgent& Agent, const ENodeType NodeType)
 	switch (NodeType)
 	{
 	case ENodeType::ResourceNode:
-		return Agent.GetBlackboard().IsSet(EBlackboardMask::ResourceNode);
 	case ENodeType::Stockpile:
-		return Agent.GetBlackboard().IsSet(EBlackboardMask::Stockpile);
 	case ENodeType::BuildingSite:
-		return Agent.GetBlackboard().IsSet(EBlackboardMask::BuildingSite);		
+		return true;
+		
 	default: 
 		break;
 	}

@@ -49,6 +49,9 @@ bool UActionGoto::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldSt
 	const FWorldProperty* PropAtNode = CurrentWorldState.Get(EWorldPropertyKey::AtNode);
 	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node)
 		return false;
+	
+	if (!FAIHelper::HasValidTransform(Agent, PropAtNode->NodeType))
+		return false;
 
 	return true;
 }

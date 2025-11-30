@@ -52,7 +52,7 @@ bool UAbstractGoalCollectResource::Init(IAgent& Agent, FWorldState& WorldState, 
 	
 	Agent.GetBlackboard().SetResourceNode(ResourceNode);
 	
-	WorldState.Set(EWorldPropertyKey::Harvest, ENodeType::ResourceNode);
+	WorldState.Set(EWorldPropertyKey::HasResource, ENodeType::ResourceNode);
 	
 	return true;
 }

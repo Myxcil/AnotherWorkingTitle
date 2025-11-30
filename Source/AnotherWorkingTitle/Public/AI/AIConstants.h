@@ -35,12 +35,12 @@ enum class EWorldPropertyKey : uint8
 	AtNode,
 	PathExists,
 
-	Harvest,
-	Transfer,
-	Construct,
-	SatisfyNeed,
 	HasResource,
+	Transfer,
+	UseSlot,
 		
+	Construct,
+
 	Count,
 };
 constexpr int32 WorldPropertyKeyCount = static_cast<int32>(EWorldPropertyKey::Count);

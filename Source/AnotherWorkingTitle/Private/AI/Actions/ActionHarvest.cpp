@@ -10,8 +10,8 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionHarvest::UActionHarvest()
 {
-	Preconditions.Set(EWorldPropertyKey::AtNode, EWorldPropertyKey::Harvest);
-	Results.Set(EWorldPropertyKey::Harvest, EWorldPropertyKey::Harvest);
+	Preconditions.Set(EWorldPropertyKey::AtNode, EWorldPropertyKey::HasResource);
+	Results.Set(EWorldPropertyKey::HasResource, EWorldPropertyKey::HasResource);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -20,8 +20,8 @@ bool UActionHarvest::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorl
 	if (!Super::AreContextPreconditionsSatisfied(Agent, CurrentWorldState, bIsPlanning))
 		return false;
 	
-	const FWorldProperty* PropHarvest = CurrentWorldState.Get(EWorldPropertyKey::Harvest);
-	if (!PropHarvest || PropHarvest->Type != EWorldPropertyType::Node)
+	const FWorldProperty* PropHasResource = CurrentWorldState.Get(EWorldPropertyKey::HasResource);
+	if (!PropHasResource || PropHasResource->Type != EWorldPropertyType::Node)
 		return false;
 	
 	if (!bIsPlanning)

@@ -28,7 +28,10 @@ bool UActionDepositResources::AreContextPreconditionsSatisfied(IAgent& Agent, co
 	{
 		const AStockpile* Stockpile = Agent.GetBlackboard().GetStockpile();
 		if (!Stockpile)
+		{
+			AI_WARN(TEXT("%s no stockpile registered"), *Agent.GetActorName());
 			return false;
+		}
 	}
 	
 	return true;

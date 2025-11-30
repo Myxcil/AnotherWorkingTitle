@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "AbstractAction.h"
-#include "ActionConsumeSlot.generated.h"
+#include "ActionFindResourceInInventory.generated.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
-class ANOTHERWORKINGTITLE_API UActionConsumeSlot : public UAbstractAction
+class ANOTHERWORKINGTITLE_API UActionFindResourceInInventory : public UAbstractAction
 {
 	GENERATED_BODY()
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	UActionConsumeSlot();
+	UActionFindResourceInInventory();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual bool AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const override;
