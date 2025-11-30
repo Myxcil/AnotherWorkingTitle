@@ -13,6 +13,9 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 float UAbstractGoalCollectResource::Evaluate(IAgent& Agent) const
 {
+	if (Agent.IsStressed())
+		return 0;
+	
 	const UResourceDefinition* Resource = GetResource(Agent);
 	if (!Resource)
 		return 0;

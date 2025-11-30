@@ -13,6 +13,9 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 float UGoalDropItemsAtStockpile::Evaluate(IAgent& Agent) const
 {
+	if (Agent.IsStressed())
+		return 0;
+	
 	const int32 CarryingAmount = Agent.GetTotalAmountInInventoryByCategory(EResourceCategory::RawMaterial);
 	if (CarryingAmount == 0)
 		return 0;

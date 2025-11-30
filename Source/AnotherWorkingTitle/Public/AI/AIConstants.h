@@ -37,9 +37,9 @@ enum class EWorldPropertyKey : uint8
 
 	HasResource,
 	Transfer,
-	UseSlot,
 		
 	Construct,
+	Need,
 
 	Count,
 };
@@ -111,6 +111,5 @@ enum class EBlackboardMask : uint8
 	Stockpile,
 	BuildingSite,
 	NeedsModifier,
-	SlotIndex,
 };
 FString GetBlackboardMaskName(EBlackboardMask BlackboardMask);

@@ -12,7 +12,7 @@
 UActionSatisfyNeedAtLocation::UActionSatisfyNeedAtLocation()
 {
 	Preconditions.Set(EWorldPropertyKey::AtNode, ENodeType::NeedsModifier);
-	Results.Set(EWorldPropertyKey::UseSlot, EWorldPropertyKey::UseSlot);
+	Results.Set(EWorldPropertyKey::Need, EWorldPropertyKey::Need);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,11 +21,11 @@ bool UActionSatisfyNeedAtLocation::AreContextPreconditionsSatisfied(IAgent& Agen
 	if (!Super::AreContextPreconditionsSatisfied(Agent, CurrentWorldState, bIsPlanning))
 		return false;
 	
-	const FWorldProperty* PropUseSlot = CurrentWorldState.Get(EWorldPropertyKey::UseSlot);
-	if (!PropUseSlot || PropUseSlot->Type != EWorldPropertyType::NeedType)
+	const FWorldProperty* PropNeed = CurrentWorldState.Get(EWorldPropertyKey::Need);
+	if (!PropNeed || PropNeed->Type != EWorldPropertyType::NeedType)
 		return false;
 	
-	const ANeedsModifier* NeedsModifier = FAIHelper::FindNeedImprover(PropUseSlot->NeedType);
+	const ANeedsModifier* NeedsModifier = FAIHelper::FindNeedImprover(PropNeed->NeedType);
 	if (!NeedsModifier)
 		return false;
 	

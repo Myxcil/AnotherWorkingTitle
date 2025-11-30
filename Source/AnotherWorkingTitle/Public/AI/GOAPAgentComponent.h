@@ -51,6 +51,8 @@ public:
 	
 	virtual const FWorldState& GetWorldState() const override { return WorldState; }
 	virtual const TArray<const UAbstractAction*>& GetActions(EWorldPropertyKey Key) const override { return ActionList[static_cast<uint32>(Key)]; }
+
+	virtual bool IsStressed() const override;
 	
 	virtual void SetSprinting(const bool bEnable) override;
 	virtual bool IsNear(const ENodeType NodeType) const override;

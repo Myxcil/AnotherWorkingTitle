@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "AbstractAction.h"
-#include "ActionSearchPathByUse.generated.h"
+#include "ActionSearchPathByNeed.generated.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
-class ANOTHERWORKINGTITLE_API UActionSearchPathByUse : public UAbstractAction
+class ANOTHERWORKINGTITLE_API UActionSearchPathByNeed : public UAbstractAction
 {
 	GENERATED_BODY()
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	UActionSearchPathByUse();
+	UActionSearchPathByNeed();
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual int32 GetPrecedence() const override { return 10; }

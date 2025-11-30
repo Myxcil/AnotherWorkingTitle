@@ -27,9 +27,6 @@ public:
 	void SetNeedsModifier(ANeedsModifier* InNeedsModifier) { SetFlag(EBlackboardMask::NeedsModifier); NeedsModifier = InNeedsModifier; }
 	ANeedsModifier* GetNeedsModifier() const { return IsSet(EBlackboardMask::NeedsModifier) ? NeedsModifier : nullptr; }
 	
-	void SetSlotIndex(const int32 InSlotIndex) { SetFlag(EBlackboardMask::SlotIndex); SlotIndex = InSlotIndex; }
-	int32 GetSlotIndex() const { return IsSet(EBlackboardMask::SlotIndex) ? SlotIndex : INDEX_NONE; }
-	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool IsSet(EBlackboardMask Mask) const { return (Flags & AI_ENUM_TO_FLAG(Mask)) != 0; }
 
@@ -46,5 +43,4 @@ private:
 	AStockpile* Stockpile = nullptr;
 	ABuildingSite* BuildingSite = nullptr;
 	ANeedsModifier* NeedsModifier = nullptr;
-	int32 SlotIndex = INDEX_NONE;
 };

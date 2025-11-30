@@ -10,6 +10,7 @@
 #include "AI/Goals/AbstractGoal.h"
 #include "Construction/BuildingSite.h"
 #include "Inventory/InventoryComponent.h"
+#include "rapidjson/rapidjson.h"
 #include "Resources/ResourceNode.h"
 #include "Resources/ResourceRegistrySubsystem.h"
 #include "Settlers/NeedsComponent.h"
@@ -470,6 +471,22 @@ void UGOAPAgentComponent::OnMovementComplete(bool bSuccess)
 UResourceRegistrySubsystem* UGOAPAgentComponent::GetResourceRegistry() const
 {
 	return ResourceRegistry.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UGOAPAgentComponent::IsStressed() const
+{
+	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		if (const UNeedsComponent* NeedsComponent = Settler->GetNeedsComponent())
+		{
+			if (NeedsComponent->IsAnyNeedInSeverityLevel(ENeedSeverity::Critical))
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

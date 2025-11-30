@@ -1,7 +1,7 @@
 ﻿// (c) 2025 MK
 
 
-#include "AI/Actions/ActionSearchPathByUse.h"
+#include "AI/Actions/ActionSearchPathByNeed.h"
 
 #include "AI/AIBlackboard.h"
 #include "AI/AIHelper.h"
@@ -9,13 +9,13 @@
 #include "Interactive/NeedsModifier.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-UActionSearchPathByUse::UActionSearchPathByUse()
+UActionSearchPathByNeed::UActionSearchPathByNeed()
 {
 	Results.Set(EWorldPropertyKey::PathExists, EWorldPropertyKey::AtNode);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionSearchPathByUse::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
+bool UActionSearchPathByNeed::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
 {
 	if (!Super::AreContextPreconditionsSatisfied(Agent, CurrentWorldState, bIsPlanning))
 		return false;
@@ -24,13 +24,13 @@ bool UActionSearchPathByUse::AreContextPreconditionsSatisfied(IAgent& Agent, con
 	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node)
 		return false;
 	
-	const FWorldProperty* PropUseSlot = CurrentWorldState.Get(EWorldPropertyKey::UseSlot);
-	if (!PropUseSlot || PropUseSlot->Type != EWorldPropertyType::NeedType)
+	const FWorldProperty* PropNeed = CurrentWorldState.Get(EWorldPropertyKey::Need);
+	if (!PropNeed || PropNeed->Type != EWorldPropertyType::NeedType)
 		return false;
 		
 	if (PropAtNode->NodeType == ENodeType::NeedsModifier)
 	{
-		const ANeedsModifier* NeedsModifier = FAIHelper::FindNeedImprover(PropUseSlot->NeedType);
+		const ANeedsModifier* NeedsModifier = FAIHelper::FindNeedImprover(PropNeed->NeedType);
 		if (!NeedsModifier)
 			return false;
 		
@@ -41,14 +41,14 @@ bool UActionSearchPathByUse::AreContextPreconditionsSatisfied(IAgent& Agent, con
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionSearchPathByUse::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
+bool UActionSearchPathByNeed::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	const FWorldProperty* PropAtNode = CurrentWorldState.Get(EWorldPropertyKey::AtNode);
-	const FWorldProperty* PropUseSlot = CurrentWorldState.Get(EWorldPropertyKey::UseSlot);
+	const FWorldProperty* PropNeed = CurrentWorldState.Get(EWorldPropertyKey::Need);
 	
 	if (PropAtNode->NodeType == ENodeType::NeedsModifier)
 	{
-		if (ANeedsModifier* NeedsModifier = FAIHelper::FindNeedImprover(PropUseSlot->NeedType))
+		if (ANeedsModifier* NeedsModifier = FAIHelper::FindNeedImprover(PropNeed->NeedType))
 		{
 			Agent.GetBlackboard().SetNeedsModifier(NeedsModifier);	
 			return true;
@@ -59,13 +59,13 @@ bool UActionSearchPathByUse::Activate(IAgent& Agent, const FWorldState& CurrentW
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionSearchPathByUse::Deactivate(IAgent& Agent) const
+void UActionSearchPathByNeed::Deactivate(IAgent& Agent) const
 {
 	
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionSearchPathByUse::IsComplete(IAgent& Agent) const
+EActionResult UActionSearchPathByNeed::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }

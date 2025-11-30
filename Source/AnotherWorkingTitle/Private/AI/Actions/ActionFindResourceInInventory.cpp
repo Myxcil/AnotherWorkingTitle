@@ -39,7 +39,6 @@ bool UActionFindResourceInInventory::AreContextPreconditionsSatisfied(IAgent& Ag
 		
 		return true;
 	}
-		
 	if (PropHasResource->Type == EWorldPropertyType::Int)
 	{
 		const int32 SlotIndex = FAIHelper::FindFirstInInventoryByRuntimeId(Agent, PropHasResource->Value);
@@ -55,28 +54,7 @@ bool UActionFindResourceInInventory::AreContextPreconditionsSatisfied(IAgent& Ag
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool UActionFindResourceInInventory::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
-	if (const FWorldProperty* PropHasResource = CurrentWorldState.Get(EWorldPropertyKey::HasResource))
-	{
-		int32 SlotIndex = INDEX_NONE;
-		if (PropHasResource->Type == EWorldPropertyType::NeedType)
-		{
-			SlotIndex = FAIHelper::FindBestInInventoryByNeedChange(Agent, PropHasResource->NeedType);
-		}
-		else if (PropHasResource->Type == EWorldPropertyType::ResourceCategory)
-		{
-			SlotIndex = FAIHelper::FindFirstInInventoryByCategory(Agent, PropHasResource->ResourceCategory);
-		}
-		else if (PropHasResource->Type == EWorldPropertyType::Int)
-		{
-			SlotIndex = FAIHelper::FindFirstInInventoryByRuntimeId(Agent, PropHasResource->Value);
-		}
-		if (SlotIndex == INDEX_NONE)
-			return false;
-
-		Agent.GetBlackboard().SetSlotIndex(SlotIndex);
-		return true;
-	}
-	return false;
+	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

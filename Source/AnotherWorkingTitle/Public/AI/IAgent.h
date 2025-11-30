@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "AIConstants.h"
 #include "Actions/AbstractAction.h"
-#include "BehaviorTree/Blackboard/BlackboardKey.h"
 #include "Inventory/Stockpile.h"
 #include "Settlers/Needs.h"
 
@@ -36,11 +35,14 @@ public:
 	virtual FString GetActorName() const = 0;
 	virtual UResourceRegistrySubsystem* GetResourceRegistry() const = 0;
 	virtual FAIBlackboard& GetBlackboard() const = 0;
-
+	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual const FWorldState& GetWorldState() const = 0;
 	virtual const TArray<const UAbstractAction*>& GetActions(EWorldPropertyKey Key) const = 0;
 	
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual bool IsStressed() const = 0;
+
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void SetSprinting(const bool bEnable) = 0;
 	virtual bool IsNear(const ENodeType NodeType) const = 0;

@@ -1,7 +1,7 @@
 ﻿// (c) 2025 MK
 
 
-#include "AI/Actions/ActionUseSlot.h"
+#include "AI/Actions/ActionSatisfyNeedFromSlot.h"
 
 #include "AI/AIBlackboard.h"
 #include "AI/AIHelper.h"
@@ -9,31 +9,28 @@
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-UActionUseSlot::UActionUseSlot()
+UActionSatisfyNeedFromSlot::UActionSatisfyNeedFromSlot()
 {
-	Preconditions.Set(EWorldPropertyKey::HasResource, EWorldPropertyKey::UseSlot);
-	Results.Set(EWorldPropertyKey::UseSlot, EWorldPropertyKey::UseSlot);
+	Preconditions.Set(EWorldPropertyKey::HasResource, EWorldPropertyKey::Need);
+	Results.Set(EWorldPropertyKey::Need, EWorldPropertyKey::Need);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionUseSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
+bool UActionSatisfyNeedFromSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
 {
 	if (!Super::AreContextPreconditionsSatisfied(Agent, CurrentWorldState, bIsPlanning))
 		return false;
 	
-	const FWorldProperty* PropUseSlot = CurrentWorldState.Get(EWorldPropertyKey::UseSlot);
-	if (!PropUseSlot)
+	const FWorldProperty* PropNeed = CurrentWorldState.Get(EWorldPropertyKey::Need);
+	if (!PropNeed || PropNeed->Type != EWorldPropertyType::NeedType)
 		return false;
 	
-	if (PropUseSlot->Type == EWorldPropertyType::NeedType)
-	{
-		if (!FAIHelper::HasResourceNodeByNeed(PropUseSlot->NeedType))
-			return false;
-	}
+	if (PropNeed->NeedType == ENeedType::Unknown)
+		return false;
 	
 	if (!bIsPlanning)
 	{
-		const int32 SlotIndex = Agent.GetBlackboard().GetSlotIndex();
+		const int32 SlotIndex = FAIHelper::FindFirstInInventoryByNeedChange(Agent, PropNeed->NeedType);
 		if (SlotIndex == INDEX_NONE)
 			return false;
 	}
@@ -42,20 +39,23 @@ bool UActionUseSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorl
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionUseSlot::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
+bool UActionSatisfyNeedFromSlot::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
-	const int32 SlotIndex = Agent.GetBlackboard().GetSlotIndex();
+	const FWorldProperty* PropNeed = CurrentWorldState.Get(EWorldPropertyKey::Need);
+	check(PropNeed);
+	check(PropNeed->Type == EWorldPropertyType::NeedType);
+
+	const int32 SlotIndex = FAIHelper::FindBestInInventoryByNeedChange(Agent, PropNeed->NeedType);
 	return Agent.UseSlot(SlotIndex);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionUseSlot::Deactivate(IAgent& Agent) const
+void UActionSatisfyNeedFromSlot::Deactivate(IAgent& Agent) const
 {
-	Agent.GetBlackboard().Clear(EBlackboardMask::SlotIndex);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionUseSlot::IsComplete(IAgent& Agent) const
+EActionResult UActionSatisfyNeedFromSlot::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }
