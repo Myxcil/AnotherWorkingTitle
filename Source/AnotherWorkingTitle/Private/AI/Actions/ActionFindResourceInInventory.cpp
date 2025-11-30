@@ -36,6 +36,21 @@ bool UActionFindResourceInInventory::AreContextPreconditionsSatisfied(IAgent& Ag
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UActionFindResourceInInventory::ApplyPreconditions(IAgent& Agent, FWorldState& GoalState) const
+{
+	Super::ApplyPreconditions(Agent, GoalState);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UActionFindResourceInInventory::ArePreconditionsSatisfied(const FWorldState& CurrentWorldState, const FWorldState& GoalState, EWorldPropertyKey& FailedKey) const
+{
+	if (!Super::ArePreconditionsSatisfied(CurrentWorldState, GoalState, FailedKey))
+		return false;
+	
+	return true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool UActionFindResourceInInventory::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	if (const FWorldProperty* PropHasResource = CurrentWorldState.Get(EWorldPropertyKey::HasResource))

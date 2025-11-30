@@ -28,4 +28,8 @@ struct FResourceStack
 	}
 	
 	static const FResourceStack Invalid;
+	
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
+#endif
 };

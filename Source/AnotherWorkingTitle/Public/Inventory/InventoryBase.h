@@ -83,4 +83,8 @@ struct FInventoryBase
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	static FGlobalInventoryChanged OnInventoryBaseChanged;
+	
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
+#endif
 };

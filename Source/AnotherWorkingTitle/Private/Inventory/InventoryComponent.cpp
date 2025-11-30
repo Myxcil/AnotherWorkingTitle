@@ -76,3 +76,22 @@ void UInventoryComponent::TransferByCategory(FSettlementStock& Destination, ERes
 	Inventory.ClearByCategory(ResourceCategory);
 	OnInventoryChanged.Broadcast();
 }
+
+#if WITH_EDITOR
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UInventoryComponent::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	const FName PropertyName = PropertyChangedEvent.GetPropertyName();
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(FResourceStack, Amount) ||
+		PropertyName == GET_MEMBER_NAME_CHECKED(FResourceStack, Resource))
+	{
+		for (FResourceStack& Stack : Inventory.Stacks)
+		{
+			Stack.PostEditChangeProperty(PropertyChangedEvent);
+		}
+	}
+}
+
+#endif

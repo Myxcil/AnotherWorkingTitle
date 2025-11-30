@@ -25,3 +25,22 @@ float UResourceDefinition::GetNeedChange(const ENeedType NeedType) const
 	}
 	return 0;
 }
+
+#if WITH_EDITOR
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void FResourceStack::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	const FName PropertyName = PropertyChangedEvent.GetPropertyName();
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(FResourceStack, Amount) ||
+		PropertyName == GET_MEMBER_NAME_CHECKED(FResourceStack, Resource))
+	{
+		if (Resource)
+		{
+			Amount = FMath::Clamp(Amount, 1, Resource->MaxStackSize);
+		}
+	}
+}
+
+
+#endif

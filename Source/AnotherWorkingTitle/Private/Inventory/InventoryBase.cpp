@@ -132,3 +132,16 @@ void FInventoryBase::ClearByCategory(const EResourceCategory ResourceCategory)
 		OnInventoryBaseChanged.Broadcast();
 	}
 }
+
+#if WITH_EDITOR
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void FInventoryBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	for (FResourceStack& Stack : Stacks)
+	{
+		Stack.PostEditChangeProperty(PropertyChangedEvent);
+	}
+}
+
+#endif
