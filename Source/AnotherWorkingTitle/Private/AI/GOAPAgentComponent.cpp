@@ -38,24 +38,45 @@ void UGOAPAgentComponent::BeginPlay()
 	
 	HandleGlobalInventoryChanged = FInventoryBase::OnGlobalInventoryChanged.AddUObject(this, &ThisClass::SetDirty);
 	HandleGlobalBuildingSiteChanged = ABuildingSite::OnGlobalBuildingSiteChanged.AddUObject(this, &UGOAPAgentComponent::SetDirty);
-	HandleGlobalRsourceNodeChanged = AResourceNode::OnGlobalResourceNodeChanged.AddUObject(this, &UGOAPAgentComponent::SetDirty);
+	HandleGlobalResourceNodeChanged = AResourceNode::OnGlobalResourceNodeChanged.AddUObject(this, &UGOAPAgentComponent::SetDirty);
+	
+	if (UNeedsComponent* NeedsComponent = SettlerPtr->GetNeedsComponent())
+	{
+		HandleNeedSeverityChanged = NeedsComponent->OnNeedSeverityChanged.AddUObject(this, &UGOAPAgentComponent::SetDirty);
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UGOAPAgentComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (HandleGlobalInventoryChanged.IsValid())
+	if (HandleNeedSeverityChanged.IsValid())
+	{
+		if (const ASettlerCharacter* SettlerCharacter = SettlerPtr.Get())
+		{
+			if (UNeedsComponent* NeedsComponent = SettlerCharacter->GetNeedsComponent())
+			{
+				NeedsComponent->OnNeedSeverityChanged.Remove(HandleNeedSeverityChanged);
+				HandleNeedSeverityChanged.Reset();
+			}
+		}
+	}
+	
+	if (HandleGlobalBuildingSiteChanged.IsValid())
 	{
 		FInventoryBase::OnGlobalInventoryChanged.Remove(HandleGlobalInventoryChanged);
 		HandleGlobalInventoryChanged.Reset();
-		
+	}
+	if (HandleGlobalBuildingSiteChanged.IsValid())
+	{
 		ABuildingSite::OnGlobalBuildingSiteChanged.Remove(HandleGlobalBuildingSiteChanged);
 		HandleGlobalBuildingSiteChanged.Reset();
-		
-		AResourceNode::OnGlobalResourceNodeChanged.Remove(HandleGlobalRsourceNodeChanged);
-		HandleGlobalRsourceNodeChanged.Reset();
 	}
-
+	if (HandleGlobalResourceNodeChanged.IsValid())
+	{
+		AResourceNode::OnGlobalResourceNodeChanged.Remove(HandleGlobalResourceNodeChanged);
+		HandleGlobalResourceNodeChanged.Reset();
+	}
+	
 	delete Blackboard;
 	Blackboard = nullptr;
 	
@@ -682,16 +703,16 @@ bool UGOAPAgentComponent::UseSlot(const int32 SlotIndex)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGOAPAgentComponent::IsInCriticalState() const
+ENeedSeverity UGOAPAgentComponent::GetNeedSeverity(const ENeedType NeedType) const
 {
 	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
 	{
 		if (const UNeedsComponent* NeedsComponent = Settler->GetNeedsComponent())
 		{
-			return NeedsComponent->IsAnyNeedCritical();
+			return NeedsComponent->CalculateSeverity(NeedType);
 		}
 	}
-	return false;
+	return ENeedSeverity::Normal;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -13,9 +13,6 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 float UGoalConstructBuilding::Evaluate(IAgent& Agent) const
 {
-	if (Agent.IsInCriticalState())
-		return 0;
-
 	const ABuildingSite* BuildingSite = FAIHelper::FindNearestUnfinishedBuilding(Agent.GetFeetPosition());
 	if (!BuildingSite)
 		return 0;

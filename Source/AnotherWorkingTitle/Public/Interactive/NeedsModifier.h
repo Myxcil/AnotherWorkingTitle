@@ -19,6 +19,9 @@ class ANOTHERWORKINGTITLE_API ANeedsModifier : public AActor
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	static const TArray<ANeedsModifier*>& GetInstances();
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	ANeedsModifier();
 
 protected:
@@ -29,6 +32,10 @@ protected:
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void Tick(float DeltaTime) override;
+	
+	float GetRadius() const;
+	ENeedType GetAffectedType() const { return AffectedType; }
+	float GetNeedDelta() const { return NeedsValueDelta; }
 	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

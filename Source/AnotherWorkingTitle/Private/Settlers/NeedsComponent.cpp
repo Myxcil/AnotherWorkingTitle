@@ -12,6 +12,17 @@ UNeedsComponent::UNeedsComponent()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UNeedsComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	for (int32 I=0; I < PrevNeedSeverity.Num(); ++I)
+	{
+		PrevNeedSeverity[I] = ENeedSeverity::Normal;		
+	}	
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UNeedsComponent::TickNeeds(const float DeltaGameHour)
 {
 	if (DeltaGameHour == 0)
@@ -39,19 +50,19 @@ void UNeedsComponent::TickNeeds(const float DeltaGameHour)
 	}
 	
 	float TotalDamage = 0;
-	if (IsNeedCritical(ENeedType::Hunger))
+	if (CalculateSeverity(ENeedType::Hunger) == ENeedSeverity::Critical)
 	{
 		TotalDamage += DamageForCriticalHunger;
 	}
-	if (IsNeedCritical(ENeedType::Thirst))
+	if (CalculateSeverity(ENeedType::Thirst) == ENeedSeverity::Critical)
 	{
 		TotalDamage += DamageForCriticalThirst;
 	}
-	if (IsNeedCritical(ENeedType::Cold))
+	if (CalculateSeverity(ENeedType::Cold) == ENeedSeverity::Critical)
 	{
 		TotalDamage += DamageForCriticalCold;
 	}
-	if (IsNeedCritical(ENeedType::Fatigue))
+	if (CalculateSeverity(ENeedType::Fatigue) == ENeedSeverity::Critical)
 	{
 		TotalDamage += DamageForCriticalFatigue;
 	}
@@ -64,6 +75,8 @@ void UNeedsComponent::TickNeeds(const float DeltaGameHour)
 			OnDamagedReachedMaximum.ExecuteIfBound();
 		}
 	}
+	
+	CheckNeedSeverity();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -116,11 +129,26 @@ bool UNeedsComponent::ChangeNeedValue(const ENeedType NeedType, const float Delt
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UNeedsComponent::IsAnyNeedUncomfortable() const
+ENeedSeverity UNeedsComponent::CalculateSeverity(const ENeedType NeedType) const
+{
+	const float Value = GetNeedValue(NeedType);
+	if (Value >= CriticalThreshold)
+	{
+		return ENeedSeverity::Critical;
+	}
+	if (Value >= UncomfortableThreshold)
+	{
+		return ENeedSeverity::Uncomfortable;
+	}
+	return ENeedSeverity::Normal;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UNeedsComponent::IsAnyNeedInSeverityLevel(const ENeedSeverity NeedSeverity) const
 {
 	for (const ENeedType Type : TEnumRange<ENeedType>())
 	{
-		if (IsNeedUncomfortable(Type))
+		if (CalculateSeverity(Type) == NeedSeverity)
 		{
 			return true;
 		}
@@ -129,14 +157,17 @@ bool UNeedsComponent::IsAnyNeedUncomfortable() const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UNeedsComponent::IsAnyNeedCritical() const
+void UNeedsComponent::CheckNeedSeverity()
 {
-	for (const ENeedType Type : TEnumRange<ENeedType>())
+	int32 Index = 0;
+	for (const ENeedType NeedType : TEnumRange<ENeedType>())
 	{
-		if (IsNeedCritical(Type))
+		const ENeedSeverity NewSeverity = CalculateSeverity(NeedType);
+		if (PrevNeedSeverity[Index] != NewSeverity)
 		{
-			return true;
+			PrevNeedSeverity[Index] = NewSeverity;
+			OnNeedSeverityChanged.Broadcast();
 		}
+		++Index;
 	}
-	return false;
 }

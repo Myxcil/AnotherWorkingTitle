@@ -10,7 +10,8 @@
 class ANeedsModifier;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-DECLARE_DELEGATE(FDamagedReachedMaximum)
+DECLARE_MULTICAST_DELEGATE(FNeedSeverityChanged);
+DECLARE_DELEGATE(FDamagedReachedMaximum);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FNeedsMofifierChanged, ANeedsModifier*, NeedsModifier, bool, bEnter);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,6 +24,12 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UNeedsComponent();
 
+protected:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual void BeginPlay() override;
+	void CheckNeedSeverity();
+
+public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void TickNeeds(const float DeltaGameHour);
 	
@@ -36,13 +43,11 @@ public:
 	bool ChangeNeedValue(const ENeedType NeedType, const float Delta);
 
 	UFUNCTION(BlueprintPure)
-	bool IsNeedUncomfortable(const ENeedType NeedType) const { return GetNeedValue(NeedType) >= UncomfortableThreshold; }
-	UFUNCTION(BlueprintPure)
-	bool IsNeedCritical(const ENeedType NeedType) const { return GetNeedValue(NeedType) >= CriticalThreshold; }
+	ENeedSeverity CalculateSeverity(const ENeedType NeedType) const;
 	
-	bool IsAnyNeedUncomfortable() const;
-	bool IsAnyNeedCritical() const;
+	bool IsAnyNeedInSeverityLevel(const ENeedSeverity NeedSeverity) const;
 	
+	FNeedSeverityChanged OnNeedSeverityChanged;
 	FDamagedReachedMaximum OnDamagedReachedMaximum;
 	UPROPERTY(BlueprintAssignable)
 	FNeedsMofifierChanged OnNeedsModifierChanged;
@@ -82,4 +87,7 @@ private:
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void SetNeedValue(const ENeedType NeedType, const float InValue);
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	TStaticArray<ENeedSeverity, 6> PrevNeedSeverity;
 };

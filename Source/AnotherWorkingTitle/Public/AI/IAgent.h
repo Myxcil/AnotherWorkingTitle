@@ -69,6 +69,6 @@ public:
 	virtual bool UseSlot(const int32 SlotIndex) = 0;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual bool IsInCriticalState() const = 0;
+	virtual ENeedSeverity GetNeedSeverity(const ENeedType NeedType) const = 0;
 	virtual float GetNeedValue(const ENeedType NeedType) const = 0;
 };

@@ -7,6 +7,7 @@
 #include "Resources/ResourceCategory.h"
 #include "Settlers/Needs.h"
 
+class ANeedsModifier;
 class IAgent;
 class ABuildingSite;
 class AStockpile;
@@ -20,21 +21,30 @@ class ANOTHERWORKINGTITLE_API FAIHelper
 public:
 	FORCEINLINE static float Clamp01(const float InValue) { return FMath::Clamp(InValue, 0.0f, 1.0f); }
 	
+	// World
 	static bool HasValidTransform(const IAgent& Agent, const ENodeType NodeType);
 	static bool GetObjectTransform(const IAgent& Agent, const ENodeType NodeType, FTransform& Result);
+	static float CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale = 0.0001f);
 	
+	// Resources
 	static const UResourceDefinition* FindMinResourceInStockpiles(const UResourceRegistrySubsystem* ResourceRegistry);
-	static AResourceNode* FindNearestResourceNode(const FVector& RefPosition, const UResourceDefinition* Resource);
-	static AResourceNode* FindNearestResourceNodeByNeed(const FVector& RefPosition, const ENeedType NeedType);
 	
-	static AStockpile* FindNearestStockpile(const FVector& RefPosition);
+	static AResourceNode* FindNearestResourceNode(const FVector& RefPosition, const UResourceDefinition* Resource);
+	static bool HasResourceNodeByNeed(const ENeedType NeedType);
+	static AResourceNode* FindNearestResourceNodeByNeed(const FVector& RefPosition, const ENeedType NeedType);
 	
 	static float CalculateResourceScarcity(const UResourceDefinition* Resource);
 
-	static float CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale = 0.0001f);
+	// Storage
+	static AStockpile* FindNearestStockpile(const FVector& RefPosition);
 	
+	// Construction
 	static ABuildingSite* FindNearestUnfinishedBuilding(const FVector& RefPosition);
 	
+	// Needs
+	static ANeedsModifier* FindNeedImprover(const ENeedType NeedType);
+
+	// Inventory
 	static int32 FindFirstInInventoryByNeedChange(const IAgent& Agent, const ENeedType NeedType);
 	static int32 FindBestInInventoryByNeedChange(const IAgent& Agent, const ENeedType NeedType);
 	

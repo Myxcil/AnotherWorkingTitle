@@ -7,6 +7,7 @@
 #include "AI/AIConstants.h"
 #include "AI/IAgent.h"
 #include "Construction/BuildingSite.h"
+#include "Interactive/NeedsModifier.h"
 #include "Inventory/Stockpile.h"
 #include "Resources/ResourceNode.h"
 #include "Resources/ResourceRegistrySubsystem.h"
@@ -19,6 +20,7 @@ bool FAIHelper::HasValidTransform(const IAgent& Agent, const ENodeType NodeType)
 	case ENodeType::ResourceNode:
 	case ENodeType::Stockpile:
 	case ENodeType::BuildingSite:
+	case ENodeType::NeedsModifier:
 		return true;
 		
 	default: 
@@ -32,7 +34,6 @@ bool FAIHelper::GetObjectTransform(const IAgent& Agent, const ENodeType NodeType
 {
 	switch (NodeType)
 	{
-		
 	case ENodeType::ResourceNode:
 		if (const AResourceNode* ResourceNode = Agent.GetBlackboard().GetResourceNode())
 		{
@@ -40,6 +41,7 @@ bool FAIHelper::GetObjectTransform(const IAgent& Agent, const ENodeType NodeType
 			return true;
 		}
 		break;
+		
 	case ENodeType::Stockpile:
 		if (const AStockpile* Stockpile = Agent.GetBlackboard().GetStockpile())
 		{
@@ -47,10 +49,19 @@ bool FAIHelper::GetObjectTransform(const IAgent& Agent, const ENodeType NodeType
 			return true;
 		}
 		break;
+		
 	case ENodeType::BuildingSite:
 		if (const ABuildingSite* BuildingSite = Agent.GetBlackboard().GetBuildingSite())
 		{
 			Result = BuildingSite->GetActorTransform();
+			return true;
+		}
+		break;
+		
+	case ENodeType::NeedsModifier:
+		if (const ANeedsModifier* NeedsModifier = Agent.GetBlackboard().GetNeedsModifier())
+		{
+			Result = NeedsModifier->GetActorTransform();
 			return true;
 		}
 		break;
@@ -139,6 +150,27 @@ AResourceNode* FAIHelper::FindNearestResourceNode(const FVector& RefPosition, co
 	}
 	
 	return NearestNode;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool FAIHelper::HasResourceNodeByNeed(const ENeedType NeedType)
+{
+	const TArray<AResourceNode*>& AllResourceNodes = AResourceNode::GetInstances();
+	for (AResourceNode* ResourceNode : AllResourceNodes)
+	{
+		if (!ResourceNode)
+			continue;
+		
+		if (!ResourceNode->CanHarvest())
+			continue;
+		
+		const UResourceDefinition* Resource = ResourceNode->GetResource();
+		check(Resource);
+		
+		if (Resource->GetNeedChange(NeedType) < 0)
+			return true;
+	}
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -256,6 +288,25 @@ ABuildingSite* FAIHelper::FindNearestUnfinishedBuilding(const FVector& RefPositi
 	}
 	
 	return NearestSite;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+ANeedsModifier* FAIHelper::FindNeedImprover(const ENeedType NeedType)
+{
+	for (ANeedsModifier* NeedsModifier : ANeedsModifier::GetInstances())
+	{
+		if (!NeedsModifier)
+			continue;
+		
+		if (NeedsModifier->GetAffectedType() != NeedType)
+			continue;
+		
+		if (NeedsModifier->GetNeedDelta() >= 0)
+			continue;;
+		
+		return NeedsModifier;
+	}
+	return nullptr;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,61 +1,59 @@
 ﻿// (c) 2025 MK
 
 
-#include "AI/Actions/ActionUseSlot.h"
+#include "AI/Actions/ActionSatisfyNeedAtLocation.h"
 
 #include "AI/AIBlackboard.h"
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
-
+#include "Interactive/NeedsModifier.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-UActionUseSlot::UActionUseSlot()
+UActionSatisfyNeedAtLocation::UActionSatisfyNeedAtLocation()
 {
-	Preconditions.Set(EWorldPropertyKey::HasResource, EWorldPropertyKey::UseSlot);
+	Preconditions.Set(EWorldPropertyKey::AtNode, ENodeType::NeedsModifier);
 	Results.Set(EWorldPropertyKey::UseSlot, EWorldPropertyKey::UseSlot);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionUseSlot::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
+bool UActionSatisfyNeedAtLocation::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
 {
 	if (!Super::AreContextPreconditionsSatisfied(Agent, CurrentWorldState, bIsPlanning))
 		return false;
 	
 	const FWorldProperty* PropUseSlot = CurrentWorldState.Get(EWorldPropertyKey::UseSlot);
-	if (!PropUseSlot)
+	if (!PropUseSlot || PropUseSlot->Type != EWorldPropertyType::NeedType)
 		return false;
 	
-	if (PropUseSlot->Type == EWorldPropertyType::NeedType)
-	{
-		if (!FAIHelper::HasResourceNodeByNeed(PropUseSlot->NeedType))
-			return false;
-	}
-	
-	if (!bIsPlanning)
-	{
-		const int32 SlotIndex = Agent.GetBlackboard().GetSlotIndex();
-		if (SlotIndex == INDEX_NONE)
-			return false;
-	}
+	const ANeedsModifier* NeedsModifier = FAIHelper::FindNeedImprover(PropUseSlot->NeedType);
+	if (!NeedsModifier)
+		return false;
 	
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionUseSlot::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
+bool UActionSatisfyNeedAtLocation::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
-	const int32 SlotIndex = Agent.GetBlackboard().GetSlotIndex();
-	return Agent.UseSlot(SlotIndex);
+	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionUseSlot::Deactivate(IAgent& Agent) const
+void UActionSatisfyNeedAtLocation::Deactivate(IAgent& Agent) const
 {
-	Agent.GetBlackboard().Clear(EBlackboardMask::SlotIndex);
+	
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionUseSlot::IsComplete(IAgent& Agent) const
+EActionResult UActionSatisfyNeedAtLocation::IsComplete(IAgent& Agent) const
 {
+	if (const ANeedsModifier* NeedsModifier = Agent.GetBlackboard().GetNeedsModifier())
+	{
+		const ENeedType NeedType = NeedsModifier->GetAffectedType();
+		if (Agent.GetNeedSeverity(NeedType) != ENeedSeverity::Normal)
+		{
+			return EActionResult::Incomplete;
+		}
+	}
 	return EActionResult::Complete;
 }

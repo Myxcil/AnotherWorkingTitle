@@ -8,7 +8,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionSearchPath::UActionSearchPath()
 {
-	Results.Set(EWorldPropertyKey::PathExists, EWorldPropertyKey::AtNode);
+	Results.Set(EWorldPropertyKey::PathExists, EWorldPropertyKey::PathExists);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,7 +21,8 @@ bool UActionSearchPath::AreContextPreconditionsSatisfied(IAgent& Agent, const FW
 	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node)
 		return false;
 	
-	if (!FAIHelper::HasValidTransform(Agent, PropAtNode->NodeType))
+	FTransform Transform;
+	if (!FAIHelper::GetObjectTransform(Agent, PropAtNode->NodeType, Transform))
 		return false;
 	
 	return true;

@@ -10,6 +10,18 @@
 #include "Settlers/SettlerCharacter.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+namespace 
+{
+	TArray<ANeedsModifier*> AllNeedsModifiers;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+const TArray<ANeedsModifier*>& ANeedsModifier::GetInstances()
+{
+	return AllNeedsModifiers;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 ANeedsModifier::ANeedsModifier()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -28,11 +40,15 @@ void ANeedsModifier::BeginPlay()
 	
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnComponentBeginOverlap);
 	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnComponentEndOverlap);
+	
+	AllNeedsModifiers.Add(this);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ANeedsModifier::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	AllNeedsModifiers.Remove(this);
+	
 	for (int32 I=0; I < OverlappingNeedsComponents.Num(); ++I)
 	{
 		if (UNeedsComponent* NeedsComponent = OverlappingNeedsComponents[I].Get())
@@ -77,9 +93,15 @@ void ANeedsModifier::Tick(float DeltaTime)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+float ANeedsModifier::GetRadius() const
+{
+	return SphereComponent->GetScaledSphereRadius();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ANeedsModifier::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (ASettlerCharacter* SettlerCharacter = Cast<ASettlerCharacter>(OtherActor))
+	if (const ASettlerCharacter* SettlerCharacter = Cast<ASettlerCharacter>(OtherActor))
 	{
 		if (UNeedsComponent* NeedsComponent = SettlerCharacter->GetNeedsComponent())
 		{

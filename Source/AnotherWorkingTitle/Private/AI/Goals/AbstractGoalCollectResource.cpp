@@ -13,9 +13,6 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 float UAbstractGoalCollectResource::Evaluate(IAgent& Agent) const
 {
-	if (Agent.IsInCriticalState())
-		return 0;
-	
 	const UResourceDefinition* Resource = GetResource(Agent);
 	if (!Resource)
 		return 0;

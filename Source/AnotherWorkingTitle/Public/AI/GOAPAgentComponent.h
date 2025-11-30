@@ -76,7 +76,7 @@ public:
 	
 	virtual bool UseSlot(const int32 SlotIndex) override;
 
-	virtual bool IsInCriticalState() const override;
+	virtual ENeedSeverity GetNeedSeverity(const ENeedType NeedType) const override;
 	virtual float GetNeedValue(const ENeedType NeedType) const override;
 	
 private:
@@ -141,7 +141,8 @@ private:
 	bool bWorldIsDirty;
 	FDelegateHandle HandleGlobalInventoryChanged;
 	FDelegateHandle HandleGlobalBuildingSiteChanged;
-	FDelegateHandle HandleGlobalRsourceNodeChanged;
+	FDelegateHandle HandleGlobalResourceNodeChanged;
+	FDelegateHandle HandleNeedSeverityChanged;
 
 	TWeakObjectPtr<const UAbstractGoal> CurrentGoal;
 	FWorldState CurrentGoalState;

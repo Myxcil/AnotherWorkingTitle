@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIConstants.h"
 
+class ANeedsModifier;
 class ABuildingSite;
 class AStockpile;
 class AResourceNode;
@@ -22,6 +23,9 @@ public:
 	
 	void SetBuildingSite(ABuildingSite* InBuildingSite) { SetFlag(EBlackboardMask::BuildingSite); BuildingSite = InBuildingSite; }
 	ABuildingSite* GetBuildingSite() const { return IsSet(EBlackboardMask::BuildingSite) ? BuildingSite : nullptr; }
+	
+	void SetNeedsModifier(ANeedsModifier* InNeedsModifier) { SetFlag(EBlackboardMask::NeedsModifier); NeedsModifier = InNeedsModifier; }
+	ANeedsModifier* GetNeedsModifier() const { return IsSet(EBlackboardMask::NeedsModifier) ? NeedsModifier : nullptr; }
 	
 	void SetSlotIndex(const int32 InSlotIndex) { SetFlag(EBlackboardMask::SlotIndex); SlotIndex = InSlotIndex; }
 	int32 GetSlotIndex() const { return IsSet(EBlackboardMask::SlotIndex) ? SlotIndex : INDEX_NONE; }
@@ -41,5 +45,6 @@ private:
 	AResourceNode* ResourceNode = nullptr;
 	AStockpile* Stockpile = nullptr;
 	ABuildingSite* BuildingSite = nullptr;
+	ANeedsModifier* NeedsModifier = nullptr;
 	int32 SlotIndex = INDEX_NONE;
 };

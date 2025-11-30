@@ -32,6 +32,7 @@ protected:
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	bool CanHarvest() const { return bIsUnlimited || Stack.Amount > 0; }
 	bool Harvest(ASettlerCharacter* InstigatorCharacter);
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ public:
 	virtual void Interact_Implementation(ASettlerCharacter* InstigatorCharacter) override;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	bool HasResource(const UResourceDefinition* InResource) const { return Stack.Resource == InResource && (bIsUnlimited || Stack.Amount > 0); }
+	bool HasResource(const UResourceDefinition* InResource) const { return Stack.Resource == InResource && CanHarvest(); }
 	const UResourceDefinition* GetResource() const { return Stack.Resource; }
 	
 	UPROPERTY(BlueprintAssignable)
