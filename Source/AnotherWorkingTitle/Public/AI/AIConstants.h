@@ -96,6 +96,7 @@ enum class ENodeType : uint8
 	Stockpile,
 	BuildingSite,
 	NeedsModifier,
+	NeedInteraction,
 	
 	Query,
 	
@@ -111,5 +112,6 @@ enum class EBlackboardMask : uint8
 	Stockpile,
 	BuildingSite,
 	NeedsModifier,
+	NeedInteraction,
 };
 FString GetBlackboardMaskName(EBlackboardMask BlackboardMask);

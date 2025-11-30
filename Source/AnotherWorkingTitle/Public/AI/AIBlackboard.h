@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIConstants.h"
 
+class ANeedInteraction;
 class ANeedsModifier;
 class ABuildingSite;
 class AStockpile;
@@ -27,6 +28,9 @@ public:
 	void SetNeedsModifier(ANeedsModifier* InNeedsModifier) { SetFlag(EBlackboardMask::NeedsModifier); NeedsModifier = InNeedsModifier; }
 	ANeedsModifier* GetNeedsModifier() const { return IsSet(EBlackboardMask::NeedsModifier) ? NeedsModifier : nullptr; }
 	
+	void SetNeedInteraction(ANeedInteraction* InNeedInteraction) { SetFlag(EBlackboardMask::NeedInteraction); NeedInteraction = InNeedInteraction; }
+	ANeedInteraction* GetNeedInteraction() const { return IsSet(EBlackboardMask::NeedInteraction) ? NeedInteraction : nullptr; }
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool IsSet(EBlackboardMask Mask) const { return (Flags & AI_ENUM_TO_FLAG(Mask)) != 0; }
 
@@ -43,4 +47,5 @@ private:
 	AStockpile* Stockpile = nullptr;
 	ABuildingSite* BuildingSite = nullptr;
 	ANeedsModifier* NeedsModifier = nullptr;
+	ANeedInteraction* NeedInteraction = nullptr;
 };

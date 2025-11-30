@@ -30,14 +30,21 @@ bool UActionSearchPathByNeed::AreContextPreconditionsSatisfied(IAgent& Agent, co
 		
 	if (PropAtNode->NodeType == ENodeType::NeedsModifier)
 	{
-		if (const ANeedsModifier* NeedsModifier = FAIHelper::FindNeedImprover(PropNeed->NeedType))
+		if (FAIHelper::HasNeedImprover(PropNeed->NeedType))
 		{
 			return true;
 		}
 	}
 	else if (PropAtNode->NodeType == ENodeType::ResourceNode)
 	{
-		if (const AResourceNode* ResourceNode = FAIHelper::FindNearestResourceNodeByNeed(Agent.GetFeetPosition(), PropNeed->NeedType))
+		if (FAIHelper::HasResourceNodeByNeed(PropNeed->NeedType))
+		{
+			return true;
+		}
+	}
+	else if (PropAtNode->NodeType == ENodeType::NeedInteraction)
+	{
+		if (FAIHelper::HasNeedInteraction(PropNeed->NeedType))
 		{
 			return true;
 		}
@@ -54,7 +61,7 @@ bool UActionSearchPathByNeed::Activate(IAgent& Agent, const FWorldState& Current
 	
 	if (PropAtNode->NodeType == ENodeType::NeedsModifier)
 	{
-		if (ANeedsModifier* NeedsModifier = FAIHelper::FindNeedImprover(PropNeed->NeedType))
+		if (ANeedsModifier* NeedsModifier = FAIHelper::FindNearestNeedImprover(Agent.GetFeetPosition(), PropNeed->NeedType))
 		{
 			Agent.GetBlackboard().SetNeedsModifier(NeedsModifier);	
 			return true;
@@ -68,7 +75,15 @@ bool UActionSearchPathByNeed::Activate(IAgent& Agent, const FWorldState& Current
 			return true;
 		}
 	}
-	
+	else if (PropAtNode->NodeType == ENodeType::NeedInteraction)
+	{
+		if (ANeedInteraction* NeedInteraction = FAIHelper::FindNearestNeedInteraction(Agent.GetFeetPosition(), PropNeed->NeedType))
+		{
+			Agent.GetBlackboard().SetNeedInteraction(NeedInteraction);
+			return true;
+		}
+	}
+
 	return false;
 }
 

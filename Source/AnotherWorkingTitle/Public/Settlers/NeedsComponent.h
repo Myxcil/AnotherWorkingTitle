@@ -65,7 +65,9 @@ private:
 	float ColdRatePerHour = 0.3f;
 	UPROPERTY(EditAnywhere, Category="Needs|Config", meta=(AllowPrivateAccess=true))
 	float FatigueRatePerHour = 0.15f;
-	
+	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	float RateVariation = 0.08f;
+
 	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
 	float DamageForCriticalHunger = 0.1f;
 	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
@@ -74,20 +76,28 @@ private:
 	float DamageForCriticalCold = 0.1f;
 	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
 	float DamageForCriticalFatigue = 0.1f;
+	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	float DamageVariation = 0.05f;
 
 	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
 	float UncomfortableThreshold = 0.4f;
 	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
 	float CriticalThreshold = 0.8f;
+	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	float ThresholdVariation = 0.15f;
+	
 	
 	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
 	bool bInvincible = false;
 	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
 	bool bUndead = false;
+	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	bool bIgnoreVariations = false;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void SetNeedValue(const ENeedType NeedType, const float InValue);
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	FRandomStream RandomStream;
 	TStaticArray<ENeedSeverity, 6> PrevNeedSeverity;
 };

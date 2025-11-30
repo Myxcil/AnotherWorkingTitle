@@ -69,6 +69,9 @@ public:
 	virtual void DepositByCategory(AStockpile* Stockpile, const EResourceCategory ResourceCategory) = 0;
 	
 	virtual bool UseSlot(const int32 SlotIndex) = 0;
+	
+	virtual bool StartInteraction(ANeedInteraction* Interaction) = 0;
+	virtual void StopInteraction(ANeedInteraction* Interaction) = 0;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual ENeedSeverity GetNeedSeverity(const ENeedType NeedType) const = 0;

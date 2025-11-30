@@ -77,6 +77,9 @@ public:
 	virtual void DepositByCategory(AStockpile* Stockpile, const EResourceCategory ResourceCategory) override;
 	
 	virtual bool UseSlot(const int32 SlotIndex) override;
+	
+	virtual bool StartInteraction(ANeedInteraction* Interaction) override;
+	virtual void StopInteraction(ANeedInteraction* Interaction) override;
 
 	virtual ENeedSeverity GetNeedSeverity(const ENeedType NeedType) const override;
 	virtual float GetNeedValue(const ENeedType NeedType) const override;

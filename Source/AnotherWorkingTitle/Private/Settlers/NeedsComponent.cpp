@@ -20,6 +20,34 @@ void UNeedsComponent::BeginPlay()
 	{
 		PrevNeedSeverity[I] = ENeedSeverity::Normal;		
 	}	
+
+	static int32 RandomSeed = 1;
+	RandomStream.Initialize(RandomSeed++);
+	
+	if (!bIgnoreVariations)
+	{
+		if (RateVariation != 0.0f)
+		{
+			HungerRatePerHour += RandomStream.FRandRange(-RateVariation, RateVariation);
+			ThirstRatePerHour += RandomStream.FRandRange(-RateVariation, RateVariation);
+			ColdRatePerHour += RandomStream.FRandRange(-RateVariation, RateVariation);
+			FatigueRatePerHour += RandomStream.FRandRange(-RateVariation, RateVariation);
+		}
+	
+		if (DamageVariation != 0.0f)
+		{
+			DamageForCriticalHunger += RandomStream.FRandRange(-DamageVariation, DamageVariation);
+			DamageForCriticalThirst += RandomStream.FRandRange(-DamageVariation, DamageVariation);
+			DamageForCriticalCold += RandomStream.FRandRange(-DamageVariation, DamageVariation);
+			DamageForCriticalFatigue += RandomStream.FRandRange(-DamageVariation, DamageVariation);
+		}
+	
+		if (ThresholdVariation != 0.0f)
+		{
+			UncomfortableThreshold += RandomStream.FRandRange(-ThresholdVariation, ThresholdVariation);
+			CriticalThreshold += RandomStream.FRandRange(-ThresholdVariation, ThresholdVariation);
+		}
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

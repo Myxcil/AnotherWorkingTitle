@@ -9,6 +9,7 @@
 #include "AI/Actions/AbstractAction.h"
 #include "AI/Goals/AbstractGoal.h"
 #include "Construction/BuildingSite.h"
+#include "Interactive/NeedInteraction.h"
 #include "Inventory/InventoryComponent.h"
 #include "rapidjson/rapidjson.h"
 #include "Resources/ResourceNode.h"
@@ -717,6 +718,21 @@ bool UGOAPAgentComponent::UseSlot(const int32 SlotIndex)
 		}
 	}
 	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UGOAPAgentComponent::StartInteraction(ANeedInteraction* Interaction)
+{
+	if (ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		return Interaction->StartInteraction(Settler);
+	}
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UGOAPAgentComponent::StopInteraction(ANeedInteraction* Interaction)
+{
+	Interaction->StopInteraction();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,26 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interaction.h"
 #include "Construction/BaseBuilding.h"
 #include "Settlers/Needs.h"
-#include "NeedsModifier.generated.h"
+#include "NeedInteraction.generated.h"
 
 class UGameTimeSubsystem;
-class UNeedsComponent;
-class USphereComponent;
+class ASettlerCharacter;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(Abstract)
-class ANOTHERWORKINGTITLE_API ANeedsModifier : public ABaseBuilding
+class ANOTHERWORKINGTITLE_API ANeedInteraction : public ABaseBuilding, public IHoldInteraction
 {
 	GENERATED_BODY()
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	static const TArray<ANeedsModifier*>& GetInstances();
+	static const TArray<ANeedInteraction*>& GetInstances();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	ANeedsModifier();
+	ANeedInteraction();
 
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -31,33 +31,33 @@ protected:
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual void Tick(float DeltaTime) override;
+	// IHoldInteraction
+	virtual void BeginInteraction_Implementation(ASettlerCharacter* SettlerCharacter) override;
+	virtual void EndInteraction_Implementation(ASettlerCharacter* SettlerCharacter) override;
+	virtual bool TickInteraction_Implementation(ASettlerCharacter* SettlerCharacter, float DeltaTime) override;
 	
-	float GetRadius() const;
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	ENeedType GetAffectedType() const { return AffectedType; }
 	float GetNeedDelta() const { return NeedsValueDelta; }
 	
-protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
-	TObjectPtr<USphereComponent> SphereComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
-	ENeedType AffectedType = ENeedType::Cold;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
-	float NeedsValueDelta = 0.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
-	bool bFallOff = true;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
-	TObjectPtr<UTexture2D> EffectIcon = nullptr;
-		
-private:
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	UFUNCTION()
-	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-	UFUNCTION()
-	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	bool StartInteraction(ASettlerCharacter* Settler);
+	void StopInteraction();
+	bool IsInteracting() const { return CurrentUser.IsValid();}
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual void Tick(float DeltaSeconds) override;
+	
+protected:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	bool UpdateInteraction();
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
+	ENeedType AffectedType = ENeedType::Fatigue;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
+	float NeedsValueDelta = 0.0f;
+	
 	TWeakObjectPtr<const UGameTimeSubsystem> GameTimeSubsystemPtr;
-	TArray<TWeakObjectPtr<UNeedsComponent>> OverlappingNeedsComponents;
+	TWeakObjectPtr<ASettlerCharacter> CurrentUser;
 };

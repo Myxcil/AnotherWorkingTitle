@@ -7,6 +7,7 @@
 #include "AI/AIConstants.h"
 #include "AI/IAgent.h"
 #include "Construction/BuildingSite.h"
+#include "Interactive/NeedInteraction.h"
 #include "Interactive/NeedsModifier.h"
 #include "Inventory/Stockpile.h"
 #include "Resources/ResourceNode.h"
@@ -27,6 +28,8 @@ bool FAIHelper::HasValidTransform(const IAgent& Agent, const ENodeType NodeType,
 		return !bCheckBlackboardMembers || Blackboard.IsSet(EBlackboardMask::BuildingSite);
 	case ENodeType::NeedsModifier:
 		return !bCheckBlackboardMembers || Blackboard.IsSet(EBlackboardMask::NeedsModifier);
+	case ENodeType::NeedInteraction:
+		return !bCheckBlackboardMembers || Blackboard.IsSet(EBlackboardMask::NeedInteraction);
 	default: 
 		break;
 	}
@@ -70,6 +73,14 @@ bool FAIHelper::GetObjectTransform(const IAgent& Agent, const ENodeType NodeType
 		}
 		break;
 		
+	case ENodeType::NeedInteraction:
+		if (const ANeedInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction())
+		{
+			Result = NeedInteraction->GetActorTransform();
+			return true;
+		}
+		break;
+	
 	default: 
 		break;
 	}
@@ -80,19 +91,35 @@ bool FAIHelper::GetObjectTransform(const IAgent& Agent, const ENodeType NodeType
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool FAIHelper::HasResourceNode(const UResourceDefinition* Resource)
+{
+	if (!Resource)
+		return false;
+
+	for (AResourceNode* ResourceNode : AResourceNode::GetInstances())
+	{
+		if (!ResourceNode)
+			continue;
+		
+		if (!ResourceNode->HasResource(Resource))
+			continue;
+		
+		return true;
+	}
+	
+	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 AResourceNode* FAIHelper::FindNearestResourceNode(const FVector& RefPosition, const UResourceDefinition* Resource)
 {
 	if (!Resource)
 		return nullptr;
 	
-	const TArray<AResourceNode*>& AllResourceNodes = AResourceNode::GetInstances();
-	if (AllResourceNodes.Num() == 0)
-		return nullptr;
-	
 	AResourceNode* NearestNode = nullptr;
 	float SqMinDist = std::numeric_limits<float>::max();
 	
-	for (AResourceNode* ResourceNode : AllResourceNodes)
+	for (AResourceNode* ResourceNode : AResourceNode::GetInstances())
 	{
 		if (!ResourceNode)
 			continue;
@@ -229,8 +256,7 @@ ABuildingSite* FAIHelper::FindNearestUnfinishedBuilding(const FVector& RefPositi
 	ABuildingSite* NearestSite = nullptr;
 	float SqMinDist = std::numeric_limits<float>::max();
 	
-	const TArray<ABuildingSite*>& AlLBuildingSites = ABuildingSite::GetInstances();
-	for (ABuildingSite* BuildingSite : AlLBuildingSites)
+	for (ABuildingSite* BuildingSite : ABuildingSite::GetInstances())
 	{
 		if (!BuildingSite)
 			continue;
@@ -250,7 +276,7 @@ ABuildingSite* FAIHelper::FindNearestUnfinishedBuilding(const FVector& RefPositi
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-ANeedsModifier* FAIHelper::FindNeedImprover(const ENeedType NeedType)
+bool FAIHelper::HasNeedImprover(const ENeedType NeedType)
 {
 	for (ANeedsModifier* NeedsModifier : ANeedsModifier::GetInstances())
 	{
@@ -263,9 +289,88 @@ ANeedsModifier* FAIHelper::FindNeedImprover(const ENeedType NeedType)
 		if (NeedsModifier->GetNeedDelta() >= 0)
 			continue;;
 		
-		return NeedsModifier;
+		return true;
 	}
-	return nullptr;
+	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+ANeedsModifier* FAIHelper::FindNearestNeedImprover(const FVector& RefPosition, const ENeedType NeedType)
+{
+	ANeedsModifier* NearestNeedsModifier = nullptr;
+	float SqMinDist = std::numeric_limits<float>::max();
+	
+	for (ANeedsModifier* NeedsModifier : ANeedsModifier::GetInstances())
+	{
+		if (!NeedsModifier)
+			continue;
+		
+		if (NeedsModifier->GetAffectedType() != NeedType)
+			continue;
+		
+		if (NeedsModifier->GetNeedDelta() >= 0)
+			continue;;
+		
+		const float SqDist = FVector::DistSquared(RefPosition, NeedsModifier->GetActorLocation());
+		if (SqDist < SqMinDist)
+		{
+			SqMinDist = SqDist;
+			NearestNeedsModifier = NeedsModifier;
+		}
+	}
+	return NearestNeedsModifier;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool FAIHelper::HasNeedInteraction(const ENeedType NeedType)
+{
+	for (ANeedInteraction* NeedInteraction : ANeedInteraction::GetInstances())
+	{
+		if (!NeedInteraction)
+			continue;
+		
+		if (NeedInteraction->GetAffectedType() != NeedType)
+			continue;
+		
+		if (NeedInteraction->GetNeedDelta() >= 0)
+			continue;;
+		
+		if (NeedInteraction->IsInteracting())
+			continue;
+		
+		return true;
+	}
+	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+ANeedInteraction* FAIHelper::FindNearestNeedInteraction(const FVector& RefPosition, const ENeedType NeedType)
+{
+	ANeedInteraction* NearestNeedIntersection = nullptr;
+	float SqMinDist = std::numeric_limits<float>::max();
+	
+	for (ANeedInteraction* NeedInteraction : ANeedInteraction::GetInstances())
+	{
+		if (!NeedInteraction)
+			continue;
+		
+		if (NeedInteraction->GetAffectedType() != NeedType)
+			continue;
+		
+		if (NeedInteraction->GetNeedDelta() >= 0)
+			continue;;
+		
+		if (NeedInteraction->IsInteracting())
+			continue;
+		
+		const float SqDist = FVector::DistSquared(RefPosition, NeedInteraction->GetActorLocation());
+		if (SqDist < SqMinDist)
+		{
+			SqMinDist = SqDist;
+			NearestNeedIntersection = NeedInteraction;
+		}
+	}
+	return NearestNeedIntersection;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

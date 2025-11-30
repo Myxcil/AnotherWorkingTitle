@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "BuildingDefinition.generated.h"
 
+class ABaseBuilding;
 class UResourceDefinition;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -46,5 +47,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Building")
 	float TimeToBuild = 10.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Building")
-	TSubclassOf<AActor> BuildingToSpawn;
+	TSubclassOf<ABaseBuilding> BuildingToSpawn;
 };

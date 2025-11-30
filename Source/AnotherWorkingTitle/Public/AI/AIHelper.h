@@ -7,6 +7,7 @@
 #include "Resources/ResourceCategory.h"
 #include "Settlers/Needs.h"
 
+class ANeedInteraction;
 class ANeedsModifier;
 class IAgent;
 class ABuildingSite;
@@ -27,6 +28,7 @@ public:
 	static float CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale = 0.0001f);
 	
 	// Resources
+	static bool HasResourceNode(const UResourceDefinition* Resource);
 	static AResourceNode* FindNearestResourceNode(const FVector& RefPosition, const UResourceDefinition* Resource);
 	static bool HasResourceNodeByNeed(const ENeedType NeedType);
 	static AResourceNode* FindNearestResourceNodeByNeed(const FVector& RefPosition, const ENeedType NeedType);
@@ -40,8 +42,11 @@ public:
 	static ABuildingSite* FindNearestUnfinishedBuilding(const FVector& RefPosition);
 	
 	// Needs
-	static ANeedsModifier* FindNeedImprover(const ENeedType NeedType);
-
+	static bool HasNeedImprover(const ENeedType NeedType);
+	static ANeedsModifier* FindNearestNeedImprover(const FVector& RefPosition, const ENeedType NeedType);
+	static bool HasNeedInteraction(const ENeedType NeedType);
+	static ANeedInteraction* FindNearestNeedInteraction(const FVector& RefPosition, const ENeedType NeedType);
+	
 	// Inventory
 	static int32 FindFirstInInventoryByNeedChange(const IAgent& Agent, const ENeedType NeedType);
 	static int32 FindBestInInventoryByNeedChange(const IAgent& Agent, const ENeedType NeedType);

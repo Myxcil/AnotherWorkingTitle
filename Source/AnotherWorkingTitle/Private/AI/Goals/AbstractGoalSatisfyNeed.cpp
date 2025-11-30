@@ -10,9 +10,6 @@
 float UAbstractGoalSatisfyNeed::Evaluate(IAgent& Agent) const
 {
 	const ENeedType NeedType = GetNeedType(); 
-	if (Agent.GetNeedSeverity(NeedType) == ENeedSeverity::Normal)
-		return 0;
-	
 	return Agent.GetNeedValue(NeedType);
 }
 
