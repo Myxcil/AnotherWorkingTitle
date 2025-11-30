@@ -1,7 +1,7 @@
 ﻿// (c) 2025 MK
 
 
-#include "AI/Actions/ActionSatisfyNeedAtLocation.h"
+#include "AI/Actions/ActionSatisfyNeedAtModifier.h"
 
 #include "AI/AIBlackboard.h"
 #include "AI/AIHelper.h"
@@ -9,14 +9,14 @@
 #include "Interactive/NeedsModifier.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-UActionSatisfyNeedAtLocation::UActionSatisfyNeedAtLocation()
+UActionSatisfyNeedAtModifier::UActionSatisfyNeedAtModifier()
 {
 	Preconditions.Set(EWorldPropertyKey::AtNode, ENodeType::NeedsModifier);
 	Results.Set(EWorldPropertyKey::Need, EWorldPropertyKey::Need);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionSatisfyNeedAtLocation::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
+bool UActionSatisfyNeedAtModifier::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
 {
 	if (!Super::AreContextPreconditionsSatisfied(Agent, CurrentWorldState, bIsPlanning))
 		return false;
@@ -33,19 +33,19 @@ bool UActionSatisfyNeedAtLocation::AreContextPreconditionsSatisfied(IAgent& Agen
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionSatisfyNeedAtLocation::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
+bool UActionSatisfyNeedAtModifier::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UActionSatisfyNeedAtLocation::Deactivate(IAgent& Agent) const
+void UActionSatisfyNeedAtModifier::Deactivate(IAgent& Agent) const
 {
 	
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionSatisfyNeedAtLocation::IsComplete(IAgent& Agent) const
+EActionResult UActionSatisfyNeedAtModifier::IsComplete(IAgent& Agent) const
 {
 	if (const ANeedsModifier* NeedsModifier = Agent.GetBlackboard().GetNeedsModifier())
 	{

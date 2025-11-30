@@ -50,7 +50,7 @@ bool UActionGoto::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldSt
 	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node)
 		return false;
 	
-	if (!FAIHelper::HasValidTransform(Agent, PropAtNode->NodeType))
+	if (!FAIHelper::HasValidTransform(Agent, PropAtNode->NodeType, false))
 		return false;
 
 	return true;

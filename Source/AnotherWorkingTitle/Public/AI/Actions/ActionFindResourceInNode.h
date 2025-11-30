@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "AbstractAction.h"
-#include "ActionSatisfyNeedAtLocation.generated.h"
+#include "ActionFindResourceInNode.generated.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
-class ANOTHERWORKINGTITLE_API UActionSatisfyNeedAtLocation : public UAbstractAction
+class ANOTHERWORKINGTITLE_API UActionFindResourceInNode : public UAbstractAction
 {
 	GENERATED_BODY()
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	UActionSatisfyNeedAtLocation();
-
+	UActionFindResourceInNode();
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual bool AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const override;
 	

@@ -21,8 +21,7 @@ bool UActionSearchPath::AreContextPreconditionsSatisfied(IAgent& Agent, const FW
 	if (!PropAtNode || PropAtNode->Type != EWorldPropertyType::Node)
 		return false;
 	
-	FTransform Transform;
-	if (!FAIHelper::GetObjectTransform(Agent, PropAtNode->NodeType, Transform))
+	if (!FAIHelper::HasValidTransform(Agent, PropAtNode->NodeType, true))
 		return false;
 	
 	return true;

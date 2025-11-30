@@ -13,16 +13,20 @@
 #include "Resources/ResourceRegistrySubsystem.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool FAIHelper::HasValidTransform(const IAgent& Agent, const ENodeType NodeType)
+bool FAIHelper::HasValidTransform(const IAgent& Agent, const ENodeType NodeType, const bool bCheckBlackboardMembers)
 {
+	const FAIBlackboard& Blackboard = Agent.GetBlackboard();
+	
 	switch (NodeType)
 	{
 	case ENodeType::ResourceNode:
+		return !bCheckBlackboardMembers || Blackboard.IsSet(EBlackboardMask::ResourceNode);
 	case ENodeType::Stockpile:
+		return !bCheckBlackboardMembers || Blackboard.IsSet(EBlackboardMask::Stockpile);
 	case ENodeType::BuildingSite:
+		return !bCheckBlackboardMembers || Blackboard.IsSet(EBlackboardMask::BuildingSite);
 	case ENodeType::NeedsModifier:
-		return true;
-		
+		return !bCheckBlackboardMembers || Blackboard.IsSet(EBlackboardMask::NeedsModifier);
 	default: 
 		break;
 	}
@@ -73,51 +77,6 @@ bool FAIHelper::GetObjectTransform(const IAgent& Agent, const ENodeType NodeType
 	AI_WARN(TEXT("GetObjectTransform, unhandled object"));
 	Result = FTransform::Identity;
 	return false;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-const UResourceDefinition* FAIHelper::FindMinResourceInStockpiles(const UResourceRegistrySubsystem* ResourceRegistry)
-{
-	const TArray<const UResourceDefinition*>& AllResources = ResourceRegistry->GetAllResources();
-	if (AllResources.Num() == 0)
-		return nullptr;
-
-	const TArray<AStockpile*>& Stockpiles = AStockpile::GetInstances();
-	if (Stockpiles.Num() == 0)
-		return nullptr;
-	
-	const UResourceDefinition* ScarcestResource = nullptr;
-	int32 MinTotalAmount = TNumericLimits<int32>::Max();
-
-	for (const UResourceDefinition* Resource : AllResources)
-	{
-		if (Resource == nullptr)
-			continue;
-
-		int32 TotalAmount = 0;
-
-		for (const AStockpile* Stockpile : Stockpiles)
-		{
-			if (Stockpile == nullptr)
-			{
-				continue;
-			}
-
-			const FSettlementStock& Stock = Stockpile->GetSettlementStock();
-			TotalAmount += Stock.GetAmount(Resource);
-		}
-
-		if (TotalAmount < MinTotalAmount)
-		{
-			MinTotalAmount   = TotalAmount;
-			ScarcestResource = Resource;
-			
-			if (MinTotalAmount == 0)
-				break;
-		}
-	}
-
-	return ScarcestResource;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

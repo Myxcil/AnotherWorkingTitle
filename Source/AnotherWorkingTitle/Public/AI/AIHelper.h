@@ -22,13 +22,11 @@ public:
 	FORCEINLINE static float Clamp01(const float InValue) { return FMath::Clamp(InValue, 0.0f, 1.0f); }
 	
 	// World
-	static bool HasValidTransform(const IAgent& Agent, const ENodeType NodeType);
+	static bool HasValidTransform(const IAgent& Agent, const ENodeType NodeType, const bool bCheckBlackboardMembers);
 	static bool GetObjectTransform(const IAgent& Agent, const ENodeType NodeType, FTransform& Result);
 	static float CalculateDistanceWeight(const FVector& From, const FVector& To, const float Scale = 0.0001f);
 	
 	// Resources
-	static const UResourceDefinition* FindMinResourceInStockpiles(const UResourceRegistrySubsystem* ResourceRegistry);
-	
 	static AResourceNode* FindNearestResourceNode(const FVector& RefPosition, const UResourceDefinition* Resource);
 	static bool HasResourceNodeByNeed(const ENeedType NeedType);
 	static AResourceNode* FindNearestResourceNodeByNeed(const FVector& RefPosition, const ENeedType NeedType);

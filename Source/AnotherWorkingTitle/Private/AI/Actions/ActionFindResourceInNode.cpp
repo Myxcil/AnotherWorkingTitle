@@ -1,49 +1,61 @@
 ﻿// (c) 2025 MK
 
 
-#include "AI/Actions/ActionHarvest.h"
+#include "AI/Actions/ActionFindResourceInNode.h"
 
 #include "AI/AIBlackboard.h"
+#include "AI/AIHelper.h"
 #include "AI/IAgent.h"
-#include "Resources/ResourceNode.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-UActionHarvest::UActionHarvest()
+UActionFindResourceInNode::UActionFindResourceInNode()
 {
-	Preconditions.Set(EWorldPropertyKey::AtNode, EWorldPropertyKey::HasResource);
+	Preconditions.Set(EWorldPropertyKey::AtNode, ENodeType::ResourceNode);
 	Results.Set(EWorldPropertyKey::HasResource, EWorldPropertyKey::HasResource);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionHarvest::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
+bool UActionFindResourceInNode::AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const
 {
 	if (!Super::AreContextPreconditionsSatisfied(Agent, CurrentWorldState, bIsPlanning))
 		return false;
 	
 	const FWorldProperty* PropHasResource = CurrentWorldState.Get(EWorldPropertyKey::HasResource);
-	if (!PropHasResource || PropHasResource->Type != EWorldPropertyType::Node)
+	if (!PropHasResource)
 		return false;
 	
-	if (!bIsPlanning)
+	if (PropHasResource->Type == EWorldPropertyType::NeedType)
 	{
-		const AResourceNode* ResourceNode = Agent.GetBlackboard().GetResourceNode();
-		if (!ResourceNode)
+		if (!FAIHelper::HasResourceNodeByNeed(PropHasResource->NeedType))
 			return false;
+		
+		if (!bIsPlanning)
+		{
+			if (!Agent.GetBlackboard().IsSet(EBlackboardMask::ResourceNode))
+				return false;
+		}
+		
+		return true;
 	}
 	
-	return true;
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UActionHarvest::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
+bool UActionFindResourceInNode::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
 	AResourceNode* ResourceNode = Agent.GetBlackboard().GetResourceNode();
 	return Agent.Harvest(ResourceNode);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EActionResult UActionHarvest::IsComplete(IAgent& Agent) const
+void UActionFindResourceInNode::Deactivate(IAgent& Agent) const
+{
+	
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+EActionResult UActionFindResourceInNode::IsComplete(IAgent& Agent) const
 {
 	return EActionResult::Complete;
 }
-
