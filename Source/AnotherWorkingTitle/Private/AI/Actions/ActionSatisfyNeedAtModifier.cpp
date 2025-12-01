@@ -6,7 +6,7 @@
 #include "AI/AIBlackboard.h"
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
-#include "Interactive/NeedsModifier.h"
+#include "Interactive/NeedModifierArea.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionSatisfyNeedAtModifier::UActionSatisfyNeedAtModifier()
@@ -46,7 +46,7 @@ void UActionSatisfyNeedAtModifier::Deactivate(IAgent& Agent) const
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 EActionResult UActionSatisfyNeedAtModifier::IsComplete(IAgent& Agent) const
 {
-	if (const ANeedsModifier* NeedsModifier = Agent.GetBlackboard().GetNeedsModifier())
+	if (const ANeedModifierArea* NeedsModifier = Agent.GetBlackboard().GetNeedsModifier())
 	{
 		const ENeedType NeedType = NeedsModifier->GetAffectedType();
 		if (Agent.GetNeedValue(NeedType) > 0)

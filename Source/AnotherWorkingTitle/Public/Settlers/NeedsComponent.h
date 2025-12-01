@@ -7,12 +7,12 @@
 #include "Components/ActorComponent.h"
 #include "NeedsComponent.generated.h"
 
-class ANeedsModifier;
+class ANeedModifierArea;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 DECLARE_MULTICAST_DELEGATE(FNeedSeverityChanged);
 DECLARE_DELEGATE(FDamagedReachedMaximum);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FNeedsMofifierChanged, ANeedsModifier*, NeedsModifier, bool, bEnter);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FNeedsMofifierChanged, ANeedModifierArea*, NeedsModifier, bool, bEnter);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -65,7 +65,7 @@ private:
 	float ColdRatePerHour = 0.3f;
 	UPROPERTY(EditAnywhere, Category="Needs|Config", meta=(AllowPrivateAccess=true))
 	float FatigueRatePerHour = 0.15f;
-	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Needs|Config", meta=(AllowPrivateAccess=true))
 	float RateVariation = 0.08f;
 
 	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
@@ -76,7 +76,7 @@ private:
 	float DamageForCriticalCold = 0.1f;
 	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
 	float DamageForCriticalFatigue = 0.1f;
-	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Needs|Damage", meta=(AllowPrivateAccess=true))
 	float DamageVariation = 0.05f;
 
 	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
@@ -87,11 +87,11 @@ private:
 	float ThresholdVariation = 0.15f;
 	
 	
-	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Needs|Cheats", meta=(AllowPrivateAccess=true))
 	bool bInvincible = false;
-	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Needs|Cheats", meta=(AllowPrivateAccess=true))
 	bool bUndead = false;
-	UPROPERTY(EditAnywhere, Category="Needs|Thresholds", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Needs|Cheats", meta=(AllowPrivateAccess=true))
 	bool bIgnoreVariations = false;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

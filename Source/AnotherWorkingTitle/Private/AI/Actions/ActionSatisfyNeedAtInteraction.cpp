@@ -6,7 +6,7 @@
 #include "AI/AIBlackboard.h"
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
-#include "Interactive/NeedInteraction.h"
+#include "Interactive/NeedModifierInteraction.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionSatisfyNeedAtInteraction::UActionSatisfyNeedAtInteraction()
@@ -30,7 +30,7 @@ bool UActionSatisfyNeedAtInteraction::AreContextPreconditionsSatisfied(IAgent& A
 	
 	if (!bIsPlanning)
 	{
-		const ANeedInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction();
+		const ANeedModifierInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction();
 		if (!NeedInteraction)
 			return false;
 		
@@ -44,7 +44,7 @@ bool UActionSatisfyNeedAtInteraction::AreContextPreconditionsSatisfied(IAgent& A
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool UActionSatisfyNeedAtInteraction::Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const
 {
-	ANeedInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction();
+	ANeedModifierInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction();
 	check(NeedInteraction);
 	return Agent.StartInteraction(NeedInteraction);
 }
@@ -52,7 +52,7 @@ bool UActionSatisfyNeedAtInteraction::Activate(IAgent& Agent, const FWorldState&
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UActionSatisfyNeedAtInteraction::Deactivate(IAgent& Agent) const
 {
-	ANeedInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction();
+	ANeedModifierInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction();
 	check(NeedInteraction);
 	Agent.StopInteraction(NeedInteraction);
 }
@@ -60,13 +60,6 @@ void UActionSatisfyNeedAtInteraction::Deactivate(IAgent& Agent) const
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 EActionResult UActionSatisfyNeedAtInteraction::IsComplete(IAgent& Agent) const
 {
-	if (const ANeedInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction())
-	{
-		const ENeedType NeedType = NeedInteraction->GetAffectedType();
-		if (Agent.GetNeedSeverity(NeedType) != ENeedSeverity::Normal)
-		{
-			return EActionResult::Incomplete;
-		}
-	}
+	// Interaction will have set the busy timer, so we can just exit here
 	return EActionResult::Complete;
 }

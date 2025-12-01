@@ -3,54 +3,35 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interaction.h"
 #include "Construction/BaseBuilding.h"
 #include "Settlers/Needs.h"
-#include "NeedInteraction.generated.h"
+#include "AbstractNeedModifier.generated.h"
 
 class UGameTimeSubsystem;
-class ASettlerCharacter;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(Abstract)
-class ANOTHERWORKINGTITLE_API ANeedInteraction : public ABaseBuilding, public IHoldInteraction
+class ANOTHERWORKINGTITLE_API AAbstractNeedModifier : public ABaseBuilding
 {
 	GENERATED_BODY()
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	static const TArray<ANeedInteraction*>& GetInstances();
-	
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	ANeedInteraction();
+	AAbstractNeedModifier();
 
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-public:
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	// IHoldInteraction
-	virtual void BeginInteraction_Implementation(ASettlerCharacter* SettlerCharacter) override;
-	virtual void EndInteraction_Implementation(ASettlerCharacter* SettlerCharacter) override;
-	virtual bool TickInteraction_Implementation(ASettlerCharacter* SettlerCharacter, float DeltaTime) override;
 	
+public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	ENeedType GetAffectedType() const { return AffectedType; }
 	float GetNeedDelta() const { return NeedsValueDelta; }
-	
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	float StartInteraction(ASettlerCharacter* Settler);
-	void StopInteraction();
-	bool IsInteracting() const { return CurrentUser.IsValid();}
-	
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual void Tick(float DeltaSeconds) override;
-	
+
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	bool UpdateInteraction();
+	float GetDeltaTimeHour() const;
+	float GetGameHourToRealSeconds(const float GameHour) const;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
@@ -58,6 +39,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
 	float NeedsValueDelta = 0.0f;
 	
+private:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	TWeakObjectPtr<const UGameTimeSubsystem> GameTimeSubsystemPtr;
-	TWeakObjectPtr<ASettlerCharacter> CurrentUser;
 };

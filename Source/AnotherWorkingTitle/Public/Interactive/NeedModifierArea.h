@@ -3,26 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Construction/BaseBuilding.h"
-#include "Settlers/Needs.h"
-#include "NeedsModifier.generated.h"
+#include "AbstractNeedModifier.h"
+#include "NeedModifierArea.generated.h"
 
-class UGameTimeSubsystem;
 class UNeedsComponent;
 class USphereComponent;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(Abstract)
-class ANOTHERWORKINGTITLE_API ANeedsModifier : public ABaseBuilding
+class ANOTHERWORKINGTITLE_API ANeedModifierArea : public AAbstractNeedModifier
 {
 	GENERATED_BODY()
 
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	static const TArray<ANeedsModifier*>& GetInstances();
+	static const TArray<ANeedModifierArea*>& GetInstances();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	ANeedsModifier();
+	ANeedModifierArea();
 
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -34,17 +32,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	float GetRadius() const;
-	ENeedType GetAffectedType() const { return AffectedType; }
-	float GetNeedDelta() const { return NeedsValueDelta; }
 	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
 	TObjectPtr<USphereComponent> SphereComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
-	ENeedType AffectedType = ENeedType::Cold;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
-	float NeedsValueDelta = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
 	bool bFallOff = true;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
@@ -58,6 +50,5 @@ private:
 	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	TWeakObjectPtr<const UGameTimeSubsystem> GameTimeSubsystemPtr;
 	TArray<TWeakObjectPtr<UNeedsComponent>> OverlappingNeedsComponents;
 };

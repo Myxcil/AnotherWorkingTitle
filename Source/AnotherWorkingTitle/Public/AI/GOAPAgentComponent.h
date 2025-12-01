@@ -80,8 +80,8 @@ public:
 	
 	virtual bool UseSlot(const int32 SlotIndex) override;
 	
-	virtual bool StartInteraction(ANeedInteraction* Interaction) override;
-	virtual void StopInteraction(ANeedInteraction* Interaction) override;
+	virtual bool StartInteraction(ANeedModifierInteraction* Interaction) override;
+	virtual void StopInteraction(ANeedModifierInteraction* Interaction) override;
 
 	virtual ENeedSeverity GetNeedSeverity(const ENeedType NeedType) const override;
 	virtual float GetNeedValue(const ENeedType NeedType) const override;

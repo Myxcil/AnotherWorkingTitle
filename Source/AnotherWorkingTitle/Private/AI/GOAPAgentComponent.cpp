@@ -9,7 +9,7 @@
 #include "AI/Actions/AbstractAction.h"
 #include "AI/Goals/AbstractGoal.h"
 #include "Construction/BuildingSite.h"
-#include "Interactive/NeedInteraction.h"
+#include "Interactive/NeedModifierInteraction.h"
 #include "Inventory/InventoryComponent.h"
 #include "Resources/ResourceNode.h"
 #include "Resources/ResourceRegistrySubsystem.h"
@@ -62,7 +62,7 @@ void UGOAPAgentComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		}
 	}
 	
-	if (HandleGlobalBuildingSiteChanged.IsValid())
+	if (HandleGlobalInventoryChanged.IsValid())
 	{
 		FInventoryBase::OnGlobalInventoryChanged.Remove(HandleGlobalInventoryChanged);
 		HandleGlobalInventoryChanged.Reset();
@@ -730,12 +730,12 @@ bool UGOAPAgentComponent::UseSlot(const int32 SlotIndex)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGOAPAgentComponent::StartInteraction(ANeedInteraction* Interaction)
+bool UGOAPAgentComponent::StartInteraction(ANeedModifierInteraction* Interaction)
 {
 	if (ASettlerCharacter* Settler = SettlerPtr.Get())
 	{
 		const float Duration = Interaction->StartInteraction(Settler);
-		if (Duration > 0)
+		if (Duration >= 0)
 		{
 			BusyTimer = Duration;
 			return true;
@@ -744,7 +744,7 @@ bool UGOAPAgentComponent::StartInteraction(ANeedInteraction* Interaction)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UGOAPAgentComponent::StopInteraction(ANeedInteraction* Interaction)
+void UGOAPAgentComponent::StopInteraction(ANeedModifierInteraction* Interaction)
 {
 	Interaction->StopInteraction();
 }

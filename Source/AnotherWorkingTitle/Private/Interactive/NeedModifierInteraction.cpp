@@ -1,73 +1,67 @@
 ﻿// (c) 2025 MK
 
 
-#include "Interactive/NeedInteraction.h"
+#include "Interactive/NeedModifierInteraction.h"
 
-#include "GameTimeSubsystem.h"
 #include "Settlers/NeedsComponent.h"
 #include "Settlers/SettlerCharacter.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 namespace 
 {
-	TArray<ANeedInteraction*> AllNeedInteractions;
+	TArray<ANeedModifierInteraction*> AllNeedInteractions;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-const TArray<ANeedInteraction*>& ANeedInteraction::GetInstances()
+const TArray<ANeedModifierInteraction*>& ANeedModifierInteraction::GetInstances()
 {
 	return AllNeedInteractions;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-ANeedInteraction::ANeedInteraction()
+ANeedModifierInteraction::ANeedModifierInteraction()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ANeedInteraction::BeginPlay()
+void ANeedModifierInteraction::BeginPlay()
 {
 	Super::BeginPlay();
-	GameTimeSubsystemPtr = GetWorld()->GetSubsystem<UGameTimeSubsystem>();
 	AllNeedInteractions.Add(this);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ANeedInteraction::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ANeedModifierInteraction::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	AllNeedInteractions.Remove(this);
 	Super::EndPlay(EndPlayReason);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ANeedInteraction::BeginInteraction_Implementation(ASettlerCharacter* SettlerCharacter)
+void ANeedModifierInteraction::BeginInteraction_Implementation(ASettlerCharacter* SettlerCharacter)
 {
 	CurrentUser = SettlerCharacter;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ANeedInteraction::EndInteraction_Implementation(ASettlerCharacter* SettlerCharacter)
+void ANeedModifierInteraction::EndInteraction_Implementation(ASettlerCharacter* SettlerCharacter)
 {
 	StopInteraction();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool ANeedInteraction::TickInteraction_Implementation(ASettlerCharacter* SettlerCharacter, float DeltaTime)
+bool ANeedModifierInteraction::TickInteraction_Implementation(ASettlerCharacter* SettlerCharacter, float DeltaTime)
 {
 	return UpdateInteraction();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-float ANeedInteraction::StartInteraction(ASettlerCharacter* Settler)
+float ANeedModifierInteraction::StartInteraction(ASettlerCharacter* Settler)
 {
 	if (CurrentUser.IsValid())
-		return false;
-	
-	const UGameTimeSubsystem* GameTimeSubsystem = GameTimeSubsystemPtr.Get();
-	if (!GameTimeSubsystem)
-		return false;
+		return -1.0f;
 	
 	CurrentUser = Settler;
 	SetActorTickEnabled(true);
@@ -79,14 +73,14 @@ float ANeedInteraction::StartInteraction(ASettlerCharacter* Settler)
 		{
 			const float NeedValue = NeedsComponent->GetNeedValue(AffectedType);
 			const float DurationToFull = NeedValue / -NeedsValueDelta;
-			DurationRealTime = GameTimeSubsystem->GetGameHourToRealSeconds(DurationToFull);
+			DurationRealTime = GetGameHourToRealSeconds(DurationToFull);
 		}
 	}
 	return FMath::Max(5.0f, DurationRealTime);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ANeedInteraction::StopInteraction()
+void ANeedModifierInteraction::StopInteraction()
 {
 	CurrentUser.Reset();
 	if (IsActorTickEnabled())
@@ -96,7 +90,7 @@ void ANeedInteraction::StopInteraction()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ANeedInteraction::Tick(float DeltaSeconds)
+void ANeedModifierInteraction::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	
@@ -107,12 +101,8 @@ void ANeedInteraction::Tick(float DeltaSeconds)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool ANeedInteraction::UpdateInteraction()
+bool ANeedModifierInteraction::UpdateInteraction()
 {
-	const UGameTimeSubsystem* GameTimeSubsystem = GameTimeSubsystemPtr.Get();
-	if (!GameTimeSubsystem)
-		return false;
-
 	const ASettlerCharacter* User = CurrentUser.Get();
 	if (!User)
 		return false;
@@ -120,7 +110,7 @@ bool ANeedInteraction::UpdateInteraction()
 	UNeedsComponent* NeedsComponent = User->GetNeedsComponent();
 	check(NeedsComponent);
 	
-	const float DeltaChange = NeedsValueDelta * GameTimeSubsystem->GetGameDeltaHour();
+	const float DeltaChange = NeedsValueDelta * GetDeltaTimeHour();
 	if (!NeedsComponent->ChangeNeedValue(AffectedType, DeltaChange))
 	{
 		return false;

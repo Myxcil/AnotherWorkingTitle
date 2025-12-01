@@ -6,7 +6,7 @@
 #include "AI/AIBlackboard.h"
 #include "AI/AIHelper.h"
 #include "AI/IAgent.h"
-#include "Interactive/NeedsModifier.h"
+#include "Interactive/NeedModifierArea.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UActionSearchPathByNeed::UActionSearchPathByNeed()
@@ -61,7 +61,7 @@ bool UActionSearchPathByNeed::Activate(IAgent& Agent, const FWorldState& Current
 	
 	if (PropAtNode->NodeType == ENodeType::NeedsModifier)
 	{
-		if (ANeedsModifier* NeedsModifier = FAIHelper::FindNearestNeedImprover(Agent.GetFeetPosition(), PropNeed->NeedType))
+		if (ANeedModifierArea* NeedsModifier = FAIHelper::FindNearestNeedImprover(Agent.GetFeetPosition(), PropNeed->NeedType))
 		{
 			Agent.GetBlackboard().SetNeedsModifier(NeedsModifier);	
 			return true;
@@ -77,7 +77,7 @@ bool UActionSearchPathByNeed::Activate(IAgent& Agent, const FWorldState& Current
 	}
 	else if (PropAtNode->NodeType == ENodeType::NeedInteraction)
 	{
-		if (ANeedInteraction* NeedInteraction = FAIHelper::FindNearestNeedInteraction(Agent.GetFeetPosition(), PropNeed->NeedType))
+		if (ANeedModifierInteraction* NeedInteraction = FAIHelper::FindNearestNeedInteraction(Agent.GetFeetPosition(), PropNeed->NeedType))
 		{
 			Agent.GetBlackboard().SetNeedInteraction(NeedInteraction);
 			return true;

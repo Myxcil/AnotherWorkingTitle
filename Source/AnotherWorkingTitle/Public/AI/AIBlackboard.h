@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "AIConstants.h"
 
-class ANeedInteraction;
-class ANeedsModifier;
+class ANeedModifierInteraction;
+class ANeedModifierArea;
 class ABuildingSite;
 class AStockpile;
 class AResourceNode;
@@ -25,11 +25,11 @@ public:
 	void SetBuildingSite(ABuildingSite* InBuildingSite) { SetFlag(EBlackboardMask::BuildingSite); BuildingSite = InBuildingSite; }
 	ABuildingSite* GetBuildingSite() const { return IsSet(EBlackboardMask::BuildingSite) ? BuildingSite : nullptr; }
 	
-	void SetNeedsModifier(ANeedsModifier* InNeedsModifier) { SetFlag(EBlackboardMask::NeedsModifier); NeedsModifier = InNeedsModifier; }
-	ANeedsModifier* GetNeedsModifier() const { return IsSet(EBlackboardMask::NeedsModifier) ? NeedsModifier : nullptr; }
+	void SetNeedsModifier(ANeedModifierArea* InNeedsModifier) { SetFlag(EBlackboardMask::NeedsModifier); NeedsModifier = InNeedsModifier; }
+	ANeedModifierArea* GetNeedsModifier() const { return IsSet(EBlackboardMask::NeedsModifier) ? NeedsModifier : nullptr; }
 	
-	void SetNeedInteraction(ANeedInteraction* InNeedInteraction) { SetFlag(EBlackboardMask::NeedInteraction); NeedInteraction = InNeedInteraction; }
-	ANeedInteraction* GetNeedInteraction() const { return IsSet(EBlackboardMask::NeedInteraction) ? NeedInteraction : nullptr; }
+	void SetNeedInteraction(ANeedModifierInteraction* InNeedInteraction) { SetFlag(EBlackboardMask::NeedInteraction); NeedInteraction = InNeedInteraction; }
+	ANeedModifierInteraction* GetNeedInteraction() const { return IsSet(EBlackboardMask::NeedInteraction) ? NeedInteraction : nullptr; }
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool IsSet(EBlackboardMask Mask) const { return (Flags & AI_ENUM_TO_FLAG(Mask)) != 0; }
@@ -46,6 +46,6 @@ private:
 	AResourceNode* ResourceNode = nullptr;
 	AStockpile* Stockpile = nullptr;
 	ABuildingSite* BuildingSite = nullptr;
-	ANeedsModifier* NeedsModifier = nullptr;
-	ANeedInteraction* NeedInteraction = nullptr;
+	ANeedModifierArea* NeedsModifier = nullptr;
+	ANeedModifierInteraction* NeedInteraction = nullptr;
 };

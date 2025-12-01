@@ -70,8 +70,8 @@ public:
 	
 	virtual bool UseSlot(const int32 SlotIndex) = 0;
 	
-	virtual bool StartInteraction(ANeedInteraction* Interaction) = 0;
-	virtual void StopInteraction(ANeedInteraction* Interaction) = 0;
+	virtual bool StartInteraction(ANeedModifierInteraction* Interaction) = 0;
+	virtual void StopInteraction(ANeedModifierInteraction* Interaction) = 0;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual ENeedSeverity GetNeedSeverity(const ENeedType NeedType) const = 0;

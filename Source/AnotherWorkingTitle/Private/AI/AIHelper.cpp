@@ -7,8 +7,8 @@
 #include "AI/AIConstants.h"
 #include "AI/IAgent.h"
 #include "Construction/BuildingSite.h"
-#include "Interactive/NeedInteraction.h"
-#include "Interactive/NeedsModifier.h"
+#include "Interactive/NeedModifierInteraction.h"
+#include "Interactive/NeedModifierArea.h"
 #include "Inventory/Stockpile.h"
 #include "Resources/ResourceNode.h"
 #include "Resources/ResourceRegistrySubsystem.h"
@@ -66,7 +66,7 @@ bool FAIHelper::GetObjectTransform(const IAgent& Agent, const ENodeType NodeType
 		break;
 		
 	case ENodeType::NeedsModifier:
-		if (const ANeedsModifier* NeedsModifier = Agent.GetBlackboard().GetNeedsModifier())
+		if (const ANeedModifierArea* NeedsModifier = Agent.GetBlackboard().GetNeedsModifier())
 		{
 			Result = NeedsModifier->GetActorTransform();
 			return true;
@@ -74,7 +74,7 @@ bool FAIHelper::GetObjectTransform(const IAgent& Agent, const ENodeType NodeType
 		break;
 		
 	case ENodeType::NeedInteraction:
-		if (const ANeedInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction())
+		if (const ANeedModifierInteraction* NeedInteraction = Agent.GetBlackboard().GetNeedInteraction())
 		{
 			Result = NeedInteraction->GetActorTransform();
 			return true;
@@ -278,7 +278,7 @@ ABuildingSite* FAIHelper::FindNearestUnfinishedBuilding(const FVector& RefPositi
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool FAIHelper::HasNeedImprover(const ENeedType NeedType)
 {
-	for (ANeedsModifier* NeedsModifier : ANeedsModifier::GetInstances())
+	for (ANeedModifierArea* NeedsModifier : ANeedModifierArea::GetInstances())
 	{
 		if (!NeedsModifier)
 			continue;
@@ -295,12 +295,12 @@ bool FAIHelper::HasNeedImprover(const ENeedType NeedType)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-ANeedsModifier* FAIHelper::FindNearestNeedImprover(const FVector& RefPosition, const ENeedType NeedType)
+ANeedModifierArea* FAIHelper::FindNearestNeedImprover(const FVector& RefPosition, const ENeedType NeedType)
 {
-	ANeedsModifier* NearestNeedsModifier = nullptr;
+	ANeedModifierArea* NearestNeedsModifier = nullptr;
 	float SqMinDist = std::numeric_limits<float>::max();
 	
-	for (ANeedsModifier* NeedsModifier : ANeedsModifier::GetInstances())
+	for (ANeedModifierArea* NeedsModifier : ANeedModifierArea::GetInstances())
 	{
 		if (!NeedsModifier)
 			continue;
@@ -324,7 +324,7 @@ ANeedsModifier* FAIHelper::FindNearestNeedImprover(const FVector& RefPosition, c
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool FAIHelper::HasNeedInteraction(const ENeedType NeedType)
 {
-	for (ANeedInteraction* NeedInteraction : ANeedInteraction::GetInstances())
+	for (ANeedModifierInteraction* NeedInteraction : ANeedModifierInteraction::GetInstances())
 	{
 		if (!NeedInteraction)
 			continue;
@@ -344,12 +344,12 @@ bool FAIHelper::HasNeedInteraction(const ENeedType NeedType)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-ANeedInteraction* FAIHelper::FindNearestNeedInteraction(const FVector& RefPosition, const ENeedType NeedType)
+ANeedModifierInteraction* FAIHelper::FindNearestNeedInteraction(const FVector& RefPosition, const ENeedType NeedType)
 {
-	ANeedInteraction* NearestNeedIntersection = nullptr;
+	ANeedModifierInteraction* NearestNeedIntersection = nullptr;
 	float SqMinDist = std::numeric_limits<float>::max();
 	
-	for (ANeedInteraction* NeedInteraction : ANeedInteraction::GetInstances())
+	for (ANeedModifierInteraction* NeedInteraction : ANeedModifierInteraction::GetInstances())
 	{
 		if (!NeedInteraction)
 			continue;

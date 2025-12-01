@@ -7,8 +7,8 @@
 #include "Resources/ResourceCategory.h"
 #include "Settlers/Needs.h"
 
-class ANeedInteraction;
-class ANeedsModifier;
+class ANeedModifierInteraction;
+class ANeedModifierArea;
 class IAgent;
 class ABuildingSite;
 class AStockpile;
@@ -43,9 +43,9 @@ public:
 	
 	// Needs
 	static bool HasNeedImprover(const ENeedType NeedType);
-	static ANeedsModifier* FindNearestNeedImprover(const FVector& RefPosition, const ENeedType NeedType);
+	static ANeedModifierArea* FindNearestNeedImprover(const FVector& RefPosition, const ENeedType NeedType);
 	static bool HasNeedInteraction(const ENeedType NeedType);
-	static ANeedInteraction* FindNearestNeedInteraction(const FVector& RefPosition, const ENeedType NeedType);
+	static ANeedModifierInteraction* FindNearestNeedInteraction(const FVector& RefPosition, const ENeedType NeedType);
 	
 	// Inventory
 	static int32 FindFirstInInventoryByNeedChange(const IAgent& Agent, const ENeedType NeedType);
