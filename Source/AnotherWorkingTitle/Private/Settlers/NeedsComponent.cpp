@@ -4,6 +4,7 @@
 #include "Settlers/NeedsComponent.h"
 
 #include "AI/AIHelper.h"
+#include "Settlers/SettlerCharacter.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UNeedsComponent::UNeedsComponent()
@@ -16,6 +17,8 @@ void UNeedsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SettlerCharacterPtr = Cast<ASettlerCharacter>(GetOwner());
+	
 	for (int32 I=0; I < PrevNeedSeverity.Num(); ++I)
 	{
 		PrevNeedSeverity[I] = ENeedSeverity::Normal;		
@@ -23,31 +26,6 @@ void UNeedsComponent::BeginPlay()
 
 	static int32 RandomSeed = 1;
 	RandomStream.Initialize(RandomSeed++);
-	
-	if (!bIgnoreVariations)
-	{
-		if (RateVariation != 0.0f)
-		{
-			HungerRatePerHour += RandomStream.FRandRange(-RateVariation, RateVariation);
-			ThirstRatePerHour += RandomStream.FRandRange(-RateVariation, RateVariation);
-			ColdRatePerHour += RandomStream.FRandRange(-RateVariation, RateVariation);
-			FatigueRatePerHour += RandomStream.FRandRange(-RateVariation, RateVariation);
-		}
-	
-		if (DamageVariation != 0.0f)
-		{
-			DamageForCriticalHunger += RandomStream.FRandRange(-DamageVariation, DamageVariation);
-			DamageForCriticalThirst += RandomStream.FRandRange(-DamageVariation, DamageVariation);
-			DamageForCriticalCold += RandomStream.FRandRange(-DamageVariation, DamageVariation);
-			DamageForCriticalFatigue += RandomStream.FRandRange(-DamageVariation, DamageVariation);
-		}
-	
-		if (ThresholdVariation != 0.0f)
-		{
-			UncomfortableThreshold += RandomStream.FRandRange(-ThresholdVariation, ThresholdVariation);
-			CriticalThreshold += RandomStream.FRandRange(-ThresholdVariation, ThresholdVariation);
-		}
-	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -74,7 +52,13 @@ void UNeedsComponent::TickNeeds(const float DeltaGameHour)
 		Needs.Hunger = FAIHelper::Clamp01( Needs.Hunger + HungerRatePerHour * DeltaGameHour);
 		Needs.Thirst = FAIHelper::Clamp01( Needs.Thirst + ThirstRatePerHour * DeltaGameHour);
 		Needs.Cold = FAIHelper::Clamp01( Needs.Cold + ColdRatePerHour * DeltaGameHour);
-		Needs.Fatigue = FAIHelper::Clamp01( Needs.Fatigue + FatigueRatePerHour * DeltaGameHour);
+		
+		float FatigueRate = FatigueRatePerHour;
+		if (SettlerCharacterPtr->IsSprinting())
+		{
+			FatigueRate *= FatigueRateScaleSprint;
+		}
+		Needs.Fatigue = FAIHelper::Clamp01( Needs.Fatigue + FatigueRate * DeltaGameHour);
 	}
 	
 	float TotalDamage = 0;

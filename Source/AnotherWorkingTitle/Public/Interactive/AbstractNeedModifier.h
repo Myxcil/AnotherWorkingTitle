@@ -38,7 +38,9 @@ protected:
 	ENeedType AffectedType = ENeedType::Fatigue;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
 	float NeedsValueDelta = 0.0f;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
+	TObjectPtr<UTexture2D> EffectIcon = nullptr;
+
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	TWeakObjectPtr<const UGameTimeSubsystem> GameTimeSubsystemPtr;

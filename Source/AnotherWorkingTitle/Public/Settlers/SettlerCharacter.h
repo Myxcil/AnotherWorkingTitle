@@ -37,6 +37,9 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool IsBusy() const;
 	FVector GetFeetPosition() const;
+	UFUNCTION(BlueprintCallable)
+	void SetSprinting(const bool bEnable);
+	bool IsSprinting() const { return bIsSprinting; }
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UNeedsComponent* GetNeedsComponent() const				{ return NeedsComponent; }
@@ -63,14 +66,21 @@ protected:
 	void OnDamagedReachedMaximum();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Settler|Movement")
+	float WalkSpeed = 250.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Settler|Movement")
+	float RunSpeed = 500.0f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNeedsComponent> NeedsComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UGOAPAgentComponent> GOAPAgentComponent;
-	
+		
 	TWeakObjectPtr<const UGameTimeSubsystem> GameTimeSubsystemPtr;
+
+	bool bIsSprinting = false;
 	
 	TWeakObjectPtr<AActor> CurrentHoldInteraction;
 	

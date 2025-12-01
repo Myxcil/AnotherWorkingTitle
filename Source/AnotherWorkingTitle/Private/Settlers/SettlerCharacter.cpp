@@ -6,6 +6,7 @@
 #include "GameTimeSubsystem.h"
 #include "AI/GOAPAgentComponent.h"
 #include "AnotherWorkingTitle/AnotherWorkingTitle.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Interactive/Interaction.h"
 #include "Inventory//InventoryComponent.h"
@@ -29,7 +30,9 @@ void ASettlerCharacter::BeginPlay()
 
 	GameTimeSubsystemPtr = GetWorld()->GetSubsystem<UGameTimeSubsystem>();
 	
-	NeedsComponent->OnDamagedReachedMaximum.BindUObject(this, &ThisClass::OnDamagedReachedMaximum);	
+	NeedsComponent->OnDamagedReachedMaximum.BindUObject(this, &ThisClass::OnDamagedReachedMaximum);
+	
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,6 +89,16 @@ bool ASettlerCharacter::IsBusy() const
 FVector ASettlerCharacter::GetFeetPosition() const
 {
 	return GetMovementComponent()->GetFeetLocation();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ASettlerCharacter::SetSprinting(const bool bEnable)
+{
+	if (bIsSprinting == bEnable)
+		return;
+	
+	bIsSprinting = bEnable;
+	GetCharacterMovement()->MaxWalkSpeed = bIsSprinting ? RunSpeed : WalkSpeed;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

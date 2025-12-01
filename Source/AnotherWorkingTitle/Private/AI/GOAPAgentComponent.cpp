@@ -17,6 +17,9 @@
 #include "Settlers/SettlerCharacter.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+constexpr bool GDetailLogging = false;
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UGOAPAgentComponent::UGOAPAgentComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -287,9 +290,12 @@ bool UGOAPAgentComponent::ExecutePlan(ASettlerCharacter* SettlerCharacter)
 			return false;
 		}
 		
-		for (int32 I=0; I < Plan.Num(); ++I)
+		if (GDetailLogging)
 		{
-			Plan[I].WriteToLog();
+			for (int32 I=0; I < Plan.Num(); ++I)
+			{
+				Plan[I].WriteToLog();
+			}
 		}
 		
 		PlanStep = 0;
@@ -404,9 +410,12 @@ const UAbstractGoal* UGOAPAgentComponent::ChooseTopGoal()
 		});
 	
 		AI_LOG(TEXT("%s evaluated goals"), *SettlerPtr->GetName());
-		for (int32 I=0; I < NumGoals; ++I)
+		if (GDetailLogging)
 		{
-			AI_LOG(TEXT(" %.4f %s"), GoalList[I].Priority, *GoalList[I].Goal->GetTypeName())
+			for (int32 I=0; I < NumGoals; ++I)
+			{
+				AI_LOG(TEXT(" %.4f %s"), GoalList[I].Priority, *GoalList[I].Goal->GetTypeName())
+			}
 		}
 		
 		if (OnGoalListUpdated.IsBound())
@@ -414,6 +423,8 @@ const UAbstractGoal* UGOAPAgentComponent::ChooseTopGoal()
 			FString Desc;
 			for (int32 I=0; I < NumGoals; ++I)
 			{
+				if (GoalList[I].Priority == 0)
+					break;
 				Desc += FString::Printf(TEXT("%.4f %s\n"), GoalList[I].Priority, *GoalList[I].Goal->GetTypeName());
 			}
 			OnGoalListUpdated.Broadcast(FText::FromString(Desc));
@@ -502,6 +513,10 @@ bool UGOAPAgentComponent::IsStressed() const
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UGOAPAgentComponent::SetSprinting(const bool bEnable)
 {
+	if (ASettlerCharacter* Settler = SettlerPtr.Get())
+	{
+		return Settler->SetSprinting(bEnable);
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

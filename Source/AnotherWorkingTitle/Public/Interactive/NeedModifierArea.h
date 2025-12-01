@@ -35,12 +35,10 @@ public:
 	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs|Area")
 	TObjectPtr<USphereComponent> SphereComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs|Area")
 	bool bFallOff = true;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Needs")
-	TObjectPtr<UTexture2D> EffectIcon = nullptr;
 		
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
