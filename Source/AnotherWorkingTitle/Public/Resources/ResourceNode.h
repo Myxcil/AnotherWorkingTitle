@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "ResourceStack.h"
-#include "GameFramework/Actor.h"
 #include "Interactive/Interaction.h"
+#include "Interactive/InteractiveActor.h"
 #include "ResourceNode.generated.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResourceDepleted);
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
-class ANOTHERWORKINGTITLE_API AResourceNode : public AActor, public IInteraction
+class ANOTHERWORKINGTITLE_API AResourceNode : public AInteractiveActor, public IInteraction
 {
 	GENERATED_BODY()
 

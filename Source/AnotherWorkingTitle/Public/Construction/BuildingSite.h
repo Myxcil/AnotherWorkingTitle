@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
 #include "Interactive/Interaction.h"
+#include "Interactive/InteractiveActor.h"
 #include "BuildingSite.generated.h"
 
 class AStockpile;
@@ -19,7 +19,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBuildCostUpdated, const TArray<FRes
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
-class ANOTHERWORKINGTITLE_API ABuildingSite : public AActor, public IHoldInteraction
+class ANOTHERWORKINGTITLE_API ABuildingSite : public AInteractiveActor, public IHoldInteraction
 {
 	GENERATED_BODY()
 

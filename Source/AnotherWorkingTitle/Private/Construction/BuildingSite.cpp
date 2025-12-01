@@ -5,6 +5,7 @@
 
 #include "AI/AIHelper.h"
 #include "AnotherWorkingTitle/AnotherWorkingTitle.h"
+#include "Construction/BaseBuilding.h"
 #include "Construction/BuildingDefinition.h"
 #include "Inventory/Stockpile.h"
 
@@ -26,7 +27,6 @@ const TArray<ABuildingSite*>& ABuildingSite::GetInstances()
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 ABuildingSite::ABuildingSite()
 {
-	PrimaryActorTick.bCanEverTick = false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
