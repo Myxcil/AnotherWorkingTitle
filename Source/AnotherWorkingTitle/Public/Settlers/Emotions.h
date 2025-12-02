@@ -23,6 +23,7 @@ struct FEmotionalState
 {
 	GENERATED_BODY()
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
 	float JoySadness = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
@@ -33,49 +34,9 @@ struct FEmotionalState
 	float SurpriseAnticipation = 0;
 	
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
-	void SetValue(const EPrimaryEmotionAxis Axis, const float NewValue)
-	{
-		switch (Axis)
-		{
-		case EPrimaryEmotionAxis::JoySadness:
-			JoySadness = FMath::Clamp(NewValue, -1.0f, 1.0f);
-			break;
-		case EPrimaryEmotionAxis::TrustDisgust:
-			TrustDisgust = FMath::Clamp(NewValue, -1.0f, 1.0f);
-			break;
-		case EPrimaryEmotionAxis::FearAnger:
-			FearAnger = FMath::Clamp(NewValue, -1.0f, 1.0f);
-			break;
-		case EPrimaryEmotionAxis::SurpriseAnticipation:
-			SurpriseAnticipation = FMath::Clamp(NewValue, -1.0f, 1.0f);
-			break;
-		}
-	}
-
-	//------------------------------------------------------------------------------------------------------------------------------------------------------------
-	float GetValue(const EPrimaryEmotionAxis Axis) const
-	{
-		switch (Axis)
-		{
-		case EPrimaryEmotionAxis::JoySadness:
-			return JoySadness;
-		case EPrimaryEmotionAxis::TrustDisgust:
-			return TrustDisgust;
-		case EPrimaryEmotionAxis::FearAnger:
-			return FearAnger;
-		case EPrimaryEmotionAxis::SurpriseAnticipation:
-			return SurpriseAnticipation;
-		}
-		return 0;
-	}
-
-	//------------------------------------------------------------------------------------------------------------------------------------------------------------
-	bool ChangeValue(const EPrimaryEmotionAxis Axis, const float Delta)
-	{
-		const float OldValue = GetValue(Axis);
-		SetValue(Axis, OldValue + Delta);
-		return OldValue != GetValue(Axis);
-	}
+	void SetValue(const EPrimaryEmotionAxis Axis, const float NewValue);
+	float GetValue(const EPrimaryEmotionAxis Axis) const;
+	bool ChangeValue(const EPrimaryEmotionAxis Axis, const float Delta);
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -149,6 +110,7 @@ struct FEmotionTemperament
 {
 	GENERATED_BODY()
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FEmotionAxisTemperament JoySadness;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -158,6 +120,7 @@ struct FEmotionTemperament
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FEmotionAxisTemperament SurpriseAnticipation;
 
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	FEmotionAxisTemperament& GetAxis(const EPrimaryEmotionAxis Axis)
 	{
 		switch (Axis)
@@ -174,6 +137,7 @@ struct FEmotionTemperament
 		}
 	}
 
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	const FEmotionAxisTemperament& GetAxis(const EPrimaryEmotionAxis Axis) const
 	{
 		switch (Axis)
@@ -192,17 +156,46 @@ struct FEmotionTemperament
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+USTRUCT(BlueprintType)
+struct FRelationshipState
+{
+	GENERATED_BODY()
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	/** Langfristige, geglättete Emotionen, die Self gegenüber Other empfindet. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEmotionalState LongTermEmotion;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	/** Abgeleitete, kompakte Relationship-Dimensionen [-1..+1] */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
+	float Affinity = 0.0f;  // mögen / Sympathie
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
+	float Trust = 0.0f;     // Vertrauen / Misstrauen
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
+	float Respect = 0.0f;   // Respekt / Geringschätzung
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
+	float Safety = 0.0f;    // Sicherheitsgefühl / Bedrohung
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	void ApplyEmotionDelta(const FEmotionalState& Delta, float Weight = 1.0f, float Smoothing = 0.2f); 
+	void RecomputeDerivedValues();
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(BlueprintType)
 class UEmotionalArchetype : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName ArchetypeId;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText DisplayName;
 
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FEmotionTemperament Temperament;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
