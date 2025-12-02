@@ -32,8 +32,8 @@ void USocialComponent::BeginPlay()
 	for (USocialComponent* Other : AllSocialComponents)
 	{
 		check(Other != this);
-		Other->Connect(this);
 		Connect(Other);
+		Other->Connect(this);
 	}
 	AllSocialComponents.Add(this);
 }
@@ -55,24 +55,16 @@ void USocialComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void USocialComponent::Connect(USocialComponent* SocialComponent)
 {
 	check(SocialComponent);
-	
 	check(!RelationShips.Contains(SocialComponent));
 	RelationShips.Add(SocialComponent, FRelationshipState());
-
-	check(!SocialComponent->RelationShips.Contains(this));
-	SocialComponent->RelationShips.Add(this, FRelationshipState());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void USocialComponent::Disconnect(USocialComponent* SocialComponent)
 {
 	check(SocialComponent);
-	
 	check(RelationShips.Contains(SocialComponent));
 	RelationShips.Remove(SocialComponent);
-
-	check(SocialComponent->RelationShips.Contains(this));
-	SocialComponent->RelationShips.Remove(this);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
