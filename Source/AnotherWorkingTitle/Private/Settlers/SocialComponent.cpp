@@ -3,6 +3,8 @@
 
 #include "Settlers/SocialComponent.h"
 
+#include "AnotherWorkingTitle/AnotherWorkingTitle.h"
+
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 namespace
 {
@@ -57,6 +59,7 @@ void USocialComponent::Connect(USocialComponent* SocialComponent)
 	check(SocialComponent);
 	check(!RelationShips.Contains(SocialComponent));
 	RelationShips.Add(SocialComponent, FRelationshipState());
+	UE_LOG(LogAWT, Log, TEXT("Social Connection: %s -> %s"), *GetOwner()->GetName(), *SocialComponent->GetOwner()->GetName());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
