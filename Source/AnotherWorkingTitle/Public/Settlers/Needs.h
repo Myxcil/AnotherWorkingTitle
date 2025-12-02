@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿// (c) 2025 MK
+
+
+#pragma once
 
 #include "CoreMinimal.h"
 #include "Needs.generated.h"

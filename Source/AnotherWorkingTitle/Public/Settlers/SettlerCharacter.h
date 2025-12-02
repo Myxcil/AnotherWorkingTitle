@@ -11,6 +11,7 @@ class IHoldInteraction;
 class UGOAPAgentComponent;
 class UInventoryComponent;
 class UNeedsComponent;
+class USocialComponent; 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSettlerDied);
@@ -45,6 +46,7 @@ public:
 	UNeedsComponent* GetNeedsComponent() const				{ return NeedsComponent; }
 	UInventoryComponent* GetInventoryComponent() const		{ return InventoryComponent; }
 	UGOAPAgentComponent* GetGOAPAgentComponent() const		{ return GOAPAgentComponent; }
+	USocialComponent* GetSocialComponent() const			{ return SocialComponent; }
 
 	bool UseSlot(const int32 SlotIndex);
 	
@@ -77,6 +79,8 @@ protected:
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UGOAPAgentComponent> GOAPAgentComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<USocialComponent> SocialComponent;
 		
 	TWeakObjectPtr<const UGameTimeSubsystem> GameTimeSubsystemPtr;
 

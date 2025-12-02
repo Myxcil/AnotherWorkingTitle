@@ -34,6 +34,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FInventoryChanged OnInventoryChanged;
+	
 	UFUNCTION(BlueprintPure)
 	const FInventory& GetInventory() const { return Inventory; }
 	

@@ -11,6 +11,7 @@
 #include "Interactive/Interaction.h"
 #include "Inventory//InventoryComponent.h"
 #include "Settlers/NeedsComponent.h"
+#include "Settlers/SocialComponent.h"
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,7 +22,8 @@ ASettlerCharacter::ASettlerCharacter()
 	NeedsComponent = CreateDefaultSubobject<UNeedsComponent>(TEXT("NeedsComponent"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	GOAPAgentComponent = CreateDefaultSubobject<UGOAPAgentComponent>(TEXT("GOAPAgentComponent"));
-}
+	SocialComponent = CreateDefaultSubobject<USocialComponent>(TEXT("SocialComponent"));
+ }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ASettlerCharacter::BeginPlay()
@@ -65,6 +67,11 @@ void ASettlerCharacter::Tick(float DeltaTime)
 	if (NeedsComponent)
 	{
 		NeedsComponent->TickNeeds(GameDeltaTime);
+	}
+	
+	if (SocialComponent)
+	{
+		SocialComponent->TickSocial(GameDeltaTime);
 	}
 	
 	if (AActor* Target = CurrentHoldInteraction.Get())
