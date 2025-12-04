@@ -88,6 +88,10 @@ enum class EEmotion : uint8
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+inline bool EmotionAtMost(EEmotion Actual, EEmotion Threshold) { return Actual != EEmotion::Undecided && static_cast<int32>(Actual) <= static_cast<int32>(Threshold); }
+inline bool EmotionAtLeast(EEmotion Actual, EEmotion Threshold) { return Actual != EEmotion::Undecided && static_cast<int32>(Actual) >= static_cast<int32>(Threshold); }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
 struct FEmotionalThreshold
 {

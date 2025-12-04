@@ -10,7 +10,9 @@
 float UAbstractGoalSatisfyNeed::Evaluate(IAgent& Agent) const
 {
 	const ENeedType NeedType = GetNeedType(); 
-	return Agent.GetNeedValue(NeedType);
+	const float NeedRawValue = Agent.GetNeedValue(NeedType);
+	
+	return NeedRawValue;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -35,6 +35,8 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void TickSocial(const float DeltaGameHour);
 	
+	const FEmotionSummary& GetEmotionSummary() const { return CachedSummary; }
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintPure)
 	FRelationshipState& GetRelationshipMutable(const USocialComponent* Other) { return RelationShips[Other]; }

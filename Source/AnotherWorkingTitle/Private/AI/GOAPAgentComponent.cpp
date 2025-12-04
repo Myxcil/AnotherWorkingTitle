@@ -15,6 +15,7 @@
 #include "Resources/ResourceRegistrySubsystem.h"
 #include "Settlers/NeedsComponent.h"
 #include "Settlers/SettlerCharacter.h"
+#include "Settlers/SocialComponent.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 constexpr bool GDetailLogging = false;
@@ -41,21 +42,30 @@ void UGOAPAgentComponent::BeginPlay()
 	bWorldIsDirty = true;
 	
 	HandleGlobalInventoryChanged = FInventoryBase::OnGlobalInventoryChanged.AddUObject(this, &ThisClass::SetDirty);
-	HandleGlobalBuildingSiteChanged = ABuildingSite::OnGlobalBuildingSiteChanged.AddUObject(this, &UGOAPAgentComponent::SetDirty);
-	HandleGlobalResourceNodeChanged = AResourceNode::OnGlobalResourceNodeChanged.AddUObject(this, &UGOAPAgentComponent::SetDirty);
+	HandleGlobalBuildingSiteChanged = ABuildingSite::OnGlobalBuildingSiteChanged.AddUObject(this, &ThisClass::SetDirty);
+	HandleGlobalResourceNodeChanged = AResourceNode::OnGlobalResourceNodeChanged.AddUObject(this, &ThisClass::SetDirty);
 	
 	if (UNeedsComponent* NeedsComponent = SettlerPtr->GetNeedsComponent())
 	{
-		HandleNeedSeverityChanged = NeedsComponent->OnNeedSeverityChanged.AddUObject(this, &UGOAPAgentComponent::SetDirty);
+		HandleNeedSeverityChanged = NeedsComponent->OnNeedSeverityChanged.AddUObject(this, &ThisClass::SetDirty);
+	}
+	if (USocialComponent* SocialComponent = SettlerPtr->GetSocialComponent())
+	{
+		SocialComponent->OnEmotionalStateChanged.AddDynamic(this, &ThisClass::OnEmotionalStateChanged);
 	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UGOAPAgentComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (HandleNeedSeverityChanged.IsValid())
+	if (const ASettlerCharacter* SettlerCharacter = SettlerPtr.Get())
 	{
-		if (const ASettlerCharacter* SettlerCharacter = SettlerPtr.Get())
+		if (USocialComponent* SocialComponent = SettlerCharacter->GetSocialComponent())
+		{
+			SocialComponent->OnEmotionalStateChanged.RemoveDynamic(this, &ThisClass::OnEmotionalStateChanged);
+		}
+	
+		if (HandleNeedSeverityChanged.IsValid())
 		{
 			if (UNeedsComponent* NeedsComponent = SettlerCharacter->GetNeedsComponent())
 			{
@@ -196,6 +206,12 @@ void UGOAPAgentComponent::TickGOAP(const float DeltaSeconds)
 	
 	if (State == EInternalState::Paused)
 		return;
+	
+	if (bMoodDirty)
+	{
+		EvaluateMood();
+		bMoodDirty = false;
+	}
 	
 	if (State == EInternalState::IdleFailed && bWorldIsDirty)
 	{
@@ -482,6 +498,72 @@ bool UGOAPAgentComponent::IsBusy() const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UGOAPAgentComponent::OnEmotionalStateChanged()
+{
+	bMoodDirty = true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UGOAPAgentComponent::EvaluateMood()
+{
+	const EAgentMood OldMood = Mood;
+	EAgentMood NewMood = OldMood;
+	
+	if (const ASettlerCharacter* SettlerCharacter = SettlerPtr.Get())
+	{
+		if (const USocialComponent* SocialComponent = SettlerCharacter->GetSocialComponent())
+		{
+			const FEmotionSummary& S = SocialComponent->GetEmotionSummary();
+			NewMood = DetermineMoodFromEmotions(S);
+		}
+	}
+	
+	if (OldMood != NewMood)
+	{
+		bWorldIsDirty = true;
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+EAgentMood UGOAPAgentComponent::DetermineMoodFromEmotions(const FEmotionSummary& S)
+{
+	const bool bNegativeMood = EmotionAtLeast(S.JoySadness, EEmotion::Sadness);
+	const bool bFearful = EmotionAtLeast(S.FearAnger, EEmotion::Fear);
+	if (bNegativeMood && bFearful)
+	{
+		return EAgentMood::Stressed;
+	}
+	if (bFearful)
+	{
+		return EAgentMood::Afraid;
+	}
+	
+	if (EmotionAtLeast(S.FearAnger, EEmotion::Anger))
+	{
+		return EAgentMood::Angry;
+	}
+	
+	if (EmotionAtLeast(S.JoySadness, EEmotion::Sadness))
+	{
+		return EAgentMood::Sad;
+	}
+	
+	const bool bPositiveJoy = EmotionAtLeast(S.JoySadness, EEmotion::Joy);
+	const bool bAnticipating = EmotionAtMost(S.SurpriseAnticipation, EEmotion::Anticipation);
+	if (bPositiveJoy && bAnticipating)
+	{
+		return EAgentMood::Optimistic;
+	}
+
+	if (bPositiveJoy)
+	{
+		return EAgentMood::Content;
+	}
+
+	return EAgentMood::Neutral;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void UGOAPAgentComponent::OnMovementComplete(bool bSuccess)
 {
 	bMoveRequestDone = true;
@@ -495,19 +577,10 @@ UResourceRegistrySubsystem* UGOAPAgentComponent::GetResourceRegistry() const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool UGOAPAgentComponent::IsStressed() const
+bool UGOAPAgentComponent::HasMood(const uint32 MoodFlag) const
 {
-	if (const ASettlerCharacter* Settler = SettlerPtr.Get())
-	{
-		if (const UNeedsComponent* NeedsComponent = Settler->GetNeedsComponent())
-		{
-			if (NeedsComponent->IsAnyNeedInSeverityLevel(ENeedSeverity::Critical))
-			{
-				return true;
-			}
-		}
-	}
-	return false;
+	const uint32 MoodBit = AI_ENUM_TO_FLAG(Mood);
+	return (MoodFlag & MoodBit) != 0;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

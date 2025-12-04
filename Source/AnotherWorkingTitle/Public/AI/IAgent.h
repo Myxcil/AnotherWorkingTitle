@@ -42,7 +42,7 @@ public:
 	virtual const TArray<const UAbstractAction*>& GetActions(EWorldPropertyKey Key) const = 0;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual bool IsStressed() const = 0;
+	virtual bool HasMood(const uint32 MoodFlag) const = 0;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void SetSprinting(const bool bEnable) = 0;

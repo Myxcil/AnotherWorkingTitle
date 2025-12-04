@@ -13,7 +13,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 float UGoalDropItemsAtStockpile::Evaluate(IAgent& Agent) const
 {
-	if (Agent.IsStressed())
+	if (Agent.HasMood(MOOD_3(EAgentMood::Stressed, EAgentMood::Afraid, EAgentMood::Angry)))
 		return 0;
 	
 	const int32 CarryingAmount = Agent.GetTotalAmountInInventoryByCategory(EResourceCategory::RawMaterial);

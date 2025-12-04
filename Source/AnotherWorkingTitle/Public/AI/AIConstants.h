@@ -115,3 +115,22 @@ enum class EBlackboardMask : uint8
 	NeedInteraction,
 };
 FString GetBlackboardMaskName(EBlackboardMask BlackboardMask);
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+UENUM()
+enum class EAgentMood : uint8
+{
+	Neutral,
+	Content,
+	Optimistic,
+	Stressed,
+	Afraid,
+	Angry,
+	Sad
+};
+ENUM_RANGE_BY_FIRST_AND_LAST(EAgentMood, EAgentMood::Neutral, EAgentMood::Sad);
+
+#define MOOD_1(M0) AI_ENUM_TO_FLAG(M0)
+#define MOOD_2(M0,M1) (MOOD_1(M0) | AI_ENUM_TO_FLAG(M1))
+#define MOOD_3(M0,M1,M2) (MOOD_2(M0,M1) | AI_ENUM_TO_FLAG(M2))
+#define MOOD_4(M0,M1,M2,M3) (MOOD_3(M0,M1,M2) | AI_ENUM_TO_FLAG(M3))

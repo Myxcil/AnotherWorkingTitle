@@ -1,16 +1,20 @@
 // (c) 2024 by Crenetic GmbH Studios
 
 #include "AI/Goals/GoalIdle.h"
+
+#include "AI/AIHelper.h"
 #include "AI/Planning/WorldState.h"
 #include "AI/IAgent.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 float UGoalIdle::Evaluate(IAgent& Agent) const
 {
-	if (Agent.IsStressed())
-		return 0;
-	
-	return 0.0001f;
+	float Priority = 0.01f;
+	if (Agent.HasMood(MOOD_3(EAgentMood::Stressed, EAgentMood::Afraid, EAgentMood::Angry)))
+	{
+		Priority += 0.5f;
+	}
+	return FAIHelper::Clamp01(Priority);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------

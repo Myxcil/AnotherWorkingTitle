@@ -8,6 +8,7 @@
 #include "Components/ActorComponent.h"
 #include "Planning/Planner.h"
 #include "Planning/WorldState.h"
+#include "Settlers/Emotions.h"
 #include "Storage/WorkingMemory.h"
 #include "GOAPAgentComponent.generated.h"
 
@@ -54,7 +55,7 @@ public:
 	virtual const FWorldState& GetWorldState() const override { return WorldState; }
 	virtual const TArray<const UAbstractAction*>& GetActions(EWorldPropertyKey Key) const override { return ActionList[static_cast<uint32>(Key)]; }
 
-	virtual bool IsStressed() const override;
+	virtual bool HasMood(const uint32 MoodFlag) const override;
 	
 	virtual void SetSprinting(const bool bEnable) override;
 	virtual bool IsNear(const ENodeType NodeType) const override;
@@ -105,6 +106,11 @@ private:
 
 	void SetDirty();
 	bool IsBusy() const;
+	
+	UFUNCTION()
+	void OnEmotionalStateChanged();
+	void EvaluateMood();
+	EAgentMood DetermineMoodFromEmotions(const FEmotionSummary& S);
 		
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -164,6 +170,9 @@ private:
 
 	bool bMoveRequestDone = false;
 	bool bMoveRequestFailed = false;
+	
+	bool bMoodDirty = false;
+	EAgentMood Mood = EAgentMood::Neutral;
 	
 	float BusyTimer = 0;
 };

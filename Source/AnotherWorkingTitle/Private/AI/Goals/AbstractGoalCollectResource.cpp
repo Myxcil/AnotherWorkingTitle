@@ -13,7 +13,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 float UAbstractGoalCollectResource::Evaluate(IAgent& Agent) const
 {
-	if (Agent.IsStressed())
+	if (Agent.HasMood(MOOD_3(EAgentMood::Stressed, EAgentMood::Afraid, EAgentMood::Angry)))
 		return 0;
 	
 	const UResourceDefinition* Resource = GetResource(Agent);
