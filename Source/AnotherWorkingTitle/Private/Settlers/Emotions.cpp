@@ -88,7 +88,7 @@ void FEmotionSummary::Evaluate(const FEmotionalState& EmotionalState, const FEmo
 	JoySadness = EvaluateEmotion(0, EmotionalState.JoySadness, EmotionalThresholds.Joy, EmotionalThresholds.Sadness);
 	TrustDisgust = EvaluateEmotion(1, EmotionalState.TrustDisgust, EmotionalThresholds.Trust, EmotionalThresholds.Disgust);
 	FearAnger = EvaluateEmotion(2, EmotionalState.FearAnger, EmotionalThresholds.Fear, EmotionalThresholds.Anger);
-	SurpriseAnticipation = EvaluateEmotion(3, EmotionalState.FearAnger, EmotionalThresholds.Fear, EmotionalThresholds.Anger);
+	SurpriseAnticipation = EvaluateEmotion(3, EmotionalState.SurpriseAnticipation, EmotionalThresholds.Surprise, EmotionalThresholds.Anticipation);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

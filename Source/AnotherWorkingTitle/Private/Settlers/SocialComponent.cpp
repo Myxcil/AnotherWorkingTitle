@@ -97,13 +97,13 @@ FText USocialComponent::GetEmotionalState() const
 	{
 		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.JoySadness));	
 	}
-	if (CachedSummary.FearAnger != EEmotion::Undecided)
-	{
-		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.FearAnger));	
-	}
 	if (CachedSummary.TrustDisgust != EEmotion::Undecided)
 	{
 		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.TrustDisgust));	
+	}
+	if (CachedSummary.FearAnger != EEmotion::Undecided)
+	{
+		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.FearAnger));	
 	}
 	if (CachedSummary.SurpriseAnticipation != EEmotion::Undecided)
 	{

@@ -93,11 +93,11 @@ struct FEmotionalThreshold
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMan="1.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMax="1.0"))
 	float Low = 0.1f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMan="1.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMax="1.0"))
 	float Med = 0.4f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMan="1.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMax="1.0"))
 	float High = 0.8f;
 };
 
@@ -150,11 +150,11 @@ struct FEmotionAxisTemperament
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(CLampMin="-1.0", ClampMax="1.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
 	float Bias = 0.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(CLampMin="0.0", ClampMax="1.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMax="1.0"))
 	float Reactivity = 0.5f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(CLampMin="0.0", ClampMax="1.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMax="1.0"))
 	float Regulation = 0.5f;
 };
 
