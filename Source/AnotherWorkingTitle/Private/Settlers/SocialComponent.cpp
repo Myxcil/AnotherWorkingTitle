@@ -3,6 +3,7 @@
 
 #include "Settlers/SocialComponent.h"
 
+#include "AWTHelperFunctions.h"
 #include "AnotherWorkingTitle/AnotherWorkingTitle.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -25,11 +26,13 @@ void USocialComponent::BeginPlay()
 	if (EmotionalArchetype)
 	{
 		Temperament = EmotionalArchetype->Temperament;
+		Thresholds = EmotionalArchetype->Thresholds;
 		BaselineEmotion = EmotionalArchetype->BaselineEmotion;
 		GlobalIntensity = EmotionalArchetype->GlobalIntensity;
 	}
 	
 	CurrentEmotion = BaselineEmotion;
+	CachedSummary.Evaluate(CurrentEmotion, Thresholds);
 	
 	for (USocialComponent* Other : AllSocialComponents)
 	{
@@ -74,7 +77,52 @@ void USocialComponent::Disconnect(USocialComponent* SocialComponent)
 void USocialComponent::TickSocial(const float DeltaGameHour)
 {
 	UpdateEmotionRegulation(DeltaGameHour);
+	if (bIsDirty)
+	{
+		FEmotionSummary NewSummary;
+		NewSummary.Evaluate(CurrentEmotion, Thresholds);
+		if (NewSummary != CachedSummary)
+		{
+			CachedSummary = NewSummary;
+			OnEmotionalStateChanged.Broadcast();
+		}
+	}
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+FText USocialComponent::GetEmotionalState() const
+{
+	FString Output;
+	if (CachedSummary.JoySadness != EEmotion::Undecided)
+	{
+		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.JoySadness));	
+	}
+	if (CachedSummary.FearAnger != EEmotion::Undecided)
+	{
+		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.FearAnger));	
+	}
+	if (CachedSummary.TrustDisgust != EEmotion::Undecided)
+	{
+		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.TrustDisgust));	
+	}
+	if (CachedSummary.SurpriseAnticipation != EEmotion::Undecided)
+	{
+		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.SurpriseAnticipation));	
+	}
+	return FText::FromString(Output);
+}
+
+#if WITH_EDITOR
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void USocialComponent::RandomizeCurrentEmotion()
+{
+	for (const EPrimaryEmotionAxis Axis : TEnumRange<EPrimaryEmotionAxis>())
+	{
+		CurrentEmotion.SetValue(Axis, FMath::FRandRange(-1.0f, 1.0f));
+	}
+	bIsDirty = true;
+}
+#endif
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void USocialComponent::ApplyEmotion(const EPrimaryEmotionAxis EmotionAxis, const float Delta)
@@ -82,7 +130,10 @@ void USocialComponent::ApplyEmotion(const EPrimaryEmotionAxis EmotionAxis, const
 	const FEmotionAxisTemperament& Axis = Temperament.GetAxis(EmotionAxis);
 	const float BiasedDelta = Delta * (1.0f + Axis.Bias);
 	const float ScaledDelta = BiasedDelta * Axis.Reactivity;
-	CurrentEmotion.ChangeValue(EmotionAxis, ScaledDelta * GlobalIntensity);
+	if (CurrentEmotion.ChangeValue(EmotionAxis, ScaledDelta * GlobalIntensity))
+	{
+		bIsDirty = true;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,12 +142,14 @@ void USocialComponent::UpdateEmotionRegulation(const float DeltaGameHour)
 	for (EPrimaryEmotionAxis EmotionAxis : TEnumRange<EPrimaryEmotionAxis>())
 	{
 		const FEmotionAxisTemperament& AxisTemperament = Temperament.GetAxis(EmotionAxis);
-		float Value = CurrentEmotion.GetValue(EmotionAxis);
+		const float Value = CurrentEmotion.GetValue(EmotionAxis);
 		const float Baseline = BaselineEmotion.GetValue(EmotionAxis);
 		
 		const float Decay = AxisTemperament.Regulation * DeltaGameHour;
-		Value += (Baseline - Value) * Decay;
+		const float NewValue = Value + ((Baseline - Value) * Decay);
 		
-		CurrentEmotion.SetValue(EmotionAxis, Value);
+		CurrentEmotion.SetValue(EmotionAxis, NewValue);
+		
+		bIsDirty |=(NewValue != Value);
 	}
 }

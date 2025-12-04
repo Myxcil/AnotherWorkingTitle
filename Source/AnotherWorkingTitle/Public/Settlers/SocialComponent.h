@@ -9,6 +9,9 @@
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEmotionalStateChanged);
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ANOTHERWORKINGTITLE_API USocialComponent : public UActorComponent
 {
@@ -37,6 +40,18 @@ public:
 	FRelationshipState& GetRelationshipMutable(const USocialComponent* Other) { return RelationShips[Other]; }
 	UFUNCTION(BlueprintPure)
 	const FRelationshipState& GetRelationship(const USocialComponent* Other) const { return RelationShips[Other]; }
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	UPROPERTY(BlueprintAssignable)
+	FEmotionalStateChanged OnEmotionalStateChanged;
+	UFUNCTION(BlueprintCallable)
+	FText GetEmotionalState() const; 
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+#if WITH_EDITOR
+	UFUNCTION(CallInEditor)
+	void RandomizeCurrentEmotion();
+#endif
 	
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -49,12 +64,17 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FEmotionalState BaselineEmotion;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FEmotionalState CurrentEmotion;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FEmotionTemperament Temperament;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	FEmotionalThresholds Thresholds;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float GlobalIntensity = 1.0f;
 	
 	TMap<TWeakObjectPtr<USocialComponent>, FRelationshipState> RelationShips;
+	
+	bool bIsDirty = false;
+	FEmotionSummary CachedSummary;
 };

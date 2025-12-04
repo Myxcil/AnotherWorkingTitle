@@ -15,6 +15,7 @@ class UResourceDefinition;
 class UResourceRegistrySubsystem;
 class UAbstractAction;
 class FWorldState;
+class ANeedModifierInteraction;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 struct FAIState

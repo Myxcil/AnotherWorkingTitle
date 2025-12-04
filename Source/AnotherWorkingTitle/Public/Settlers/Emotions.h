@@ -44,50 +44,104 @@ UENUM(BlueprintType)
 enum class EEmotion : uint8
 {
 	// Joy intensity
-	Calm,
-	Pleased,
-	Delighted,
+	Serenity,
+	Joy,
+	Ecstasy,
+	
+	// Sadness intensity
+	Pensiveness,
+	Sadness,
+	Grief,
 	
 	// Trust intensity
-	Open,
-	Safe,
-	Proud,
-	
-	// Fear intensity
-	Worried,
-	Scared,
-	Alarmed,
-	
-	// Surprise intensity
-	Uncertain,
-	Shocked,
-	Amazed,
+	Acceptance,
+	Trust,
+	Admiration,
 	
 	// Disgust intensity
-	Bored,
-	Disgusted,
+	Boredom,
+	Disgust,
 	Loathing,
 	
+	// Fear intensity
+	Apprehension,
+	Fear,
+	Terror,
+	
 	// Anger intensity
-	Annoyed,
-	Mad,
-	Furious,
+	Annoyance,
+	Anger,
+	Rage,
+	
+	// Surprise intensity
+	Distraction,
+	Surprise,
+	Amazement,
 	
 	// Anticipation intensity
-	Interested,
-	Curious,
-	Focused,
+	Interest,
+	Anticipation,
+	Vigilance,
 	
-	// Intermediate
-	Connected,		// Joy + Trust
-	Obedient,		// Trust + Fear
-	Horrified,		// Fear + Sadness
-	Remorseful,		// Sadness + Anger
-	Righteous,		// Anger + Disgust
-	Hostile,		// Disgust + Anticipation
-	Hopeful,		// Anticipation + Joy
-	
+	// Too low for any channel
 	Undecided,
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+USTRUCT(BlueprintType)
+struct FEmotionalThreshold
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMan="1.0"))
+	float Low = 0.1f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMan="1.0"))
+	float Med = 0.4f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0", ClampMan="1.0"))
+	float High = 0.8f;
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+USTRUCT(BlueprintType)
+struct FEmotionalThresholds
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEmotionalThreshold Joy;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEmotionalThreshold Sadness;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEmotionalThreshold Trust;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEmotionalThreshold Disgust;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEmotionalThreshold Fear;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEmotionalThreshold Anger;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEmotionalThreshold Surprise;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEmotionalThreshold Anticipation;
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+USTRUCT(BlueprintType)
+struct FEmotionSummary
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EEmotion JoySadness = EEmotion::Undecided;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EEmotion TrustDisgust = EEmotion::Undecided;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EEmotion FearAnger = EEmotion::Undecided;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EEmotion SurpriseAnticipation = EEmotion::Undecided;
+	
+	void Evaluate(const FEmotionalState& EmotionalState, const FEmotionalThresholds& EmotionalThresholds);
+	bool operator==(const FEmotionSummary& Other) const = default;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -162,12 +216,10 @@ struct FRelationshipState
 	GENERATED_BODY()
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	/** Langfristige, geglättete Emotionen, die Self gegenüber Other empfindet. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FEmotionalState LongTermEmotion;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	/** Abgeleitete, kompakte Relationship-Dimensionen [-1..+1] */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
 	float Affinity = 0.0f;  // mögen / Sympathie
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
@@ -198,6 +250,8 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FEmotionTemperament Temperament;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FEmotionalThresholds Thresholds;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FEmotionalState BaselineEmotion;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ClampMin="0.0", ClampMax="2.0"))

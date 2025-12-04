@@ -3,6 +3,8 @@
 
 #include "Settlers/Emotions.h"
 
+#include "AWTHelperFunctions.h"
+
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void FEmotionalState::SetValue(const EPrimaryEmotionAxis Axis, const float NewValue)
 {
@@ -49,6 +51,47 @@ bool FEmotionalState::ChangeValue(const EPrimaryEmotionAxis Axis, const float De
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+EEmotion EvaluateEmotion(int32 EmotionIndex, const float Value, const FEmotionalThreshold& Positive, const FEmotionalThreshold& Negative)
+{
+	EmotionIndex *= 6;
+	if (Value >= Positive.Low)
+	{
+		if (Value >= Positive.High)
+		{
+			EmotionIndex += 2;	
+		}
+		else if (Value >= Positive.Med)
+		{
+			EmotionIndex += 1;
+		}
+		return static_cast<EEmotion>(EmotionIndex);
+	}
+	if (Value <= -Negative.Low)
+	{
+		EmotionIndex += 3;
+		if (Value <= -Negative.High)
+		{
+			EmotionIndex += 2;
+		}
+		else if (Value <= -Negative.Med)
+		{
+			EmotionIndex += 1;
+		}
+		return static_cast<EEmotion>(EmotionIndex);
+	}
+	return EEmotion::Undecided;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void FEmotionSummary::Evaluate(const FEmotionalState& EmotionalState, const FEmotionalThresholds& EmotionalThresholds)
+{
+	JoySadness = EvaluateEmotion(0, EmotionalState.JoySadness, EmotionalThresholds.Joy, EmotionalThresholds.Sadness);
+	TrustDisgust = EvaluateEmotion(1, EmotionalState.TrustDisgust, EmotionalThresholds.Trust, EmotionalThresholds.Disgust);
+	FearAnger = EvaluateEmotion(2, EmotionalState.FearAnger, EmotionalThresholds.Fear, EmotionalThresholds.Anger);
+	SurpriseAnticipation = EvaluateEmotion(3, EmotionalState.FearAnger, EmotionalThresholds.Fear, EmotionalThresholds.Anger);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void FRelationshipState::ApplyEmotionDelta(const FEmotionalState& Delta, float Weight, float Smoothing)
 {
 	for (EPrimaryEmotionAxis Axis : TEnumRange<EPrimaryEmotionAxis>())
@@ -92,7 +135,7 @@ void FRelationshipState::RecomputeDerivedValues()
 
 	// Respekt: Mischung aus wahrgenommener Kompetenz/Überraschung
 	// hier grob mit Surprise/Anticipation gekoppelt (jemand, der oft positiv "überrascht"/vorausschauend ist)
-	float respectRaw =
+	const float RespectRaw =
 		0.3f * TrustDis +
 		0.4f * SurprAnt; // +Surprise / -Anticipation kannst du je nach Interpretation feinjustieren
 
@@ -103,6 +146,6 @@ void FRelationshipState::RecomputeDerivedValues()
 
 	Affinity = FMath::Clamp(AffinityRaw, -1.0f, 1.0f);
 	Trust    = FMath::Clamp(TrustRaw,    -1.0f, 1.0f);
-	Respect  = FMath::Clamp(respectRaw,  -1.0f, 1.0f);
+	Respect  = FMath::Clamp(RespectRaw,  -1.0f, 1.0f);
 	Safety   = FMath::Clamp(SafetyRaw,   -1.0f, 1.0f);
 }
