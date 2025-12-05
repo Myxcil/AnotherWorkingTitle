@@ -41,55 +41,16 @@ struct FEmotionalState
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 UENUM(BlueprintType)
-enum class EEmotion : uint8
+enum class EEmotionalLevel : uint8
 {
-	// Joy intensity
-	Serenity,
-	Joy,
-	Ecstasy,
-	
-	// Sadness intensity
-	Pensiveness,
-	Sadness,
-	Grief,
-	
-	// Trust intensity
-	Acceptance,
-	Trust,
-	Admiration,
-	
-	// Disgust intensity
-	Boredom,
-	Disgust,
-	Loathing,
-	
-	// Fear intensity
-	Apprehension,
-	Fear,
-	Terror,
-	
-	// Anger intensity
-	Annoyance,
-	Anger,
-	Rage,
-	
-	// Surprise intensity
-	Distraction,
-	Surprise,
-	Amazement,
-	
-	// Anticipation intensity
-	Interest,
-	Anticipation,
-	Vigilance,
-	
-	// Too low for any channel
-	Undecided,
+	Worst,
+	Worse,
+	Bad,
+	Neutral,
+	Good,
+	Better,
+	Best,
 };
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-inline bool EmotionAtMost(EEmotion Actual, EEmotion Threshold) { return Actual != EEmotion::Undecided && static_cast<int32>(Actual) <= static_cast<int32>(Threshold); }
-inline bool EmotionAtLeast(EEmotion Actual, EEmotion Threshold) { return Actual != EEmotion::Undecided && static_cast<int32>(Actual) >= static_cast<int32>(Threshold); }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
@@ -136,13 +97,13 @@ struct FEmotionSummary
 	GENERATED_BODY()
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EEmotion JoySadness = EEmotion::Undecided;
+	EEmotionalLevel JoySadness = EEmotionalLevel::Neutral;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EEmotion TrustDisgust = EEmotion::Undecided;
+	EEmotionalLevel TrustDisgust = EEmotionalLevel::Neutral;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EEmotion FearAnger = EEmotion::Undecided;
+	EEmotionalLevel FearAnger = EEmotionalLevel::Neutral;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EEmotion SurpriseAnticipation = EEmotion::Undecided;
+	EEmotionalLevel SurpriseAnticipation = EEmotionalLevel::Neutral;
 	
 	void Evaluate(const FEmotionalState& EmotionalState, const FEmotionalThresholds& EmotionalThresholds);
 	bool operator==(const FEmotionSummary& Other) const = default;
@@ -261,3 +222,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ClampMin="0.0", ClampMax="2.0"))
 	float GlobalIntensity = 1.0f;
 };
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+FString GetEmotionDescription(const EPrimaryEmotionAxis Axis, const EEmotionalLevel Level);

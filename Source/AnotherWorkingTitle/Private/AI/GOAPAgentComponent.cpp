@@ -53,6 +53,8 @@ void UGOAPAgentComponent::BeginPlay()
 	{
 		SocialComponent->OnEmotionalStateChanged.AddDynamic(this, &ThisClass::OnEmotionalStateChanged);
 	}
+	
+	EvaluateMood();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -520,6 +522,7 @@ void UGOAPAgentComponent::EvaluateMood()
 	
 	if (OldMood != NewMood)
 	{
+		Mood = NewMood;
 		bWorldIsDirty = true;
 	}
 }
@@ -527,38 +530,34 @@ void UGOAPAgentComponent::EvaluateMood()
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 EAgentMood UGOAPAgentComponent::DetermineMoodFromEmotions(const FEmotionSummary& S)
 {
-	const bool bNegativeMood = EmotionAtLeast(S.JoySadness, EEmotion::Sadness);
-	const bool bFearful = EmotionAtLeast(S.FearAnger, EEmotion::Fear);
-	if (bNegativeMood && bFearful)
-	{
+	auto AtMost   = [](EEmotionalLevel V, EEmotionalLevel T){ return static_cast<int32>(V) <= static_cast<int32>(T); };
+	auto AtLeast  = [](EEmotionalLevel V, EEmotionalLevel T){ return static_cast<int32>(V) >= static_cast<int32>(T); };
+
+	// Achsen
+	const bool bStrongSad   = AtMost(S.JoySadness, EEmotionalLevel::Worse);   // Sadness-Seite stark
+	const bool bStrongFear  = AtLeast(S.FearAnger, EEmotionalLevel::Better); // Fear-Seite stark (positive Seite)
+	const bool bStrongAnger = AtMost(S.FearAnger, EEmotionalLevel::Worse);   // Anger-Seite stark (negative Seite)
+
+	if (bStrongSad && bStrongFear)
 		return EAgentMood::Stressed;
-	}
-	if (bFearful)
-	{
+
+	if (bStrongFear)
 		return EAgentMood::Afraid;
-	}
-	
-	if (EmotionAtLeast(S.FearAnger, EEmotion::Anger))
-	{
+
+	if (bStrongAnger)
 		return EAgentMood::Angry;
-	}
-	
-	if (EmotionAtLeast(S.JoySadness, EEmotion::Sadness))
-	{
+
+	if (bStrongSad)
 		return EAgentMood::Sad;
-	}
-	
-	const bool bPositiveJoy = EmotionAtLeast(S.JoySadness, EEmotion::Joy);
-	const bool bAnticipating = EmotionAtMost(S.SurpriseAnticipation, EEmotion::Anticipation);
-	if (bPositiveJoy && bAnticipating)
-	{
+
+	const bool bPositiveJoy      = AtLeast(S.JoySadness, EEmotionalLevel::Good);
+	const bool bStrongAnticipate = AtMost(S.SurpriseAnticipation, EEmotionalLevel::Bad); // Anticipation-Seite (negative) mindestens "Bad"
+
+	if (bPositiveJoy && bStrongAnticipate)
 		return EAgentMood::Optimistic;
-	}
 
 	if (bPositiveJoy)
-	{
 		return EAgentMood::Content;
-	}
 
 	return EAgentMood::Neutral;
 }
@@ -588,7 +587,7 @@ void UGOAPAgentComponent::SetSprinting(const bool bEnable)
 {
 	if (ASettlerCharacter* Settler = SettlerPtr.Get())
 	{
-		return Settler->SetSprinting(bEnable);
+		Settler->SetSprinting(bEnable);
 	}
 }
 

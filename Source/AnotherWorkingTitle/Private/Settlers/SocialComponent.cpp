@@ -3,7 +3,6 @@
 
 #include "Settlers/SocialComponent.h"
 
-#include "AWTHelperFunctions.h"
 #include "AnotherWorkingTitle/AnotherWorkingTitle.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -33,6 +32,8 @@ void USocialComponent::BeginPlay()
 	
 	CurrentEmotion = BaselineEmotion;
 	CachedSummary.Evaluate(CurrentEmotion, Thresholds);
+	
+	 
 	
 	for (USocialComponent* Other : AllSocialComponents)
 	{
@@ -79,6 +80,8 @@ void USocialComponent::TickSocial(const float DeltaGameHour)
 	UpdateEmotionRegulation(DeltaGameHour);
 	if (bIsDirty)
 	{
+		bIsDirty = false;
+
 		FEmotionSummary NewSummary;
 		NewSummary.Evaluate(CurrentEmotion, Thresholds);
 		if (NewSummary != CachedSummary)
@@ -93,21 +96,21 @@ void USocialComponent::TickSocial(const float DeltaGameHour)
 FText USocialComponent::GetEmotionalState() const
 {
 	FString Output;
-	if (CachedSummary.JoySadness != EEmotion::Undecided)
+	if (CachedSummary.JoySadness != EEmotionalLevel::Neutral)
 	{
-		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.JoySadness));	
+		Output.Appendf(TEXT("%s "), *GetEmotionDescription(EPrimaryEmotionAxis::JoySadness, CachedSummary.JoySadness));	
 	}
-	if (CachedSummary.TrustDisgust != EEmotion::Undecided)
+	if (CachedSummary.TrustDisgust != EEmotionalLevel::Neutral)
 	{
-		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.TrustDisgust));	
+		Output.Appendf(TEXT("%s "), *GetEmotionDescription(EPrimaryEmotionAxis::TrustDisgust, CachedSummary.TrustDisgust));	
 	}
-	if (CachedSummary.FearAnger != EEmotion::Undecided)
+	if (CachedSummary.FearAnger != EEmotionalLevel::Neutral)
 	{
-		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.FearAnger));	
+		Output.Appendf(TEXT("%s "), *GetEmotionDescription(EPrimaryEmotionAxis::FearAnger, CachedSummary.FearAnger));	
 	}
-	if (CachedSummary.SurpriseAnticipation != EEmotion::Undecided)
+	if (CachedSummary.SurpriseAnticipation != EEmotionalLevel::Neutral)
 	{
-		Output.Appendf(TEXT("%s "), *UAWTHelperFunctions::GetEnumValueName(CachedSummary.SurpriseAnticipation));	
+		Output.Appendf(TEXT("%s "), *GetEmotionDescription(EPrimaryEmotionAxis::SurpriseAnticipation, CachedSummary.SurpriseAnticipation));	
 	}
 	return FText::FromString(Output);
 }

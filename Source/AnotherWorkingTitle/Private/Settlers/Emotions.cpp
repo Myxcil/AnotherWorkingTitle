@@ -3,8 +3,6 @@
 
 #include "Settlers/Emotions.h"
 
-#include "AWTHelperFunctions.h"
-
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void FEmotionalState::SetValue(const EPrimaryEmotionAxis Axis, const float NewValue)
 {
@@ -51,44 +49,42 @@ bool FEmotionalState::ChangeValue(const EPrimaryEmotionAxis Axis, const float De
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-EEmotion EvaluateEmotion(int32 EmotionIndex, const float Value, const FEmotionalThreshold& Positive, const FEmotionalThreshold& Negative)
+EEmotionalLevel EvaluateEmotion(const float Value, const FEmotionalThreshold& Positive, const FEmotionalThreshold& Negative)
 {
-	EmotionIndex *= 6;
-	if (Value >= Positive.Low)
+	if (Value <= -Negative.High)
 	{
-		if (Value >= Positive.High)
-		{
-			EmotionIndex += 2;	
-		}
-		else if (Value >= Positive.Med)
-		{
-			EmotionIndex += 1;
-		}
-		return static_cast<EEmotion>(EmotionIndex);
+		return EEmotionalLevel::Worst;
+	}
+	if (Value <= -Negative.Med)
+	{
+		return EEmotionalLevel::Worse;
 	}
 	if (Value <= -Negative.Low)
 	{
-		EmotionIndex += 3;
-		if (Value <= -Negative.High)
-		{
-			EmotionIndex += 2;
-		}
-		else if (Value <= -Negative.Med)
-		{
-			EmotionIndex += 1;
-		}
-		return static_cast<EEmotion>(EmotionIndex);
+		return EEmotionalLevel::Bad;
 	}
-	return EEmotion::Undecided;
+	if (Value >= Positive.High)
+	{
+		return EEmotionalLevel::Best;
+	}
+	if (Value >= Positive.Med)
+	{
+		return EEmotionalLevel::Better;
+	}
+	if (Value >= Positive.Low)
+	{
+		return EEmotionalLevel::Good;
+	}
+	return EEmotionalLevel::Neutral;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void FEmotionSummary::Evaluate(const FEmotionalState& EmotionalState, const FEmotionalThresholds& EmotionalThresholds)
 {
-	JoySadness = EvaluateEmotion(0, EmotionalState.JoySadness, EmotionalThresholds.Joy, EmotionalThresholds.Sadness);
-	TrustDisgust = EvaluateEmotion(1, EmotionalState.TrustDisgust, EmotionalThresholds.Trust, EmotionalThresholds.Disgust);
-	FearAnger = EvaluateEmotion(2, EmotionalState.FearAnger, EmotionalThresholds.Fear, EmotionalThresholds.Anger);
-	SurpriseAnticipation = EvaluateEmotion(3, EmotionalState.SurpriseAnticipation, EmotionalThresholds.Surprise, EmotionalThresholds.Anticipation);
+	JoySadness = EvaluateEmotion(EmotionalState.JoySadness, EmotionalThresholds.Joy, EmotionalThresholds.Sadness);
+	TrustDisgust = EvaluateEmotion(EmotionalState.TrustDisgust, EmotionalThresholds.Trust, EmotionalThresholds.Disgust);
+	FearAnger = EvaluateEmotion(EmotionalState.FearAnger, EmotionalThresholds.Fear, EmotionalThresholds.Anger);
+	SurpriseAnticipation = EvaluateEmotion(EmotionalState.SurpriseAnticipation, EmotionalThresholds.Surprise, EmotionalThresholds.Anticipation);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -119,19 +115,20 @@ void FRelationshipState::RecomputeDerivedValues()
 	const float FearAnger = LongTermEmotion.GetValue(EPrimaryEmotionAxis::FearAnger);           // + Fear, - Anger
 	const float SurprAnt  = LongTermEmotion.GetValue(EPrimaryEmotionAxis::SurpriseAnticipation);// + Surprise, - Anticipation
 
-	// Beispiel-Gewichtungen – reine Startwerte, später feintunen:
-
+	const float DisgustPenalty = FMath::Abs(FMath::Min(TrustDis, 0.0f));
+	const float AngerPenalty   = FMath::Abs(FMath::Min(FearAnger, 0.0f));
+	
 	// Mögen: viel Joy und Trust, wenig Disgust/Anger
 	const float AffinityRaw =
 		0.6f * JoySad +        // Joy -> Affinity+
 		0.4f * TrustDis       // Trust -> Affinity+
-		- 0.3f * FMath::Min(0.0f, TrustDis)  // Disgust (negativ) -> Affinity-
-		- 0.3f * FMath::Min(0.0f, FearAnger);// Anger (negativ) -> Affinity-
+		- 0.3f * DisgustPenalty
+		- 0.3f * AngerPenalty;
 
 	// Vertrauen: stark von Trust/Disgust geprägt, Angst reduziert es
 	const float TrustRaw =
 		0.9f * TrustDis
-		- 0.3f * FMath::Max(0.0f, FearAnger); // Fear -> Trust-
+		- 0.3f * AngerPenalty; // Anger -> Trust-
 
 	// Respekt: Mischung aus wahrgenommener Kompetenz/Überraschung
 	// hier grob mit Surprise/Anticipation gekoppelt (jemand, der oft positiv "überrascht"/vorausschauend ist)
@@ -148,4 +145,30 @@ void FRelationshipState::RecomputeDerivedValues()
 	Trust    = FMath::Clamp(TrustRaw,    -1.0f, 1.0f);
 	Respect  = FMath::Clamp(RespectRaw,  -1.0f, 1.0f);
 	Safety   = FMath::Clamp(SafetyRaw,   -1.0f, 1.0f);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+FString GetEmotionDescription(const EPrimaryEmotionAxis Axis, const EEmotionalLevel Level)
+{
+	#define LIST(A,B,C,D,E,F,G) { TEXT(#A), TEXT(#B), TEXT(#C), TEXT(#D), TEXT(#E), TEXT(#F), TEXT(#G) } 
+	static const FString JoySadness[] = LIST(Grief,Sadness,Pensiveness,Neutral,Serenity,Joy,Ecstasy);
+	static const FString TrustDisgust[] = LIST(Loathing,Disgust,Boredom,Neutral,Acceptance,Trust,Admiration);
+	static const FString FearAnger[] = LIST(Rage,Anger,Annoyance,Neutral,Apprehension,Fear,Terror);
+	static const FString SurpriseAnticipation[] = LIST(Vigilance,Anticipation,Interest,Neutral,Distraction,Surprise,Amazement);
+	#undef LIST
+	
+	const int32 Index = static_cast<int32>(Level);
+	switch (Axis)
+	{
+	case EPrimaryEmotionAxis::JoySadness:
+		return JoySadness[Index];
+	case EPrimaryEmotionAxis::TrustDisgust:
+		return TrustDisgust[Index];
+	case EPrimaryEmotionAxis::FearAnger:
+		return FearAnger[Index];
+	case EPrimaryEmotionAxis::SurpriseAnticipation:
+		return SurpriseAnticipation[Index];
+	}
+	static FString Undefined = TEXT("???");
+	return Undefined;
 }
