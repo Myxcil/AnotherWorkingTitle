@@ -31,9 +31,10 @@ float UAbstractGoalCollectResource::Evaluate(IAgent& Agent) const
 	if (Scarcity == 0)
 		return 0;
 	
+	const float RestedValue = 1.0f - Agent.GetNeedValue(ENeedType::Fatigue);
 	const float AlreadyStored = 1.0f - FAIHelper::Clamp01(static_cast<float>(Agent.GetAmountInInventory(Resource)) / Resource->MaxStackSize);
 	const float DistanceWeight = FAIHelper::CalculateDistanceWeight(Agent.GetFeetPosition(), ResourceNode->GetActorLocation());
-	const float NormalizedPriority = Scarcity * AlreadyStored * DistanceWeight;
+	const float NormalizedPriority = RestedValue * Scarcity * AlreadyStored * DistanceWeight;
 		
 	return FMath::GetRangeValue(GoalPriorities::PriorityScaleCollect, NormalizedPriority);
 }

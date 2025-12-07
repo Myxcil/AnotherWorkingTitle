@@ -25,7 +25,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoalListUpdated, FText, GoalList);
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ANOTHERWORKINGTITLE_API UGOAPAgentComponent : public UActorComponent, public IAgent
 {
-private:
 	GENERATED_BODY()
 
 public:
