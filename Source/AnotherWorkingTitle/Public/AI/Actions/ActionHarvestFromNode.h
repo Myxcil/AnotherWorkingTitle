@@ -1,0 +1,25 @@
+﻿// (c) 2025 MK
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "AbstractAction.h"
+#include "ActionHarvestFromNode.generated.h"
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+UCLASS()
+class ANOTHERWORKINGTITLE_API UActionHarvestFromNode : public UAbstractAction
+{
+	GENERATED_BODY()
+	
+public:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	UActionHarvestFromNode();
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual bool AreContextPreconditionsSatisfied(IAgent& Agent, const FWorldState& CurrentWorldState, const bool bIsPlanning) const override;
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual bool Activate(IAgent& Agent, const FWorldState& CurrentWorldState) const override;
+	virtual EActionResult IsComplete(IAgent& Agent) const override;
+};
