@@ -9,7 +9,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 float UGoalIdle::Evaluate(IAgent& Agent) const
 {
-	float Priority = 0.01f;
+	float Priority = FMath::Lerp(0.01f, 0.4f, Agent.GetNeedValue(ENeedType::Fatigue));
 	if (Agent.HasMood(MOOD_3(EAgentMood::Stressed, EAgentMood::Afraid, EAgentMood::Angry)))
 	{
 		Priority += 0.5f;
