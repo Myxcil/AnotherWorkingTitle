@@ -45,3 +45,4 @@ struct FNeeds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Damage = 0.0f;
 };
+

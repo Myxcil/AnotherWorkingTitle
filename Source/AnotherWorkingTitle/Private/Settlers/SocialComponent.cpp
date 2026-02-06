@@ -33,8 +33,6 @@ void USocialComponent::BeginPlay()
 	CurrentEmotion = BaselineEmotion;
 	CachedSummary.Evaluate(CurrentEmotion, Thresholds);
 	
-	 
-	
 	for (USocialComponent* Other : AllSocialComponents)
 	{
 		check(Other != this);
@@ -90,6 +88,58 @@ void USocialComponent::TickSocial(const float DeltaGameHour)
 			OnEmotionalStateChanged.Broadcast();
 		}
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+FString USocialComponent::GetEmotionalDescription(const USocialComponent* Other) const
+{
+	FString Result = TEXT("In general you feel ");
+	bool bHasResult = false;
+	if (CachedSummary.JoySadness != EEmotionalLevel::Neutral)
+	{
+		Result.Append(GetEmotionDescription(EPrimaryEmotionAxis::JoySadness, CachedSummary.JoySadness));
+		bHasResult = true;
+	}
+	if (CachedSummary.TrustDisgust != EEmotionalLevel::Neutral)
+	{
+		if (bHasResult)
+		{
+			Result.AppendChar(',');
+		}
+		Result.Append(GetEmotionDescription(EPrimaryEmotionAxis::TrustDisgust, CachedSummary.TrustDisgust));
+		bHasResult = true;
+	}
+	if (CachedSummary.FearAnger != EEmotionalLevel::Neutral)
+	{
+		if (bHasResult)
+		{
+			Result.AppendChar(',');
+		}
+		Result.Append(GetEmotionDescription(EPrimaryEmotionAxis::FearAnger, CachedSummary.FearAnger));
+		bHasResult = true;
+	}
+	if (CachedSummary.SurpriseAnticipation != EEmotionalLevel::Neutral)
+	{
+		if (bHasResult)
+		{
+			Result.AppendChar(',');
+		}
+		Result.Append(GetEmotionDescription(EPrimaryEmotionAxis::SurpriseAnticipation, CachedSummary.SurpriseAnticipation));
+		bHasResult = true;
+	}
+	if (!bHasResult)
+	{
+		Result.Append(TEXT(" calm."));
+	}
+	if (Other)
+	{
+		if (const FRelationshipState* RelationshipState = RelationShips.Find(Other))
+		{
+			Result.Append(TEXT("Towards the user you feel "));
+			Result.Append(GetRelationShipDescription(*RelationshipState));
+		}
+	}
+	return Result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -224,4 +224,5 @@ public:
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+FString GetRelationShipDescription(const FRelationshipState& RelationshipState);
 FString GetEmotionDescription(const EPrimaryEmotionAxis Axis, const EEmotionalLevel Level);

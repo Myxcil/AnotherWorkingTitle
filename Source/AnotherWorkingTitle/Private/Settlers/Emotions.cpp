@@ -148,14 +148,55 @@ void FRelationshipState::RecomputeDerivedValues()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+int32 GetMappedIndex(float Value, const int32 NumElements)
+{
+	Value = FMath::Clamp(Value, -1.0f, 1.0f);
+	int32 Index = static_cast<int32>(((Value + 1.0f) * 0.5f) * NumElements);
+	return Index >= NumElements ? NumElements-1 : Index;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CollectValues(FString& Result, const float Value, const FString Descriptions[])
+{
+	const int32 Index = GetMappedIndex(Value, 5);
+	if (Index != 2)
+	{
+		if (Result.Len() > 0)
+		{
+			Result.AppendChar(',');
+		}
+		Result.Append(Descriptions[Index]);
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+FString GetRelationShipDescription(const FRelationshipState& RelationshipState)
+{
+	static const FString Affinity[] = { TEXT("Hostile"), TEXT("Weary"), TEXT("Neutral"), TEXT("Friendly"), TEXT("Affectionate") };
+	static const FString Trust[] = { TEXT("Distrustful"), TEXT("Skeptical"), TEXT("Neutral"), TEXT("Trusting"), TEXT("Confident") };
+	static const FString Respect[] = { TEXT("Contemptuous"), TEXT("Dismissive"), TEXT("Neutral"), TEXT("Respectful"), TEXT("Reverent") };
+	static const FString Safety[] = { TEXT("Threatened"), TEXT("Uneasy"), TEXT("Neutral"), TEXT("Secure"), TEXT("Protected") };
+	
+	FString Result;
+	CollectValues(Result, RelationshipState.Affinity, Affinity);
+	CollectValues(Result, RelationshipState.Trust, Trust);
+	CollectValues(Result, RelationshipState.Respect, Respect);
+	CollectValues(Result, RelationshipState.Safety, Safety);
+	if (Result.IsEmpty())
+	{
+		Result = TEXT("Neutral");
+	}
+	return Result;
+}
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 FString GetEmotionDescription(const EPrimaryEmotionAxis Axis, const EEmotionalLevel Level)
 {
-	#define LIST(A,B,C,D,E,F,G) { TEXT(#A), TEXT(#B), TEXT(#C), TEXT(#D), TEXT(#E), TEXT(#F), TEXT(#G) } 
-	static const FString JoySadness[] = LIST(Grief,Sadness,Pensiveness,Neutral,Serenity,Joy,Ecstasy);
-	static const FString TrustDisgust[] = LIST(Loathing,Disgust,Boredom,Neutral,Acceptance,Trust,Admiration);
-	static const FString FearAnger[] = LIST(Rage,Anger,Annoyance,Neutral,Apprehension,Fear,Terror);
-	static const FString SurpriseAnticipation[] = LIST(Vigilance,Anticipation,Interest,Neutral,Distraction,Surprise,Amazement);
-	#undef LIST
+	static const FString JoySadness[] = { TEXT("Grieving"), TEXT("Sad"), TEXT("Pensive"), TEXT("Calm"), TEXT("Serene"), TEXT("Joyful"), TEXT("Ecstatic") };
+	static const FString TrustDisgust[] = { TEXT("Loathing"), TEXT("Disgusted"), TEXT("Bored"), TEXT("Calm"), TEXT("Accepting"), TEXT("Trusting"), TEXT("Admiring") };
+	static const FString FearAnger[] = { TEXT("Enraged"), TEXT("Angry"), TEXT("Annoyed"), TEXT("Calm"), TEXT("Apprehensive"), TEXT("Fearful"), TEXT("Terrified") };
+	static const FString SurpriseAnticipation[] = { TEXT("Vigilant"), TEXT("Anticipating"), TEXT("Interested"), TEXT("Calm"), TEXT("Distracted"), TEXT("Surprised"), TEXT("Amazed") };
 	
 	const int32 Index = static_cast<int32>(Level);
 	switch (Axis)
