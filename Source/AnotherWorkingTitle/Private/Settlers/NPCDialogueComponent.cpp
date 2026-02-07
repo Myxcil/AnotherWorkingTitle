@@ -43,6 +43,9 @@ void UNPCDialogueComponent::ResetConversation()
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 FGuid UNPCDialogueComponent::SendPlayerLine(const FString& PlayerText, const FDialogueContextDescriptor& Context, const FDialogueGenerationParams& GenParams)
 {
+	if (PlayerText.IsEmpty())
+		return FGuid();
+	
 	UDialogueLLMService* Service = GetService();
 	if (!Service || !Service->IsReady())
 	{
@@ -80,7 +83,12 @@ TArray<FDialogueMessage> UNPCDialogueComponent::BuildMessagesForRequest(const FS
 {
 	TArray<FDialogueMessage> Out;
 
-	FString Sys = PersonaText;
+	FString Sys;
+	Sys.Append(TEXT("You are an NPC in a small survival colony. Speak as this NPC, in natural English banter."));
+	Sys.Append(TEXT("Default to 1–2 sentences unless the player explicitly asks for more detail."));
+	Sys.Append(TEXT("NPC persona:"));
+	Sys.Append(PersonaText);
+	Sys.Append(TEXT("Current state (use as guidance for tone and behavior):"));
 	Sys.Append(TEXT("Mood:"));
 	Sys.Append(Context.MoodLabel);
 	Sys.Append(TEXT("Relationship towards user:"));
@@ -89,8 +97,9 @@ TArray<FDialogueMessage> UNPCDialogueComponent::BuildMessagesForRequest(const FS
 	{
 		Sys.Append(Fact);
 	}
+	Sys.Append(Rules);
 	Out.Add({ EChatTemplateRole::System, Sys });
-	
+		
 	Out.Append(History);
 	
 	FDialogueMessage& UserLine = Out.AddDefaulted_GetRef();
@@ -126,6 +135,7 @@ void UNPCDialogueComponent::HandleServiceResponse(FGuid RequestId, const FString
 	// TODO: if owned => append assistant message to History; broadcast OnResponse
 	if (OwnedRequestIds.Contains(RequestId))
 	{
+		OwnedRequestIds.Remove(RequestId);
 		History.Add({ EChatTemplateRole::Assistant, FullText });
 		PruneHistoryIfNeeded();
 		OnResponse.Broadcast(RequestId, FullText);
@@ -138,6 +148,7 @@ void UNPCDialogueComponent::HandleServiceError(FGuid RequestId, const FString& E
 	// TODO: if owned => broadcast OnError
 	if (OwnedRequestIds.Contains(RequestId))
 	{
+		OwnedRequestIds.Remove(RequestId);
 		OnError.Broadcast(RequestId, ErrorText);
 	}
 }

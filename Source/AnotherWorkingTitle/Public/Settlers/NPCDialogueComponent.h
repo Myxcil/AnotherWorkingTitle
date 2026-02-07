@@ -42,8 +42,10 @@ public:
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Persona as short text block (2-6 sentences), English.
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Dialogue")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Dialogue", meta=(MultiLine=true))
 	FString PersonaText;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Dialogue", meta=(MultiLine=true))
+	FString Rules;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	// How many turns to keep in memory (per NPC). Keep small initially.

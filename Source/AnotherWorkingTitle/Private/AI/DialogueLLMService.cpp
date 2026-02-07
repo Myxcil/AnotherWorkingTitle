@@ -3,6 +3,7 @@
 #include "AI/DialogueLLMService.h"
 
 #include "LlamaComponent.h"
+#include "AnotherWorkingTitle/AnotherWorkingTitle.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::Initialize(FSubsystemCollectionBase& Collection)
@@ -36,8 +37,8 @@ void UDialogueLLMService::RegisterLlamaComponent(ULlamaComponent* InLlamaCompone
 	if (LlamaComponent)
 	{
 		LlamaComponent->OnModelLoaded.AddDynamic(this, &ThisClass::HandleModelLoaded);
-		LlamaComponent->OnTokenGenerated.AddDynamic(this, &ThisClass::HandleNewToken);
-		LlamaComponent->OnPartialGenerated.AddDynamic(this, &ThisClass::HandlePartialGenerated);
+		//LlamaComponent->OnTokenGenerated.AddDynamic(this, &ThisClass::HandleNewToken);
+		//LlamaComponent->OnPartialGenerated.AddDynamic(this, &ThisClass::HandlePartialGenerated);
 		LlamaComponent->OnResponseGenerated.AddDynamic(this, &ThisClass::HandleResponseGenerated);
 	}
 }
@@ -121,6 +122,7 @@ void UDialogueLLMService::HandlePartialGenerated(const FString& Chunk)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 {
+	UE_LOG(LogAWT, Log, TEXT("HandleResponseGenerated: %s"), *FullText);
 	// TODO: sanitize full text; broadcast OnLLMResponse; clear active; TryStartNextRequest.
 	ActiveBuffer = FullText;
 	SanitizeInPlace(ActiveBuffer);
@@ -170,6 +172,7 @@ void UDialogueLLMService::StartRequestInternal(const FDialogueRequest& Request)
 		const FDialogueMessage& Message = Request.Messages[I];
 		const bool bGenerateResponse = I == LastUserMessage;
 		LlamaComponent->InsertTemplatedPrompt(Message.Content, Message.Role, false, bGenerateResponse); 
+		UE_LOG(LogAWT, Log, TEXT("Prompt: %s"), *Message.Content);
 	}
 }
 
