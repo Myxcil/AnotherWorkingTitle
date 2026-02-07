@@ -91,9 +91,9 @@ void USocialComponent::TickSocial(const float DeltaGameHour)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-FString USocialComponent::GetEmotionalDescription(const USocialComponent* Other) const
+FString USocialComponent::DescribeMood() const
 {
-	FString Result = TEXT("In general you feel ");
+	FString Result;
 	bool bHasResult = false;
 	if (CachedSummary.JoySadness != EEmotionalLevel::Neutral)
 	{
@@ -129,15 +129,23 @@ FString USocialComponent::GetEmotionalDescription(const USocialComponent* Other)
 	}
 	if (!bHasResult)
 	{
-		Result.Append(TEXT(" calm."));
+		Result.Append(TEXT("Calm"));
 	}
-	if (Other)
+	return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+FString USocialComponent::DescribeRelationShip(const USocialComponent* Other) const
+{
+	FString Result;
+	if (const FRelationshipState* RelationshipState = RelationShips.Find(Other))
 	{
-		if (const FRelationshipState* RelationshipState = RelationShips.Find(Other))
-		{
-			Result.Append(TEXT("Towards the user you feel "));
-			Result.Append(GetRelationShipDescription(*RelationshipState));
-		}
+		Result.Append(TEXT("Towards the user you feel "));
+		Result.Append(GetRelationShipDescription(*RelationshipState));
+	}
+	if (Result.IsEmpty())
+	{
+		Result = TEXT("Neutral");
 	}
 	return Result;
 }

@@ -151,12 +151,15 @@ void ASettlerCharacter::TryBeginInteract(AActor* Target)
 	if (CurrentHoldInteraction.IsValid())
 		return;
 	
-	if (Cast<IHoldInteraction>(Target))
+	const UClass* TargetClass = Target->GetClass();
+	check(TargetClass);
+	
+	if (TargetClass->ImplementsInterface(UHoldInteraction::StaticClass()))
 	{
 		CurrentHoldInteraction = Target;
 		IHoldInteraction::Execute_BeginInteraction(Target, this);
 	}
-	else if (Cast<IInteraction>(Target))
+	else if (TargetClass->ImplementsInterface(UInteraction::StaticClass()))
 	{
 		IInteraction::Execute_Interact(Target, this);
 	}

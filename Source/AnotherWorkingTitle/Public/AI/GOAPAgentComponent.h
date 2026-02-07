@@ -46,6 +46,10 @@ public:
 	FAIRequestStopMovement OnAIRequestStopMovement;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	UFUNCTION(BlueprintCallable)
+	void SetPaused(bool bSetPaused);
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// IAgent
 	virtual FString GetActorName() const override { return GetOwner()->GetName(); }
 	virtual UResourceRegistrySubsystem* GetResourceRegistry() const override;

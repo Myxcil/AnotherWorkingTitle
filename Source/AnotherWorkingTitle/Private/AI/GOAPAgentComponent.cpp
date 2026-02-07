@@ -570,6 +570,25 @@ void UGOAPAgentComponent::OnMovementComplete(bool bSuccess)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UGOAPAgentComponent::SetPaused(bool bSetPaused)
+{
+	const bool bIsPaused = State == EInternalState::Paused; 
+	if (bIsPaused == bSetPaused)
+		return;
+	
+	if (bSetPaused)
+	{
+		ResetPlan(false);;
+		State = EInternalState::Paused;
+	}
+	else
+	{
+		bWorldIsDirty = true;
+		State = EInternalState::Idle;
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 UResourceRegistrySubsystem* UGOAPAgentComponent::GetResourceRegistry() const
 {
 	return ResourceRegistry.Get();

@@ -17,7 +17,8 @@ public class AnotherWorkingTitle : ModuleRules
 			"EnhancedInput", 
 			"ProceduralMeshComponent", 
 			"AIModule",
-			"NavigationSystem"
+			"NavigationSystem",
+			"LlamaCore"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

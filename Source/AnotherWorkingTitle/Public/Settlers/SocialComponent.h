@@ -45,7 +45,9 @@ public:
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintPure)
-	FString GetEmotionalDescription(const USocialComponent* Other) const;
+	FString DescribeMood() const;
+	UFUNCTION(BlueprintPure)
+	FString DescribeRelationShip(const USocialComponent* Other) const;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintAssignable)
