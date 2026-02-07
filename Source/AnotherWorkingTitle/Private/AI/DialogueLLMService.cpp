@@ -3,7 +3,8 @@
 #include "AI/DialogueLLMService.h"
 
 #include "LlamaComponent.h"
-#include "AnotherWorkingTitle/AnotherWorkingTitle.h"
+
+DEFINE_LOG_CATEGORY(LogLLM);
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::Initialize(FSubsystemCollectionBase& Collection)
@@ -18,6 +19,7 @@ void UDialogueLLMService::Deinitialize()
 	if (LlamaComponent)
 	{
 		LlamaComponent->OnModelLoaded.Clear();
+		LlamaComponent->OnError.Clear();
 		LlamaComponent->OnTokenGenerated.Clear();
 		LlamaComponent->OnPartialGenerated.Clear();
 		LlamaComponent->OnResponseGenerated.Clear();
@@ -32,14 +34,14 @@ void UDialogueLLMService::Deinitialize()
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::RegisterLlamaComponent(ULlamaComponent* InLlamaComponent)
 {
-	// TODO: store pointer, bind plugin delegates (OnModelLoaded, OnNewTokenGenerated/OnPartialGenerated, OnResponseGenerated).
 	LlamaComponent = InLlamaComponent;
 	if (LlamaComponent)
 	{
-		LlamaComponent->OnModelLoaded.AddDynamic(this, &ThisClass::HandleModelLoaded);
-		//LlamaComponent->OnTokenGenerated.AddDynamic(this, &ThisClass::HandleNewToken);
-		//LlamaComponent->OnPartialGenerated.AddDynamic(this, &ThisClass::HandlePartialGenerated);
-		LlamaComponent->OnResponseGenerated.AddDynamic(this, &ThisClass::HandleResponseGenerated);
+		LlamaComponent->OnModelLoaded.AddUniqueDynamic(this, &ThisClass::HandleModelLoaded);
+		LlamaComponent->OnError.AddUniqueDynamic(this, &ThisClass::HandleError);
+		//LlamaComponent->OnTokenGenerated.AddUniqueDynamic(this, &ThisClass::HandleNewToken);
+		//LlamaComponent->OnPartialGenerated.AddUniqueDynamic(this, &ThisClass::HandlePartialGenerated);
+		LlamaComponent->OnResponseGenerated.AddUniqueDynamic(this, &ThisClass::HandleResponseGenerated);
 	}
 }
 
@@ -63,8 +65,14 @@ void UDialogueLLMService::CancelRequest(const FGuid& RequestId)
 {
 	if (ActiveRequestId == RequestId)
 	{
+		if (LlamaComponent)
+		{
+			LlamaComponent->StopGeneration();
+		}
 		ActiveRequestId.Invalidate();
-		LlamaComponent->StopGeneration();
+		ActiveOwner = nullptr;
+
+		TryStartNextRequest();
 	}
 	else
 	{
@@ -86,6 +94,31 @@ void UDialogueLLMService::CancelAllForOwner(UObject* Owner)
 	{
 		return Request.Owner == Owner;	
 	});
+	if (ActiveOwner == Owner)
+	{
+		ActiveRequestId.Invalidate();
+		if (LlamaComponent)
+		{
+			LlamaComponent->StopGeneration();
+		}
+	}
+	TryStartNextRequest();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void UDialogueLLMService::Clear()
+{
+	if (LlamaComponent)
+	{
+		LlamaComponent->StopGeneration();
+		LlamaComponent->ResetContextHistory();
+	}
+	
+	PendingRequests.Reset();
+	
+	ActiveOwner.Reset();
+	ActiveRequestId.Invalidate();
+	ActiveBuffer.Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -122,7 +155,7 @@ void UDialogueLLMService::HandlePartialGenerated(const FString& Chunk)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 {
-	UE_LOG(LogAWT, Log, TEXT("HandleResponseGenerated: %s"), *FullText);
+	UE_LOG(LogLLM, Log, TEXT("HandleResponseGenerated: %s"), *FullText);
 
 	ActiveBuffer = FullText;
 	SanitizeInPlace(ActiveBuffer);
@@ -134,12 +167,27 @@ void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
+void UDialogueLLMService::HandleError(const FString& ErrorMessage, int32 ErrorCode)
+{
+	UE_LOG(LogLLM, Warning, TEXT("HandlError: %s, code=%d"), *ErrorMessage, ErrorCode);
+	OnLLMError.Broadcast(ActiveRequestId, ErrorMessage);
+	
+	ActiveRequestId.Invalidate();
+	ActiveOwner = nullptr;
+	
+	TryStartNextRequest();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::TryStartNextRequest()
 {
 	if (ActiveRequestId.IsValid())
 		return;
 	
 	if (PendingRequests.IsEmpty())
+		return;
+	
+	if (!LlamaComponent)
 		return;
 	
 	const FDialogueRequest Request = PendingRequests[0];
@@ -155,11 +203,25 @@ void UDialogueLLMService::StartRequestInternal(const FDialogueRequest& Request)
 	ActiveOwner = Request.Owner;
 	ActiveRequestId = Request.RequestId;
 	
-	for (const auto& Message : Request.Messages) 	
+	int32 LastUserMessage = INDEX_NONE;
+	for (int32 I=Request.Messages.Num()-1; I >= 0; --I)
 	{
-		const bool bGenerateResponse = Message.Role == EChatTemplateRole::User;
+		const FDialogueMessage& Message = Request.Messages[I];
+		if (Message.Role == EChatTemplateRole::User)
+		{
+			LastUserMessage = I;
+			break;
+		}
+	}
+	
+	UE_LOG(LogLLM, Log, TEXT("Send Prompt:"));
+	for (int32 I=0; I < Request.Messages.Num(); ++I)
+	{
+		const FDialogueMessage& Message = Request.Messages[I];
+		const bool bGenerateResponse = I == LastUserMessage;
+		
 		LlamaComponent->InsertTemplatedPrompt(Message.Content, Message.Role, false, bGenerateResponse); 
-		//UE_LOG(LogAWT, Log, TEXT("Prompt: %s"), *Message.Content);
+		UE_LOG(LogLLM, Log, TEXT("%s"), *Message.Content);
 	}
 }
 

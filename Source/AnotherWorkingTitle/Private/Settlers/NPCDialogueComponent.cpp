@@ -34,14 +34,19 @@ UDialogueLLMService* UNPCDialogueComponent::GetService() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNPCDialogueComponent::ResetConversation()
+void UNPCDialogueComponent::OnBeginDialog()
 {
 	History.Reset();
 	OwnedRequestIds.Reset();
+	if (UDialogueLLMService* Service = GetService())
+	{
+		Service->Clear();
+	}	
+	bFirstRequest = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-FGuid UNPCDialogueComponent::SendPlayerLine(const FString& PlayerText, const FDialogueContextDescriptor& Context, const FDialogueGenerationParams& GenParams)
+FGuid UNPCDialogueComponent::SendPlayerLine(const FString& PlayerText, const FDialogueContextDescriptor& Context)
 {
 	if (PlayerText.IsEmpty())
 		return FGuid();
@@ -57,7 +62,6 @@ FGuid UNPCDialogueComponent::SendPlayerLine(const FString& PlayerText, const FDi
 	Req.Owner = this;
 	Req.DebugName = GetOwner() ? GetOwner()->GetName() : TEXT("NPCDialogue");
 	Req.Messages = BuildMessagesForRequest(PlayerText, Context);
-	Req.Gen = GenParams;
 
 	const FGuid RequestId = Service->EnqueueRequest(Req);
 	OwnedRequestIds.Add(RequestId);
@@ -65,6 +69,9 @@ FGuid UNPCDialogueComponent::SendPlayerLine(const FString& PlayerText, const FDi
 	History.Add({ EChatTemplateRole::User, PlayerText });
 	
 	PruneHistoryIfNeeded();
+	
+	bFirstRequest = false;
+	
 	return RequestId;
 }
 
@@ -84,23 +91,54 @@ TArray<FDialogueMessage> UNPCDialogueComponent::BuildMessagesForRequest(const FS
 	TArray<FDialogueMessage> Out;
 
 	FString Sys;
-	Sys.Append(TEXT("You are an NPC in a small survival colony. Speak as this NPC, in natural English banter."));
-	Sys.Append(TEXT("Default to 1–2 sentences unless the player explicitly asks for more detail."));
-	Sys.Append(TEXT("NPC persona:"));
-	Sys.Append(PersonaText);
-	Sys.Append(TEXT("Current state (use as guidance for tone and behavior):"));
-	Sys.Append(TEXT("Mood:"));
-	Sys.Append(Context.MoodLabel);
-	Sys.Append(TEXT("Relationship towards user:"));
-	Sys.Append(Context.RelationshipLabel);
-	for (const FString& Fact : Context.Facts)
+	if (bFirstRequest)
 	{
-		Sys.Append(Fact);
+		Sys.Append(TEXT("You are an NPC in a small survival colony. Speak as this NPC, in natural English banter.\n"));
+		Sys.Append(TEXT("Default to 1-2 sentences unless the player explicitly asks for more detail.\n"));
+		Sys.Append(TEXT("\nNPC persona:\n"));
+		Sys.Append(PersonaText);
+		Sys.AppendChar('\n');
 	}
-	Sys.Append(Rules);
+	
+	if (!Context.MoodLabel.IsEmpty() || !Context.RelationshipLabel.IsEmpty())
+	{
+		if (bFirstRequest)
+		{
+			Sys.Append(TEXT("\nCurrent state (use as guidance for tone and behavior):"));
+		}
+		else
+		{
+			Sys.Append(TEXT("\nState update:"));
+		}
+	
+		if (!Context.MoodLabel.IsEmpty())
+		{
+			Sys.Append(TEXT("\nMood="));
+			Sys.Append(Context.MoodLabel);
+		}
+		if (!Context.RelationshipLabel.IsEmpty())
+		{
+			Sys.Append(TEXT("\nRelationship="));
+			Sys.Append(Context.RelationshipLabel);
+		}
+	}
+	
+	Sys.AppendChar('\n');
+	if (bFirstRequest)
+	{
+		for (const FString& Fact : Context.Facts)
+		{
+			Sys.Append(Fact);
+			Sys.AppendChar('\n');
+		}
+		Sys.Append(Rules);
+	}
 	Out.Add({ EChatTemplateRole::System, Sys });
 		
-	Out.Append(History);
+	if (bFirstRequest)
+	{
+		Out.Append(History);
+	}
 	
 	FDialogueMessage& UserLine = Out.AddDefaulted_GetRef();
 	UserLine.Role = EChatTemplateRole::User;

@@ -137,17 +137,11 @@ FString USocialComponent::DescribeMood() const
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 FString USocialComponent::DescribeRelationShip(const USocialComponent* Other) const
 {
-	FString Result;
 	if (const FRelationshipState* RelationshipState = RelationShips.Find(Other))
 	{
-		Result.Append(TEXT("Towards the user you feel "));
-		Result.Append(GetRelationShipDescription(*RelationshipState));
+		return GetRelationShipDescription(*RelationshipState);
 	}
-	if (Result.IsEmpty())
-	{
-		Result = TEXT("Neutral");
-	}
-	return Result;
+	return TEXT("Neutral");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------

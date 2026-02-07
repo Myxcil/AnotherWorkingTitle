@@ -31,6 +31,7 @@ void ASettlerAIController::OnPossess(APawn* InPawn)
 	if (UGOAPAgentComponent* GOAP = Settler->GetGOAPAgentComponent())
 	{
 		GOAP->OnAIRequestMoveToLocation.BindUObject(this, &ThisClass::HandleAIRequestMoveToLocation);
+		GOAP->OnAIRequestPauseMovement.BindUObject(this, &ThisClass::HandleAIRequestPauseMovement);
 		GOAP->OnAIRequestStopMovement.BindUObject(this, &ThisClass::HandleAIRequestStopMovement);
 		
 		GOAP->InitializeAgent();
@@ -50,6 +51,7 @@ void ASettlerAIController::OnUnPossess()
 	if (UGOAPAgentComponent* GOAP = CachedGOAP.Get())
 	{
 		GOAP->OnAIRequestMoveToLocation.Unbind();
+		GOAP->OnAIRequestPauseMovement.Unbind();
 		GOAP->OnAIRequestStopMovement.Unbind();
 	}
 	
@@ -120,6 +122,8 @@ bool ASettlerAIController::HandleAIRequestMoveToLocation(const FVector& Location
 		AI_WARN(TEXT("%s failed to move to %s, result=%d"), *Settler->GetName(), *ProjectedLocation.Location.ToString(), Result);
 		return false;
 	}
+	
+	CurrentMoveRequestID = GetCurrentMoveRequestID();
 
 	if (Result == EPathFollowingRequestResult::AlreadyAtGoal)
 	{
@@ -131,15 +135,38 @@ bool ASettlerAIController::HandleAIRequestMoveToLocation(const FVector& Location
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ASettlerAIController::HandleAIRequestPauseMovement(bool bSetPaused)
+{
+	if (CurrentMoveRequestID.IsValid())
+	{
+		if (bSetPaused)
+		{
+			PauseMove(CurrentMoveRequestID);
+		}
+		else
+		{
+			ResumeMove(CurrentMoveRequestID);
+		}
+	}
+	else if (bSetPaused)
+	{
+		StopMovement();
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ASettlerAIController::HandleAIRequestStopMovement()
 {
 	StopMovement();
+	CurrentMoveRequestID = FAIRequestID::InvalidRequest;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ASettlerAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
+	
+	CurrentMoveRequestID = FAIRequestID::InvalidRequest;
 	
 	if (UGOAPAgentComponent* GOAP = CachedGOAP.Get())
 	{

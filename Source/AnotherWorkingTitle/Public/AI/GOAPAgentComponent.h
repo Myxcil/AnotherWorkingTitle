@@ -17,6 +17,7 @@ class UAbstractGoal;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 DECLARE_DELEGATE_RetVal_ThreeParams(bool, FAIRequestMoveToLocation, const FVector& /*Location*/, const float /*LocationThreshold*/, const float /*AcceptanceRadius*/);
+DECLARE_DELEGATE_OneParam(FAIRequestPauseMovement, const bool /*bIsPaused*/);
 DECLARE_DELEGATE(FAIRequestStopMovement);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoalListUpdated, FText, GoalList);
@@ -43,6 +44,7 @@ public:
 	void OnMovementComplete(bool bSuccess);
 	
 	FAIRequestMoveToLocation OnAIRequestMoveToLocation;
+	FAIRequestPauseMovement OnAIRequestPauseMovement;
 	FAIRequestStopMovement OnAIRequestStopMovement;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------

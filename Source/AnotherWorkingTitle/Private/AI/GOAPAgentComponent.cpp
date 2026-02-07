@@ -585,12 +585,13 @@ void UGOAPAgentComponent::SetPaused(bool bSetPaused)
 	
 	if (bSetPaused)
 	{
-		ResetPlan(false);;
+		OnAIRequestPauseMovement.ExecuteIfBound(true);
 		State = EInternalState::Paused;
 	}
 	else
 	{
 		bWorldIsDirty = true;
+		OnAIRequestPauseMovement.ExecuteIfBound(false);
 		State = EInternalState::Idle;
 	}
 }

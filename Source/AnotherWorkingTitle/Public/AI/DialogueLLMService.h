@@ -10,6 +10,8 @@
 
 class ULlamaComponent;
 
+DECLARE_LOG_CATEGORY_EXTERN(LogLLM, Log, All);
+
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
 struct FDialogueMessage
@@ -21,22 +23,6 @@ struct FDialogueMessage
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FString Content;
-};
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
-USTRUCT(BlueprintType)
-struct FDialogueGenerationParams
-{
-	GENERATED_BODY()
-
-	// Keep this small for "as fast as possible" default; you can override per request.
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 MaxNewTokens = 128;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool bStream = true;
-
-	// Optional: temperature/top_p/etc. Add later if needed.
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -54,9 +40,6 @@ struct FDialogueRequest
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FDialogueMessage> Messages;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FDialogueGenerationParams Gen;
 
 	// Filled by service on enqueue.
 	FGuid RequestId;
@@ -83,30 +66,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RegisterLlamaComponent(ULlamaComponent* InLlamaComponent);
 
-	UFUNCTION(BlueprintCallable)
 	bool IsReady() const;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	UFUNCTION(BlueprintCallable)
 	FGuid EnqueueRequest(UPARAM(ref) FDialogueRequest& Request);
-
-	UFUNCTION(BlueprintCallable)
 	void CancelRequest(const FGuid& RequestId);
-
-	UFUNCTION(BlueprintCallable)
 	void CancelAllForOwner(UObject* Owner);
+	void Clear();
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	UPROPERTY(BlueprintAssignable)
 	FOnLLMReady OnLLMReady;
-
-	UPROPERTY(BlueprintAssignable)
 	FOnLLMToken OnLLMToken;
-
-	UPROPERTY(BlueprintAssignable)
 	FOnLLMResponse OnLLMResponse;
-
-	UPROPERTY(BlueprintAssignable)
 	FOnLLMError OnLLMError;
 
 private:
@@ -135,6 +106,9 @@ private:
 	UFUNCTION()
 	void HandleResponseGenerated(const FString& FullText);
 
+	UFUNCTION()
+	void HandleError(const FString& ErrorMessage, int32 ErrorCode);
+	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	void TryStartNextRequest();
 	void StartRequestInternal(const FDialogueRequest& Request);

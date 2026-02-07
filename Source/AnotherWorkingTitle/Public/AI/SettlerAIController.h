@@ -18,7 +18,7 @@ class ANOTHERWORKINGTITLE_API ASettlerAIController : public AAIController
 public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	ASettlerAIController();
-	
+
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
@@ -27,6 +27,7 @@ public:
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool HandleAIRequestMoveToLocation(const FVector& Location, const float LocationThreshold, const float AcceptanceRadius);
+	void HandleAIRequestPauseMovement(bool bSetPaused);
 	void HandleAIRequestStopMovement();
 	
 	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;

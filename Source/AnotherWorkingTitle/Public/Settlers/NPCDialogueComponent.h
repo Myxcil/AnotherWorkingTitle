@@ -53,14 +53,13 @@ public:
 	int32 MaxHistoryMessages = 12;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	// --- API used by UI / interaction ---
 	UFUNCTION(BlueprintCallable)
-	void ResetConversation();
-
+	void OnBeginDialog();
+	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Build + send a request. Returns RequestId.
 	UFUNCTION(BlueprintCallable)
-	FGuid SendPlayerLine(const FString& PlayerText, const FDialogueContextDescriptor& Context, const FDialogueGenerationParams& GenParams);
+	FGuid SendPlayerLine(const FString& PlayerText, const FDialogueContextDescriptor& Context);
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Cancel active/pending requests originating from this component.
@@ -91,6 +90,10 @@ private:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Keep track of outstanding requests for cancel/ignore.
 	TArray<FGuid> OwnedRequestIds;
+	
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	// Keep track of first request, which will contain additional info
+	bool bFirstRequest = true;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	UDialogueLLMService* GetService() const;
