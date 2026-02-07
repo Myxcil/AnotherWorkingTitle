@@ -123,7 +123,7 @@ void UDialogueLLMService::HandlePartialGenerated(const FString& Chunk)
 void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 {
 	UE_LOG(LogAWT, Log, TEXT("HandleResponseGenerated: %s"), *FullText);
-	// TODO: sanitize full text; broadcast OnLLMResponse; clear active; TryStartNextRequest.
+
 	ActiveBuffer = FullText;
 	SanitizeInPlace(ActiveBuffer);
 	OnLLMResponse.Broadcast(ActiveRequestId, ActiveBuffer);
@@ -136,7 +136,6 @@ void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::TryStartNextRequest()
 {
-	// TODO: if no active and queue not empty and ready -> pop and StartRequestInternal.
 	if (ActiveRequestId.IsValid())
 		return;
 	
@@ -156,30 +155,17 @@ void UDialogueLLMService::StartRequestInternal(const FDialogueRequest& Request)
 	ActiveOwner = Request.Owner;
 	ActiveRequestId = Request.RequestId;
 	
-	int32 LastUserMessage = INDEX_NONE;
-	for (int32 I=Request.Messages.Num()-1; I >= 0; --I)
+	for (const auto& Message : Request.Messages) 	
 	{
-		const FDialogueMessage& Message = Request.Messages[I];
-		if (Message.Role == EChatTemplateRole::User)
-		{
-			LastUserMessage = I;
-			break;
-		}
-	}
-	
-	for (int32 I=0; I < Request.Messages.Num(); ++I)
-	{
-		const FDialogueMessage& Message = Request.Messages[I];
-		const bool bGenerateResponse = I == LastUserMessage;
+		const bool bGenerateResponse = Message.Role == EChatTemplateRole::User;
 		LlamaComponent->InsertTemplatedPrompt(Message.Content, Message.Role, false, bGenerateResponse); 
-		UE_LOG(LogAWT, Log, TEXT("Prompt: %s"), *Message.Content);
+		//UE_LOG(LogAWT, Log, TEXT("Prompt: %s"), *Message.Content);
 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::SanitizeInPlace(FString& InOutText)
 {
-	// Known Llama3 header leak (prefix). Keep it conservative: prefix-only stripping.
 	StripPrefixOnce(InOutText, TEXT("<|start_header_id|>assistant<|end_header_id|>"));
 	InOutText = InOutText.TrimStart();
 }

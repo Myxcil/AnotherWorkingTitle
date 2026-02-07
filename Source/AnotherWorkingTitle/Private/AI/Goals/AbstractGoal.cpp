@@ -31,3 +31,9 @@ void UAbstractGoal::DeInit(IAgent& Agent, bool bIsSuccess) const
 {
 	checkf(false, TEXT("Shouldn't be called, it's abstract"));
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+FString UAbstractGoal::Describe(IAgent& Agent, const FWorldState& WorldState) const
+{
+	return TEXT("You are doing nothing worth mentioning.");
+}

@@ -45,3 +45,9 @@ void UGoalConstructBuilding::DeInit(IAgent& Agent, bool bIsSuccess) const
 {
 	Agent.GetBlackboard().Clear(EBlackboardMask::BuildingSite);
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+FString UGoalConstructBuilding::Describe(IAgent& Agent, const FWorldState& WorldState) const
+{
+	return TEXT("You are erecting a building.");
+}

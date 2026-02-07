@@ -152,7 +152,7 @@ void UGOAPAgentComponent::InitializeGoalsAndActions()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void UGOAPAgentComponent::ResetPlan(bool bSuccess)
+void UGOAPAgentComponent::ResetPlan(const bool bSuccess)
 {
 	Stop();
 	
@@ -178,6 +178,11 @@ void UGOAPAgentComponent::ResetPlan(bool bSuccess)
 
 		CurrentGoal->DeInit(*this, bSuccess);
 		CurrentGoal = nullptr;
+		
+		if (bSuccess)
+		{
+			LastGoalDescription.Reset();
+		}
 	}
 
 	CurrentGoalState.Clear();
@@ -318,6 +323,8 @@ bool UGOAPAgentComponent::ExecutePlan(ASettlerCharacter* SettlerCharacter)
 		
 		PlanStep = 0;
 		bActionActivated = false;
+		
+		LastGoalDescription = CurrentGoal->Describe(*this, CurrentGoalState);
 	}
 	// in the middle of the plan, handle actions
 	else if (PlanStep < Plan.Num())
@@ -586,6 +593,16 @@ void UGOAPAgentComponent::SetPaused(bool bSetPaused)
 		bWorldIsDirty = true;
 		State = EInternalState::Idle;
 	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+FString UGOAPAgentComponent::DescribeAction()
+{
+	if (!LastGoalDescription.IsEmpty())
+	{
+		return LastGoalDescription;
+	}
+	return TEXT("You are doing nothing.");
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

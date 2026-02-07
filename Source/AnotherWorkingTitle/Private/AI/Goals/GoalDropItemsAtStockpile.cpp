@@ -50,3 +50,9 @@ void UGoalDropItemsAtStockpile::DeInit(IAgent& Agent, bool bIsSuccess) const
 {
 	Agent.GetBlackboard().Clear(EBlackboardMask::Stockpile);
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+FString UGoalDropItemsAtStockpile::Describe(IAgent& Agent, const FWorldState& WorldState) const
+{
+	return TEXT("You are delivering goods to the stockpile.");
+}

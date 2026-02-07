@@ -26,4 +26,7 @@ public:
 	virtual float Evaluate(IAgent& Agent) const;
 	virtual bool Init(IAgent& Agent, FWorldState& WorldState, bool bIsPlanning) const;
 	virtual void DeInit(IAgent& Agent, bool bIsSuccess) const;
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual FString Describe(IAgent& Agent, const FWorldState& WorldState) const;
 };

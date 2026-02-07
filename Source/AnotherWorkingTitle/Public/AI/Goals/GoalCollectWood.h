@@ -11,7 +11,7 @@ UCLASS()
 class ANOTHERWORKINGTITLE_API UGoalCollectWood : public UAbstractGoalCollectResource
 {
 	GENERATED_BODY()
-	
+
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual const UResourceDefinition* GetResource(IAgent& Agent) const override;	

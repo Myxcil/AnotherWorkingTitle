@@ -48,6 +48,9 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintCallable)
 	void SetPaused(bool bSetPaused);
+
+	UFUNCTION(BlueprintPure)
+	FString DescribeAction();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// IAgent
@@ -99,7 +102,7 @@ private:
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void InitializeGoalsAndActions();
-	void ResetPlan(bool bSuccess);	
+	void ResetPlan(const bool bSuccess);	
 	
 	void InitWorldState(ASettlerCharacter* SettlerCharacter);
 	bool ExecutePlan(ASettlerCharacter* SettlerCharacter);
@@ -165,6 +168,7 @@ private:
 
 	TWeakObjectPtr<const UAbstractGoal> CurrentGoal;
 	FWorldState CurrentGoalState;
+	FString LastGoalDescription;
 	
 	TArray<FPlanStep> Plan;
 	int32 PlanStep = -1;

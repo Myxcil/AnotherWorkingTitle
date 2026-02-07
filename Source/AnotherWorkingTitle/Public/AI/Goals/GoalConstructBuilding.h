@@ -17,4 +17,7 @@ public:
 	virtual float Evaluate(IAgent& Agent) const override;
 	virtual bool Init(IAgent& Agent, FWorldState& WorldState, bool bIsPlanning) const override;
 	virtual void DeInit(IAgent& Agent, bool bIsSuccess) const override;
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual FString Describe(IAgent& Agent, const FWorldState& WorldState) const override;	
 };

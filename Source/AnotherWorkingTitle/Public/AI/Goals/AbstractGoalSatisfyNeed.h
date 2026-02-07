@@ -19,6 +19,9 @@ public:
 	virtual bool Init(IAgent& Agent, FWorldState& WorldState, bool bIsPlanning) const override;
 	virtual void DeInit(IAgent& Agent, bool bIsSuccess) const override;
 
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual FString Describe(IAgent& Agent, const FWorldState& WorldState) const override;
+	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual ENeedType GetNeedType() const { return static_cast<ENeedType>(255); }
