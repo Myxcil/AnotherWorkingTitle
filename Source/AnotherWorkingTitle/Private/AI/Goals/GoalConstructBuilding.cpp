@@ -54,8 +54,8 @@ FString UGoalConstructBuilding::Describe(IAgent& Agent, const FWorldState& World
 	{
 		if (const ABuildingSite* BuildingSite = Blackboard.GetBuildingSite())
 		{
-			return FString::Printf(TEXT("You are constructing a %s"), *BuildingSite->GetBuildingName());
+			return FString::Printf(TEXT("constructing a %s"), *BuildingSite->GetBuildingName());
 		}
 	}
-	return TEXT("You are erecting a building");
+	return TEXT("doing construction work");
 }

@@ -18,6 +18,13 @@ UNPCDialogueComponent::UNPCDialogueComponent()
 void UNPCDialogueComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (!GlobalPromptAsset)
+	{
+		UE_LOG(LogLLM, Warning, TEXT("No prompt asset assigned to %s"), *GetPathName());
+		DestroyComponent();
+		return;
+	}
 
 	const AActor* Owner = GetOwner();
 	check(Owner);
@@ -139,13 +146,17 @@ TArray<FDialogueMessage> UNPCDialogueComponent::BuildMessagesForRequest(const FS
 
 	if (bFirstRequest)
 	{
-		FDialogueMessage& RulesPrompt = Out.AddDefaulted_GetRef();
-		RulesPrompt.Role = EChatTemplateRole::System;
-		RulesPrompt.Content = Rules;
+		FString SetupContent;
+		SetupContent.Append(GlobalPromptAsset->Rules);
+		SetupContent.AppendChar('\n');
+		SetupContent.Append(GlobalPromptAsset->Lore);
+		SetupContent.AppendChar('\n');
+		SetupContent.Append(Persona);
+		SetupContent.AppendChar('\n');
 		
-		FDialogueMessage& PersonaPrompt = Out.AddDefaulted_GetRef();
-		PersonaPrompt.Role = EChatTemplateRole::System;
-		PersonaPrompt.Content = Persona;
+		FDialogueMessage& SetupPrompt = Out.AddDefaulted_GetRef();
+		SetupPrompt.Role = EChatTemplateRole::System;
+		SetupPrompt.Content = SetupContent;
 	}
 	
 	FWorldSnapshot WorldSnapshot;
@@ -187,9 +198,16 @@ void UNPCDialogueComponent::PruneHistoryIfNeeded()
 void UNPCDialogueComponent::TakeWorldSnapshot(FWorldSnapshot& Snapshot) const
 {
 	Social->QueryEmotionalState(Snapshot.Mood);
+	Snapshot.Mood.TrimStartAndEndInline();
+	
 	Social->QueryRelationship(Snapshot.Relationship, PlayerSocial);
+	Snapshot.Relationship.TrimStartAndEndInline();
+	
 	Needs->QueryState(Snapshot.Need);
+	Snapshot.Need.TrimStartAndEndInline();
+	
 	Agent->QueryState(Snapshot.Goal);
+	Snapshot.Goal.TrimStartAndEndInline();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -198,19 +216,19 @@ FString UNPCDialogueComponent::GenerateWorldSnapshotMessage(const FWorldSnapshot
 	FString Result;
 	if (!Snapshot.Need.IsEmpty() && Snapshot.Need != CachedSnapshot.Need)
 	{
-		Result.Appendf(TEXT(" - You are %s\n"), *Snapshot.Need);
+		Result.Appendf(TEXT("- Need: %s\n"), *Snapshot.Need);
 	}
 	if (!Snapshot.Mood.IsEmpty() && Snapshot.Mood != CachedSnapshot.Mood)
 	{
-		Result.Appendf(TEXT("- You feel %s\n"), *Snapshot.Mood);
+		Result.Appendf(TEXT("- Mood: %s\n"), *Snapshot.Mood);
 	}
 	if (!Snapshot.Relationship.IsEmpty() && Snapshot.Relationship != CachedSnapshot.Relationship)
 	{
-		Result.Appendf(TEXT("- Your relationship towards the player is %s\n"), *Snapshot.Relationship);
+		Result.Appendf(TEXT("- Toward player: %s\n"), *Snapshot.Relationship);
 	}
 	if (!Snapshot.Goal.IsEmpty() && Snapshot.Goal != CachedSnapshot.Goal)
 	{
-		Result.Appendf(TEXT(" - %s\n"), *Snapshot.Goal);
+		Result.Appendf(TEXT("- Task: %s\n"), *Snapshot.Goal);
 	}
 	return Result;
 }

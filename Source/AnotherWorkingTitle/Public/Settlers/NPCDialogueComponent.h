@@ -10,6 +10,20 @@
 class UGOAPAgentComponent;
 class UNeedsComponent;
 class USocialComponent;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+UCLASS()
+class UDialogueGlobalPromptAsset : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(MultiLine=true))
+	FString Rules;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(MultiLine=true))
+	FString Lore;
+};
+
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNPCDialogueToken, FGuid, RequestId, const FString&, TokenOrChunk);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNPCDialogueResponse, FGuid, RequestId, const FString&, FullText);
@@ -26,18 +40,10 @@ public:
 	UNPCDialogueComponent();
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	// How many turns to keep in memory (per NPC). Keep small initially.
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Dialogue")
-	int32 MaxHistoryMessages = 12;
-
-	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintCallable)
 	void OnBeginDialog();
 	UFUNCTION(BlueprintCallable)
 	void OnEndDialog();
-	
-	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	// Build + send a request. Returns RequestId.
 	UFUNCTION(BlueprintCallable)
 	void SendPlayerLine(const FString& PlayerText);
 
@@ -47,16 +53,17 @@ public:
 	virtual void OnError(const FGuid& RequestId, const FString& ErrorText) override;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	// UI/consumer binds to these.
 	UPROPERTY(BlueprintAssignable)
 	FOnNPCDialogueResponse OnResponse;
 
 protected:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(MultiLine=true))
-	FString Rules;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UDialogueGlobalPromptAsset> GlobalPromptAsset;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(MultiLine=true))
 	FString Persona;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Dialogue")
+	int32 MaxHistoryMessages = 12;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void BeginPlay() override;

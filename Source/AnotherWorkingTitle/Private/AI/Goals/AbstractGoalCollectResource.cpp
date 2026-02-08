@@ -70,5 +70,5 @@ FString UAbstractGoalCollectResource::Describe(IAgent& Agent, const FWorldState&
 {
 	const UResourceDefinition* Resource = GetResource(Agent);
 	check(Resource);
-	return FString::Printf(TEXT("You are collecting %s"), *Resource->DisplayName.ToString());
+	return FString::Printf(TEXT("harvesting %s"), *Resource->DisplayName.ToString());
 }

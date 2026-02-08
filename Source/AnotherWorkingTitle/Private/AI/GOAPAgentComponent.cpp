@@ -573,13 +573,13 @@ void UGOAPAgentComponent::SetPaused(bool bSetPaused)
 	
 	if (bSetPaused)
 	{
-		OnAIRequestPauseMovement.ExecuteIfBound(true);
+		OnAIRequestStopMovement.ExecuteIfBound();
 		State = EInternalState::Paused;
 	}
 	else
 	{
 		bWorldIsDirty = true;
-		OnAIRequestPauseMovement.ExecuteIfBound(false);
+		ResetPlan(false);
 		State = EInternalState::Idle;
 	}
 }
@@ -883,5 +883,9 @@ void UGOAPAgentComponent::QueryState(FString& Output)
 	if (const UAbstractGoal* Goal = CurrentGoal.Get())
 	{
 		Output = Goal->Describe(*this, CurrentGoalState);
+	}
+	else
+	{
+		Output = TEXT("none");
 	}
 }
