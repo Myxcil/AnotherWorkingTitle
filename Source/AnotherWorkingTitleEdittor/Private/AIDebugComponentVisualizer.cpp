@@ -32,7 +32,7 @@ namespace
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	const TCHAR* AIDebugName = TEXT("GoapDebug");
-	TCustomShowFlag<> ShowAIDebug(AIDebugName, true, SFG_Developer, FText::FromString("GOAP Debug"));
+	[[maybe_unused]] TCustomShowFlag<> ShowAIDebug(AIDebugName, true, SFG_Developer, FText::FromString("GOAP Debug"));
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool IsFlagSet(const FSceneView* View, const TCHAR* FlagName)

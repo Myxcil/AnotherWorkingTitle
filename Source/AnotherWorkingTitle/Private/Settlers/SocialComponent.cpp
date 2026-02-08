@@ -91,60 +91,6 @@ void USocialComponent::TickSocial(const float DeltaGameHour)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-FString USocialComponent::DescribeMood() const
-{
-	FString Result;
-	bool bHasResult = false;
-	if (CachedSummary.JoySadness != EEmotionalLevel::Neutral)
-	{
-		Result.Append(GetEmotionDescription(EPrimaryEmotionAxis::JoySadness, CachedSummary.JoySadness));
-		bHasResult = true;
-	}
-	if (CachedSummary.TrustDisgust != EEmotionalLevel::Neutral)
-	{
-		if (bHasResult)
-		{
-			Result.AppendChar(',');
-		}
-		Result.Append(GetEmotionDescription(EPrimaryEmotionAxis::TrustDisgust, CachedSummary.TrustDisgust));
-		bHasResult = true;
-	}
-	if (CachedSummary.FearAnger != EEmotionalLevel::Neutral)
-	{
-		if (bHasResult)
-		{
-			Result.AppendChar(',');
-		}
-		Result.Append(GetEmotionDescription(EPrimaryEmotionAxis::FearAnger, CachedSummary.FearAnger));
-		bHasResult = true;
-	}
-	if (CachedSummary.SurpriseAnticipation != EEmotionalLevel::Neutral)
-	{
-		if (bHasResult)
-		{
-			Result.AppendChar(',');
-		}
-		Result.Append(GetEmotionDescription(EPrimaryEmotionAxis::SurpriseAnticipation, CachedSummary.SurpriseAnticipation));
-		bHasResult = true;
-	}
-	if (!bHasResult)
-	{
-		Result.Append(TEXT("Calm"));
-	}
-	return Result;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
-FString USocialComponent::DescribeRelationShip(const USocialComponent* Other) const
-{
-	if (const FRelationshipState* RelationshipState = RelationShips.Find(Other))
-	{
-		return GetRelationShipDescription(*RelationshipState);
-	}
-	return TEXT("Neutral");
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
 FText USocialComponent::GetEmotionalState() const
 {
 	FString Output;

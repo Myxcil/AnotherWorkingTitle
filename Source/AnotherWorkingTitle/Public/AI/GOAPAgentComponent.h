@@ -49,9 +49,6 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintCallable)
 	void SetPaused(bool bSetPaused);
-
-	UFUNCTION(BlueprintPure)
-	FString DescribeAction();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// IAgent
@@ -168,7 +165,6 @@ private:
 
 	TWeakObjectPtr<const UAbstractGoal> CurrentGoal;
 	FWorldState CurrentGoalState;
-	FString LastGoalDescription;
 	
 	TArray<FPlanStep> Plan;
 	int32 PlanStep = -1;

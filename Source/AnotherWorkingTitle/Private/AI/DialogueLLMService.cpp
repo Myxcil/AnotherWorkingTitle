@@ -42,8 +42,6 @@ void UDialogueLLMService::RegisterLlamaComponent(ULlamaComponent* InLlamaCompone
 	{
 		LlamaComponent->OnModelLoaded.AddUniqueDynamic(this, &ThisClass::HandleModelLoaded);
 		LlamaComponent->OnError.AddUniqueDynamic(this, &ThisClass::HandleError);
-		//LlamaComponent->OnTokenGenerated.AddUniqueDynamic(this, &ThisClass::HandleNewToken);
-		//LlamaComponent->OnPartialGenerated.AddUniqueDynamic(this, &ThisClass::HandlePartialGenerated);
 		LlamaComponent->OnResponseGenerated.AddUniqueDynamic(this, &ThisClass::HandleResponseGenerated);
 	}
 }
@@ -160,16 +158,6 @@ void UDialogueLLMService::HandleModelLoaded(const FString& ModelName)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UDialogueLLMService::HandleNewToken(const FString& Token)
-{
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UDialogueLLMService::HandlePartialGenerated(const FString& Chunk)
-{
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 {
 	UE_LOG(LogLLM, Log, TEXT("HandleResponseGenerated: %s"), *FullText);
@@ -195,7 +183,7 @@ void UDialogueLLMService::HandleError(const FString& ErrorMessage, int32 ErrorCo
 	{
 		ActiveOwner->OnError(ActiveRequestId, ErrorMessage);
 	}
-	
+	ActiveBuffer.Reset();
 	ActiveRequestId.Invalidate();
 	
 	TryStartNextRequest();

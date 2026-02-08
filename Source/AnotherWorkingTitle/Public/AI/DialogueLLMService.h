@@ -96,12 +96,6 @@ private:
 	void HandleModelLoaded(const FString& ModelName);
 
 	UFUNCTION()
-	void HandleNewToken(const FString& Token);
-
-	UFUNCTION()
-	void HandlePartialGenerated(const FString& Chunk);
-
-	UFUNCTION()
 	void HandleResponseGenerated(const FString& FullText);
 
 	UFUNCTION()

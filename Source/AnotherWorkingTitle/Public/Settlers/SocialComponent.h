@@ -44,12 +44,6 @@ public:
 	const FRelationshipState& GetRelationship(const USocialComponent* Other) const { return RelationShips[Other]; }
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
-	UFUNCTION(BlueprintPure)
-	FString DescribeMood() const;
-	UFUNCTION(BlueprintPure)
-	FString DescribeRelationShip(const USocialComponent* Other) const;
-	
-	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintAssignable)
 	FEmotionalStateChanged OnEmotionalStateChanged;
 	UFUNCTION(BlueprintCallable)
