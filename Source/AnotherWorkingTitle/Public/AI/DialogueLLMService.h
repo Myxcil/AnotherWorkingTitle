@@ -69,7 +69,6 @@ public:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	void SetListener(ILLMServiceListener* InListener);
 	FGuid EnqueueRequest(UPARAM(ref) FDialogueRequest& Request);
-	void CancelRequest(const FGuid& RequestId);
 
 private:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -82,6 +81,9 @@ private:
 	TArray<FDialogueRequest> PendingRequests;
 	FGuid ActiveRequestId;
 	FString ActiveBuffer;
+	bool bRequestStop = false;
+	bool bResetHistoryAfterStop = false;
+	bool bRetryAfterStop = false;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	FString ModelFileName = TEXT("llama-3.2-3b-instruct-q4_k_m.gguf");
@@ -100,6 +102,9 @@ private:
 
 	UFUNCTION()
 	void HandleError(const FString& ErrorMessage, int32 ErrorCode);
+	
+	UFUNCTION()
+	void HandleEndOfStream(bool bStopSequenceTriggered, float TokensPerSecond);
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	void TryStartNextRequest();

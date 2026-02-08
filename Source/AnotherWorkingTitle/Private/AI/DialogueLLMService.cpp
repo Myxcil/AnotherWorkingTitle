@@ -10,7 +10,6 @@ DEFINE_LOG_CATEGORY(LogLLM);
 void UDialogueLLMService::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-	// TODO: nothing by default. Service is inert until RegisterLlamaComponent.
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -20,9 +19,8 @@ void UDialogueLLMService::Deinitialize()
 	{
 		LlamaComponent->OnModelLoaded.Clear();
 		LlamaComponent->OnError.Clear();
-		LlamaComponent->OnTokenGenerated.Clear();
-		LlamaComponent->OnPartialGenerated.Clear();
 		LlamaComponent->OnResponseGenerated.Clear();
+		LlamaComponent->OnEndOfStream.Clear();
 	}
 	
 	LlamaComponent = nullptr;
@@ -43,6 +41,7 @@ void UDialogueLLMService::RegisterLlamaComponent(ULlamaComponent* InLlamaCompone
 		LlamaComponent->OnModelLoaded.AddUniqueDynamic(this, &ThisClass::HandleModelLoaded);
 		LlamaComponent->OnError.AddUniqueDynamic(this, &ThisClass::HandleError);
 		LlamaComponent->OnResponseGenerated.AddUniqueDynamic(this, &ThisClass::HandleResponseGenerated);
+		LlamaComponent->OnEndOfStream.AddUniqueDynamic(this, &ThisClass::HandleEndOfStream);
 	}
 }
 
@@ -62,6 +61,7 @@ void UDialogueLLMService::SetListener(ILLMServiceListener* InListener)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 FGuid UDialogueLLMService::EnqueueRequest(FDialogueRequest& Request)
 {
+	check(ActiveOwner);
 	Request.RequestId = FGuid::NewGuid();
 	PendingRequests.Add(Request);
 	TryStartNextRequest();
@@ -69,36 +69,22 @@ FGuid UDialogueLLMService::EnqueueRequest(FDialogueRequest& Request)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UDialogueLLMService::CancelRequest(const FGuid& RequestId)
-{
-	if (ActiveRequestId == RequestId)
-	{
-		if (LlamaComponent)
-		{
-			LlamaComponent->StopGeneration();
-		}
-		ActiveRequestId.Invalidate();
-	}
-	else
-	{
-		const int32 Index = PendingRequests.IndexOfByPredicate([&](const FDialogueRequest& Request)
-		{
-			return Request.RequestId == RequestId;
-		});
-		if (Index != INDEX_NONE)
-		{
-			PendingRequests.RemoveAt(Index);
-		}
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::Clear()
 {
 	if (LlamaComponent)
 	{
-		LlamaComponent->StopGeneration();
-		LlamaComponent->ResetContextHistory();
+		if (ActiveRequestId.IsValid())
+		{
+			bRequestStop = true;
+			bResetHistoryAfterStop = true;
+			LlamaComponent->StopGeneration();
+		}
+		else
+		{
+			bRequestStop = false;
+			bResetHistoryAfterStop = false;
+			LlamaComponent->ResetContextHistory();
+		}
 	}
 	
 	PendingRequests.Reset();
@@ -161,7 +147,13 @@ void UDialogueLLMService::HandleModelLoaded(const FString& ModelName)
 void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 {
 	UE_LOG(LogLLM, Log, TEXT("HandleResponseGenerated: %s"), *FullText);
+	
+	if (bRequestStop)
+		return;
 
+	if (!ActiveRequestId.IsValid())
+		return;
+	
 	ActiveBuffer = FullText;
 	SanitizeInPlace(ActiveBuffer);
 
@@ -178,7 +170,7 @@ void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::HandleError(const FString& ErrorMessage, int32 ErrorCode)
 {
-	UE_LOG(LogLLM, Warning, TEXT("HandlError: %s, code=%d"), *ErrorMessage, ErrorCode);
+	UE_LOG(LogLLM, Warning, TEXT("HandleError: %s, code=%d"), *ErrorMessage, ErrorCode);
 	if (ActiveOwner)
 	{
 		ActiveOwner->OnError(ActiveRequestId, ErrorMessage);
@@ -186,7 +178,36 @@ void UDialogueLLMService::HandleError(const FString& ErrorMessage, int32 ErrorCo
 	ActiveBuffer.Reset();
 	ActiveRequestId.Invalidate();
 	
+	bRequestStop = false;
+	if (bResetHistoryAfterStop)
+	{
+		bResetHistoryAfterStop = false;
+		if (LlamaComponent)
+		{
+			LlamaComponent->ResetContextHistory();
+		}
+	}
+	
 	TryStartNextRequest();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void UDialogueLLMService::HandleEndOfStream(bool bStopSequenceTriggered, float TokensPerSecond)
+{
+	const bool bWasRequested = bRequestStop;
+	bRequestStop = false;
+	if (bResetHistoryAfterStop)
+	{
+		bResetHistoryAfterStop = false;
+		if (LlamaComponent)
+		{
+			LlamaComponent->ResetContextHistory();
+		}
+	}
+	if (bWasRequested)
+	{
+		TryStartNextRequest();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -202,6 +223,9 @@ void UDialogueLLMService::TryStartNextRequest()
 		return;
 	
 	if (!bModelReady)
+		return;
+	
+	if (bRequestStop)
 		return;
 	
 	const FDialogueRequest Request = PendingRequests[0];
