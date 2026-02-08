@@ -48,6 +48,8 @@ public:
 	
 	bool IsAnyNeedInSeverityLevel(const ENeedSeverity NeedSeverity) const;
 	
+	void QueryState(FString& Output) const;
+	
 	FNeedSeverityChanged OnNeedSeverityChanged;
 	FDamagedReachedMaximum OnDamagedReachedMaximum;
 	UPROPERTY(BlueprintAssignable)
@@ -95,6 +97,5 @@ private:
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	TWeakObjectPtr<ASettlerCharacter> SettlerCharacterPtr;
-	FRandomStream RandomStream;
 	TStaticArray<ENeedSeverity, 6> PrevNeedSeverity;
 };

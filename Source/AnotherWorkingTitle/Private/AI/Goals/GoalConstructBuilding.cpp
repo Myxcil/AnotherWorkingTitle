@@ -49,5 +49,13 @@ void UGoalConstructBuilding::DeInit(IAgent& Agent, bool bIsSuccess) const
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 FString UGoalConstructBuilding::Describe(IAgent& Agent, const FWorldState& WorldState) const
 {
+	const FAIBlackboard& Blackboard = Agent.GetBlackboard();
+	if (Blackboard.IsSet(EBlackboardMask::BuildingSite))
+	{
+		if (const ABuildingSite* BuildingSite = Blackboard.GetBuildingSite())
+		{
+			return FString::Printf(TEXT("You are constructing a %s"), *BuildingSite->GetBuildingName());
+		}
+	}
 	return TEXT("You are erecting a building.");
 }

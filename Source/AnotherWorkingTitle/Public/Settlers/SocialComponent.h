@@ -48,6 +48,10 @@ public:
 	FEmotionalStateChanged OnEmotionalStateChanged;
 	UFUNCTION(BlueprintCallable)
 	FText GetEmotionalState() const; 
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	void QueryEmotionalState(FString& Output) const;
+	bool QueryRelationship(FString& Output, const USocialComponent* Other) const;
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 #if WITH_EDITOR

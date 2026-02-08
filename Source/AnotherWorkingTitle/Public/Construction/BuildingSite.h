@@ -55,6 +55,8 @@ public:
 	
 	static FGlobalBuildingSiteChanged OnGlobalBuildingSiteChanged;
 	
+	FString GetBuildingName() const;
+	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	bool TryConsumeBuildResources();

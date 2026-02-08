@@ -23,9 +23,6 @@ void UNeedsComponent::BeginPlay()
 	{
 		PrevNeedSeverity[I] = ENeedSeverity::Normal;		
 	}	
-
-	static int32 RandomSeed = 1;
-	RandomStream.Initialize(RandomSeed++);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -166,6 +163,55 @@ bool UNeedsComponent::IsAnyNeedInSeverityLevel(const ENeedSeverity NeedSeverity)
 		}
 	}
 	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UNeedsComponent::QueryState(FString& Output) const
+{
+	int32 Index = 0;
+	bool bNeedAdded = false;
+	for (const ENeedType NeedType : TEnumRange<ENeedType>())
+	{
+		if (PrevNeedSeverity[Index] >= ENeedSeverity::Uncomfortable)
+		{
+			if (bNeedAdded)
+			{
+				Output.AppendChar(',');
+			}
+			
+			const bool bCritical = PrevNeedSeverity[Index] == ENeedSeverity::Critical;
+		
+			switch (NeedType)
+			{
+			case ENeedType::Hunger:
+				Output.Append(bCritical ? "hungry" : "starving");
+				bNeedAdded = true;
+				break;
+			case ENeedType::Thirst:
+				Output.Append(bCritical ? "thirsty" : "dehydrated");
+				bNeedAdded = true;
+				break;
+			case ENeedType::Cold:
+				Output.Append(bCritical ? "cold" : "freezing");
+				bNeedAdded = true;
+				break;
+			case ENeedType::Fatigue:
+				Output.Append(bCritical ? "tired" : "exhausted");
+				bNeedAdded = true;
+				break;
+			case ENeedType::Damage:
+				Output.Append(bCritical ? "hurt" : "dying");
+				bNeedAdded = true;
+				break;
+			}
+		}
+		++Index;
+	}
+	if (bNeedAdded)
+	{
+		Output.InsertAt(0, "You are ");
+		Output.Append(".\n");
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

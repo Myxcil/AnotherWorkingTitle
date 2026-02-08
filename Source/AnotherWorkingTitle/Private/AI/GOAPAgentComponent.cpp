@@ -876,3 +876,12 @@ float UGOAPAgentComponent::GetNeedValue(const ENeedType NeedType) const
 	}
 	return 0;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+void UGOAPAgentComponent::QueryState(FString& Output)
+{
+	if (const UAbstractGoal* Goal = CurrentGoal.Get())
+	{
+		Output = Goal->Describe(*this, CurrentGoalState);
+	}
+}

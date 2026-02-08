@@ -113,6 +113,51 @@ FText USocialComponent::GetEmotionalState() const
 	return FText::FromString(Output);
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void USocialComponent::QueryEmotionalState(FString& Output) const
+{
+	if (CachedSummary.JoySadness != EEmotionalLevel::Neutral)
+	{
+		Output.Append(GetEmotionDescription(EPrimaryEmotionAxis::JoySadness, CachedSummary.JoySadness));	
+	}
+	if (CachedSummary.TrustDisgust != EEmotionalLevel::Neutral)
+	{
+		if (!Output.IsEmpty()) Output.AppendChar(',');
+		Output.Append(GetEmotionDescription(EPrimaryEmotionAxis::TrustDisgust, CachedSummary.TrustDisgust));	
+	}
+	if (CachedSummary.FearAnger != EEmotionalLevel::Neutral)
+	{
+		if (!Output.IsEmpty()) Output.AppendChar(',');
+		Output.Append(GetEmotionDescription(EPrimaryEmotionAxis::FearAnger, CachedSummary.FearAnger));	
+	}
+	if (CachedSummary.SurpriseAnticipation != EEmotionalLevel::Neutral)
+	{
+		if (!Output.IsEmpty()) Output.AppendChar(',');
+		Output.Append(GetEmotionDescription(EPrimaryEmotionAxis::SurpriseAnticipation, CachedSummary.SurpriseAnticipation));	
+	}
+	if (!Output.IsEmpty())
+	{
+		Output.InsertAt(0, "You feel ");
+		Output.Append(".\n");
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+bool USocialComponent::QueryRelationship(FString& Output, const USocialComponent* Other) const
+{
+	if (const FRelationshipState* PtrRelationshipState = RelationShips.Find(Other))
+	{
+		Output = GetRelationShipDescription(*PtrRelationshipState);
+		if (!Output.IsEmpty())
+		{
+			Output.InsertAt(0, "Your attitude towards the player is ");
+			Output.Append(".\n");
+		}
+		return true;
+	}
+	return false;
+}
+
 #if WITH_EDITOR
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void USocialComponent::RandomizeCurrentEmotion()

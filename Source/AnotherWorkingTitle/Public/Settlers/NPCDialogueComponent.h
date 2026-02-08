@@ -7,6 +7,9 @@
 #include "AI/DialogueLLMService.h"
 #include "NPCDialogueComponent.generated.h"
 
+class UGOAPAgentComponent;
+class UNeedsComponent;
+class USocialComponent;
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNPCDialogueToken, FGuid, RequestId, const FString&, TokenOrChunk);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNPCDialogueResponse, FGuid, RequestId, const FString&, FullText);
@@ -50,17 +53,48 @@ public:
 
 protected:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(MultiLine=true))
+	FString Rules;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(MultiLine=true))
+	FString Persona;
+	
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	UDialogueLLMService* GetService() const;
-	void PruneHistoryIfNeeded();
-	TArray<FDialogueMessage> BuildMessagesForRequest(const FString& PlayerText) const;
+	struct FWorldSnapshot
+	{
+		FString	Mood;
+		FString	Relationship;
+		FString Need;
+		FString Goal;
+	};
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	UDialogueLLMService* GetService() const;
+	void PruneHistoryIfNeeded();
+	TArray<FDialogueMessage> BuildMessagesForRequest(const FString& PlayerText);
+	
+	void TakeWorldSnapshot(FWorldSnapshot& Snapshot) const;
+	FString GenerateWorldSnapshotMessage(const FWorldSnapshot& Snapshot) const;
+		
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	UPROPERTY()
+	TObjectPtr<USocialComponent> Social = nullptr;
+	UPROPERTY()
+	TObjectPtr<UNeedsComponent> Needs = nullptr;
+	UPROPERTY()
+	TObjectPtr<UGOAPAgentComponent> Agent = nullptr;
+	UPROPERTY()
+	TObjectPtr<USocialComponent> PlayerSocial = nullptr;
+	
 	TArray<FDialogueMessage> History;
 	TArray<FGuid> OwnedRequestIds;
 	bool bFirstRequest = true;
 	bool bInDialog = false;
+	
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	FWorldSnapshot CachedSnapshot;
 };

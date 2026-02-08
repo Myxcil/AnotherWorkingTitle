@@ -90,7 +90,11 @@ public:
 
 	virtual ENeedSeverity GetNeedSeverity(const ENeedType NeedType) const override;
 	virtual float GetNeedValue(const ENeedType NeedType) const override;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	void QueryState(FString& Output);
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintAssignable)
 	FGoalListUpdated OnGoalListUpdated;
 	

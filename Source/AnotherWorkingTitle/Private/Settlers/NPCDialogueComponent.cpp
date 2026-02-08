@@ -1,12 +1,38 @@
 ﻿// (c) 2025 MK
 
 #include "Settlers/NPCDialogueComponent.h"
+
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
+#include "AI/GOAPAgentComponent.h"
+#include "Settlers/NeedsComponent.h"
+#include "Settlers/SocialComponent.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 UNPCDialogueComponent::UNPCDialogueComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void UNPCDialogueComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	const AActor* Owner = GetOwner();
+	check(Owner);
+	
+	Social = Owner->GetComponentByClass<USocialComponent>();
+	check(Social);
+	Needs = Owner->GetComponentByClass<UNeedsComponent>();
+	check(Needs);
+	Agent = Owner->GetComponentByClass<UGOAPAgentComponent>();
+	check(Agent);
+
+	if (const APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+	{
+		PlayerSocial = PlayerPawn->GetComponentByClass<USocialComponent>();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,6 +68,8 @@ void UNPCDialogueComponent::OnBeginDialog()
 	
 	OwnedRequestIds.Reset();
 	bFirstRequest = true;
+	
+	CachedSnapshot = FWorldSnapshot();
 
 	if (UDialogueLLMService* Service = GetService())
 	{
@@ -69,10 +97,7 @@ void UNPCDialogueComponent::SendPlayerLine(const FString& PlayerText)
 	
 	UDialogueLLMService* Service = GetService();
 	if (!Service || !Service->IsReady())
-	{
-		// TODO: broadcast error locally.
 		return;
-	}
 
 	FDialogueRequest Req;
 	Req.Messages = BuildMessagesForRequest(PlayerText);
@@ -108,10 +133,34 @@ void UNPCDialogueComponent::OnError(const FGuid& RequestId, const FString& Error
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-TArray<FDialogueMessage> UNPCDialogueComponent::BuildMessagesForRequest(const FString& PlayerText) const
+TArray<FDialogueMessage> UNPCDialogueComponent::BuildMessagesForRequest(const FString& PlayerText)
 {
 	TArray<FDialogueMessage> Out;
 
+	if (bFirstRequest)
+	{
+		FDialogueMessage& RulesPrompt = Out.AddDefaulted_GetRef();
+		RulesPrompt.Role = EChatTemplateRole::System;
+		RulesPrompt.Content = Rules;
+		
+		FDialogueMessage& PersonaPrompt = Out.AddDefaulted_GetRef();
+		PersonaPrompt.Role = EChatTemplateRole::System;
+		PersonaPrompt.Content = Persona;
+	}
+	
+	FWorldSnapshot WorldSnapshot;
+	TakeWorldSnapshot(WorldSnapshot);
+
+	const FString WorldMessage = GenerateWorldSnapshotMessage(WorldSnapshot);
+	if (!WorldMessage.IsEmpty())
+	{
+		FDialogueMessage& WorldState = Out.AddDefaulted_GetRef();
+		WorldState.Role = EChatTemplateRole::System;
+		WorldState.Content = WorldMessage;
+		
+		CachedSnapshot = WorldSnapshot;
+	}
+	
 	if (bFirstRequest)
 	{
 		Out.Append(History);
@@ -132,4 +181,39 @@ void UNPCDialogueComponent::PruneHistoryIfNeeded()
 	{
 		History.RemoveAt(0);
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void UNPCDialogueComponent::TakeWorldSnapshot(FWorldSnapshot& Snapshot) const
+{
+	Social->QueryEmotionalState(Snapshot.Mood);
+	if (PlayerSocial)
+	{
+		Social->QueryRelationship(Snapshot.Relationship, PlayerSocial);
+	}
+	Needs->QueryState(Snapshot.Need);
+	Agent->QueryState(Snapshot.Goal);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+FString UNPCDialogueComponent::GenerateWorldSnapshotMessage(const FWorldSnapshot& Snapshot) const
+{
+	FString Result;
+	if (!Snapshot.Mood.IsEmpty() && Snapshot.Mood != CachedSnapshot.Mood)
+	{
+		Result.Append(Snapshot.Mood);
+	}
+	if (!Snapshot.Relationship.IsEmpty() && Snapshot.Relationship != CachedSnapshot.Relationship)
+	{
+		Result.Append(Snapshot.Relationship);
+	}
+	if (!Snapshot.Goal.IsEmpty() && Snapshot.Goal != CachedSnapshot.Goal)
+	{
+		Result.Append(Snapshot.Goal);
+	}
+	if (!Snapshot.Need.IsEmpty() && Snapshot.Need != CachedSnapshot.Need)
+	{
+		Result.Append(Snapshot.Need);
+	}
+	return Result;
 }

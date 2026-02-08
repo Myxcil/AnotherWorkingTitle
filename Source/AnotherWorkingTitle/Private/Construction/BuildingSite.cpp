@@ -19,6 +19,12 @@ namespace
 FGlobalBuildingSiteChanged ABuildingSite::OnGlobalBuildingSiteChanged;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+FString ABuildingSite::GetBuildingName() const
+{
+	return BuildingDefinition ? BuildingDefinition->DisplayName.ToString() : TEXT("unknown building");
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 const TArray<ABuildingSite*>& ABuildingSite::GetInstances()
 {
 	return AllBuildingSites;
