@@ -34,6 +34,9 @@ void UDialogueLLMService::Deinitialize()
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::RegisterLlamaComponent(ULlamaComponent* InLlamaComponent)
 {
+	if (!EnsureModelCopiedToSavedModels(ModelFileName))
+		return;
+	
 	LlamaComponent = InLlamaComponent;
 	if (LlamaComponent)
 	{
@@ -49,6 +52,13 @@ void UDialogueLLMService::RegisterLlamaComponent(ULlamaComponent* InLlamaCompone
 bool UDialogueLLMService::IsReady() const
 {
 	return bModelReady && IsValid(LlamaComponent);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void UDialogueLLMService::SetListener(ILLMServiceListener* InListener)
+{
+	ActiveOwner = InListener;
+	Clear();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -88,20 +98,17 @@ void UDialogueLLMService::CancelRequest(const FGuid& RequestId)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UDialogueLLMService::CancelAllForOwner(UObject* Owner)
+void UDialogueLLMService::CancelAll()
 {
-	PendingRequests.RemoveAllSwap([&](const FDialogueRequest& Request)
+	if (LlamaComponent)
 	{
-		return Request.Owner == Owner;	
-	});
-	if (ActiveOwner == Owner)
+		LlamaComponent->StopGeneration();
+	}
+	if (ActiveRequestId.IsValid())
 	{
 		ActiveRequestId.Invalidate();
-		if (LlamaComponent)
-		{
-			LlamaComponent->StopGeneration();
-		}
 	}
+	PendingRequests.Reset();
 	TryStartNextRequest();
 }
 
@@ -116,16 +123,59 @@ void UDialogueLLMService::Clear()
 	
 	PendingRequests.Reset();
 	
-	ActiveOwner.Reset();
+	ActiveOwner = nullptr;
 	ActiveRequestId.Invalidate();
 	ActiveBuffer.Reset();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool UDialogueLLMService::EnsureModelCopiedToSavedModels(const FString& InModelFileName) const
+{
+	if (InModelFileName.IsEmpty())
+	{
+		UE_LOG(LogLLM, Error, TEXT("EnsureModelCopiedToSavedModels: ModelFileName is empty."));
+		return false;
+	}
+
+	IPlatformFile& PF = FPlatformFileManager::Get().GetPlatformFile();
+
+	const FString SavedModelsDir = FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Models"));
+	const FString DestPath      = FPaths::Combine(SavedModelsDir, InModelFileName);
+
+	if (PF.FileExists(*DestPath))
+	{
+		return true;
+	}
+
+	const FString SrcPath = FPaths::Combine(FPaths::ProjectContentDir(), ContentModelSubDir, InModelFileName);
+
+	if (!PF.FileExists(*SrcPath))
+	{
+		UE_LOG(LogLLM, Error, TEXT("LLM model not found at '%s'. Ensure it is staged as Non-UFS (Packaging -> Additional Non-Asset Directories to Copy)."), *SrcPath);
+		return false;
+	}
+
+	if (!PF.CreateDirectoryTree(*SavedModelsDir))
+	{
+		UE_LOG(LogLLM, Error, TEXT("Failed to create directory '%s'."), *SavedModelsDir);
+		return false;
+	}
+
+	if (!PF.CopyFile(*DestPath, *SrcPath))
+	{
+		UE_LOG(LogLLM, Error, TEXT("Failed to copy model from '%s' to '%s'."), *SrcPath, *DestPath);
+		return false;
+	}
+
+	UE_LOG(LogLLM, Log, TEXT("Copied LLM model to '%s'."), *DestPath);
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::HandleModelLoaded(const FString& ModelName)
 {
 	bModelReady = true;
-	OnLLMReady.Broadcast(true);
+	UE_LOG(LogLLM, Log, TEXT("Model loaded: '%s'."), *ModelName);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -137,7 +187,10 @@ void UDialogueLLMService::HandleNewToken(const FString& Token)
 	{
 		SanitizeInPlace(ActiveBuffer);
 	}
-	OnLLMToken.Broadcast(ActiveRequestId, ActiveBuffer);
+	if (ActiveOwner)
+	{
+		ActiveOwner->OnTokenReceived(ActiveRequestId, ActiveBuffer);
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -149,7 +202,10 @@ void UDialogueLLMService::HandlePartialGenerated(const FString& Chunk)
 	{
 		SanitizeInPlace(ActiveBuffer);
 	}
-	OnLLMToken.Broadcast(ActiveRequestId, ActiveBuffer);
+	if (ActiveOwner)
+	{
+		ActiveOwner->OnTokenReceived(ActiveRequestId, ActiveBuffer);
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -159,8 +215,12 @@ void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 
 	ActiveBuffer = FullText;
 	SanitizeInPlace(ActiveBuffer);
-	OnLLMResponse.Broadcast(ActiveRequestId, ActiveBuffer);
-	
+
+	if (ActiveOwner)
+	{
+		ActiveOwner->OnResponseGenerated(ActiveRequestId, ActiveBuffer);
+	}
+
 	ActiveRequestId.Invalidate();
 	
 	TryStartNextRequest();
@@ -170,7 +230,10 @@ void UDialogueLLMService::HandleResponseGenerated(const FString& FullText)
 void UDialogueLLMService::HandleError(const FString& ErrorMessage, int32 ErrorCode)
 {
 	UE_LOG(LogLLM, Warning, TEXT("HandlError: %s, code=%d"), *ErrorMessage, ErrorCode);
-	OnLLMError.Broadcast(ActiveRequestId, ErrorMessage);
+	if (ActiveOwner)
+	{
+		ActiveOwner->OnError(ActiveRequestId, ErrorMessage);
+	}
 	
 	ActiveRequestId.Invalidate();
 	ActiveOwner = nullptr;
@@ -200,7 +263,6 @@ void UDialogueLLMService::StartRequestInternal(const FDialogueRequest& Request)
 {
 	ActiveBuffer.Empty();
 	
-	ActiveOwner = Request.Owner;
 	ActiveRequestId = Request.RequestId;
 	
 	int32 LastUserMessage = INDEX_NONE;

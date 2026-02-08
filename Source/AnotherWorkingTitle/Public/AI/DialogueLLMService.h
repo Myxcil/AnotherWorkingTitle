@@ -31,13 +31,6 @@ struct FDialogueRequest
 {
 	GENERATED_BODY()
 
-	// Owning object for cancellation/routing (typically a UNPCDialogueComponent or UI controller)
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TObjectPtr<UObject> Owner = nullptr;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString DebugName;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FDialogueMessage> Messages;
 
@@ -46,10 +39,17 @@ struct FDialogueRequest
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLLMReady, bool, bReady);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLLMToken, FGuid, RequestId, const FString&, TokenOrChunk);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLLMResponse, FGuid, RequestId, const FString&, FullText);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLLMError, FGuid, RequestId, const FString&, ErrorText);
+class ILLMServiceListener
+{
+public:
+	virtual ~ILLMServiceListener() = default;
+	
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual void OnTokenReceived(const FGuid& RequestId, const FString& Token) = 0;
+	virtual void OnResponseGenerated(const FGuid& RequestId, const FString& FullText) = 0;
+	virtual void OnError(const FGuid& RequestId, const FString& ErrorText) = 0;	
+};
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
@@ -65,20 +65,13 @@ public:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintCallable)
 	void RegisterLlamaComponent(ULlamaComponent* InLlamaComponent);
-
 	bool IsReady() const;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	void SetListener(ILLMServiceListener* InListener);
 	FGuid EnqueueRequest(UPARAM(ref) FDialogueRequest& Request);
 	void CancelRequest(const FGuid& RequestId);
-	void CancelAllForOwner(UObject* Owner);
-	void Clear();
-
-	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	FOnLLMReady OnLLMReady;
-	FOnLLMToken OnLLMToken;
-	FOnLLMResponse OnLLMResponse;
-	FOnLLMError OnLLMError;
+	void CancelAll();
 
 private:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,12 +80,19 @@ private:
 
 	bool bModelReady = false;
 
+	ILLMServiceListener* ActiveOwner = nullptr;
 	TArray<FDialogueRequest> PendingRequests;
-
 	FGuid ActiveRequestId;
-	TWeakObjectPtr<UObject> ActiveOwner;
 	FString ActiveBuffer;
 
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	FString ModelFileName = TEXT("llama-3.2-3b-instruct-q4_k_m.gguf");
+	FString ContentModelSubDir = TEXT("LLMModels");
+
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	bool EnsureModelCopiedToSavedModels(const FString& InModelFileName) const;
+	void Clear();
+	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	UFUNCTION()
 	void HandleModelLoaded(const FString& ModelName);

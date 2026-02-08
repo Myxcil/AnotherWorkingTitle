@@ -14,18 +14,13 @@ void UNPCDialogueComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (UDialogueLLMService* Service = GetService())
-	{
-		Service->OnLLMToken.AddDynamic(this, &UNPCDialogueComponent::HandleServiceToken);
-		Service->OnLLMResponse.AddDynamic(this, &UNPCDialogueComponent::HandleServiceResponse);
-		Service->OnLLMError.AddDynamic(this, &UNPCDialogueComponent::HandleServiceError);
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 UDialogueLLMService* UNPCDialogueComponent::GetService() const
 {
-	if (!GetWorld()) return nullptr;
+	if (!GetWorld()) 
+		return nullptr;
 	if (UGameInstance* GI = GetWorld()->GetGameInstance())
 	{
 		return GI->GetSubsystem<UDialogueLLMService>();
@@ -38,41 +33,46 @@ void UNPCDialogueComponent::OnBeginDialog()
 {
 	History.Reset();
 	OwnedRequestIds.Reset();
+	bFirstRequest = true;
+
 	if (UDialogueLLMService* Service = GetService())
 	{
-		Service->Clear();
-	}	
-	bFirstRequest = true;
+		Service->SetListener(this);
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-FGuid UNPCDialogueComponent::SendPlayerLine(const FString& PlayerText, const FDialogueContextDescriptor& Context)
+void UNPCDialogueComponent::OnEndDialog()
+{
+	if (UDialogueLLMService* Service = GetService())
+	{
+		Service->SetListener(nullptr);
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void UNPCDialogueComponent::SendPlayerLine(const FString& PlayerText)
 {
 	if (PlayerText.IsEmpty())
-		return FGuid();
+		return;
 	
 	UDialogueLLMService* Service = GetService();
 	if (!Service || !Service->IsReady())
 	{
 		// TODO: broadcast error locally.
-		return FGuid();
+		return;
 	}
 
 	FDialogueRequest Req;
-	Req.Owner = this;
-	Req.DebugName = GetOwner() ? GetOwner()->GetName() : TEXT("NPCDialogue");
-	Req.Messages = BuildMessagesForRequest(PlayerText, Context);
-
+	Req.Messages = BuildMessagesForRequest(PlayerText);
+	
 	const FGuid RequestId = Service->EnqueueRequest(Req);
 	OwnedRequestIds.Add(RequestId);
 
 	History.Add({ EChatTemplateRole::User, PlayerText });
-	
 	PruneHistoryIfNeeded();
 	
 	bFirstRequest = false;
-	
-	return RequestId;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -80,61 +80,46 @@ void UNPCDialogueComponent::CancelAllRequests()
 {
 	if (UDialogueLLMService* Service = GetService())
 	{
-		Service->CancelAllForOwner(this);
+		Service->CancelAll();
 	}
 	OwnedRequestIds.Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-TArray<FDialogueMessage> UNPCDialogueComponent::BuildMessagesForRequest(const FString& PlayerText, const FDialogueContextDescriptor& Context) const
+void UNPCDialogueComponent::OnTokenReceived(const FGuid& RequestId, const FString& Token)
+{
+	if (OwnedRequestIds.Contains(RequestId))
+	{
+		OnToken.Broadcast(RequestId, Token);
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void UNPCDialogueComponent::OnResponseGenerated(const FGuid& RequestId, const FString& FullText)
+{
+	if (OwnedRequestIds.Contains(RequestId))
+	{
+		OwnedRequestIds.Remove(RequestId);
+		History.Add({ EChatTemplateRole::Assistant, FullText });
+		PruneHistoryIfNeeded();
+		OnResponse.Broadcast(RequestId, FullText);
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+void UNPCDialogueComponent::OnError(const FGuid& RequestId, const FString& ErrorText)
+{
+	if (OwnedRequestIds.Contains(RequestId))
+	{
+		OwnedRequestIds.Remove(RequestId);
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
+TArray<FDialogueMessage> UNPCDialogueComponent::BuildMessagesForRequest(const FString& PlayerText) const
 {
 	TArray<FDialogueMessage> Out;
 
-	FString Sys;
-	if (bFirstRequest)
-	{
-		Sys.Append(TEXT("You are an NPC in a small survival colony. Speak as this NPC, in natural English banter.\n"));
-		Sys.Append(TEXT("Default to 1-2 sentences unless the player explicitly asks for more detail.\n"));
-		Sys.Append(TEXT("\nNPC persona:\n"));
-		Sys.Append(PersonaText);
-		Sys.AppendChar('\n');
-	}
-	
-	if (!Context.MoodLabel.IsEmpty() || !Context.RelationshipLabel.IsEmpty())
-	{
-		if (bFirstRequest)
-		{
-			Sys.Append(TEXT("\nCurrent state (use as guidance for tone and behavior):"));
-		}
-		else
-		{
-			Sys.Append(TEXT("\nState update:"));
-		}
-	
-		if (!Context.MoodLabel.IsEmpty())
-		{
-			Sys.Append(TEXT("\nMood="));
-			Sys.Append(Context.MoodLabel);
-		}
-		if (!Context.RelationshipLabel.IsEmpty())
-		{
-			Sys.Append(TEXT("\nRelationship="));
-			Sys.Append(Context.RelationshipLabel);
-		}
-	}
-	
-	Sys.AppendChar('\n');
-	if (bFirstRequest)
-	{
-		for (const FString& Fact : Context.Facts)
-		{
-			Sys.Append(Fact);
-			Sys.AppendChar('\n');
-		}
-		Sys.Append(Rules);
-	}
-	Out.Add({ EChatTemplateRole::System, Sys });
-		
 	if (bFirstRequest)
 	{
 		Out.Append(History);
@@ -154,39 +139,5 @@ void UNPCDialogueComponent::PruneHistoryIfNeeded()
 	while (History.Num() > MaxHistoryMessages)
 	{
 		History.RemoveAt(0);
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNPCDialogueComponent::HandleServiceToken(FGuid RequestId, const FString& TokenOrChunk)
-{
-	// TODO: if RequestId belongs to OwnedRequestIds => broadcast OnToken
-	if (OwnedRequestIds.Contains(RequestId))
-	{
-		OnToken.Broadcast(RequestId, TokenOrChunk);
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNPCDialogueComponent::HandleServiceResponse(FGuid RequestId, const FString& FullText)
-{
-	// TODO: if owned => append assistant message to History; broadcast OnResponse
-	if (OwnedRequestIds.Contains(RequestId))
-	{
-		OwnedRequestIds.Remove(RequestId);
-		History.Add({ EChatTemplateRole::Assistant, FullText });
-		PruneHistoryIfNeeded();
-		OnResponse.Broadcast(RequestId, FullText);
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNPCDialogueComponent::HandleServiceError(FGuid RequestId, const FString& ErrorText)
-{
-	// TODO: if owned => broadcast OnError
-	if (OwnedRequestIds.Contains(RequestId))
-	{
-		OwnedRequestIds.Remove(RequestId);
-		OnError.Broadcast(RequestId, ErrorText);
 	}
 }
