@@ -1,4 +1,4 @@
-﻿// (c) 2024 by Crenetic GmbH Studios
+﻿// (c) 2025 MK
 
 #pragma once
 
@@ -45,39 +45,27 @@ public:
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	// ILLMServiceListener
-	virtual void OnTokenReceived(const FGuid& RequestId, const FString& Token) override;
 	virtual void OnResponseGenerated(const FGuid& RequestId, const FString& FullText) override;
 	virtual void OnError(const FGuid& RequestId, const FString& ErrorText) override;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	// UI/consumer binds to these.
 	UPROPERTY(BlueprintAssignable)
-	FOnNPCDialogueToken OnToken;
-
-	UPROPERTY(BlueprintAssignable)
 	FOnNPCDialogueResponse OnResponse;
 
 protected:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	// Local convo memory (per NPC).
-	UPROPERTY()
-	TArray<FDialogueMessage> History;
-
-	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	// Keep track of outstanding requests for cancel/ignore.
-	TArray<FGuid> OwnedRequestIds;
-	
-	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	// Keep track of first request, which will contain additional info
-	bool bFirstRequest = true;
-
-	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	UDialogueLLMService* GetService() const;
-
 	void PruneHistoryIfNeeded();
 	TArray<FDialogueMessage> BuildMessagesForRequest(const FString& PlayerText) const;
+	
+	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	TArray<FDialogueMessage> History;
+	TArray<FGuid> OwnedRequestIds;
+	bool bFirstRequest = true;
+	bool bInDialog = false;
 };

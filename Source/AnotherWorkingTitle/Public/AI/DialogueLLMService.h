@@ -1,4 +1,4 @@
-﻿// (c) 2024 by Crenetic GmbH Studios
+﻿// (c) 2025 MK
 
 #pragma once
 
@@ -45,7 +45,6 @@ public:
 	virtual ~ILLMServiceListener() = default;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	virtual void OnTokenReceived(const FGuid& RequestId, const FString& Token) = 0;
 	virtual void OnResponseGenerated(const FGuid& RequestId, const FString& FullText) = 0;
 	virtual void OnError(const FGuid& RequestId, const FString& ErrorText) = 0;	
 };

@@ -1,4 +1,4 @@
-﻿// (c) 2024 by Crenetic GmbH Studios
+﻿// (c) 2025 MK
 
 #include "Settlers/NPCDialogueComponent.h"
 #include "Engine/World.h"
@@ -10,10 +10,14 @@ UNPCDialogueComponent::UNPCDialogueComponent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNPCDialogueComponent::BeginPlay()
+void UNPCDialogueComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::BeginPlay();
-
+	if (bInDialog)
+	{
+		OnEndDialog();
+	}
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,17 +25,21 @@ UDialogueLLMService* UNPCDialogueComponent::GetService() const
 {
 	if (!GetWorld()) 
 		return nullptr;
+	
 	if (UGameInstance* GI = GetWorld()->GetGameInstance())
 	{
 		return GI->GetSubsystem<UDialogueLLMService>();
 	}
+	
 	return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UNPCDialogueComponent::OnBeginDialog()
 {
-	History.Reset();
+	check(!bInDialog);
+	bInDialog = true;
+	
 	OwnedRequestIds.Reset();
 	bFirstRequest = true;
 
@@ -44,6 +52,9 @@ void UNPCDialogueComponent::OnBeginDialog()
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UNPCDialogueComponent::OnEndDialog()
 {
+	check(bInDialog);
+	bInDialog = false;
+	
 	if (UDialogueLLMService* Service = GetService())
 	{
 		Service->SetListener(nullptr);
@@ -83,15 +94,6 @@ void UNPCDialogueComponent::CancelAllRequests()
 		Service->CancelAll();
 	}
 	OwnedRequestIds.Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNPCDialogueComponent::OnTokenReceived(const FGuid& RequestId, const FString& Token)
-{
-	if (OwnedRequestIds.Contains(RequestId))
-	{
-		OnToken.Broadcast(RequestId, Token);
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------

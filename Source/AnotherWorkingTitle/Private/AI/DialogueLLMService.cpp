@@ -1,4 +1,4 @@
-﻿// (c) 2024 by Crenetic GmbH Studios
+﻿// (c) 2025 MK
 
 #include "AI/DialogueLLMService.h"
 
@@ -57,8 +57,8 @@ bool UDialogueLLMService::IsReady() const
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::SetListener(ILLMServiceListener* InListener)
 {
-	ActiveOwner = InListener;
 	Clear();
+	ActiveOwner = InListener;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -80,7 +80,6 @@ void UDialogueLLMService::CancelRequest(const FGuid& RequestId)
 			LlamaComponent->StopGeneration();
 		}
 		ActiveRequestId.Invalidate();
-		ActiveOwner = nullptr;
 
 		TryStartNextRequest();
 	}
@@ -123,7 +122,6 @@ void UDialogueLLMService::Clear()
 	
 	PendingRequests.Reset();
 	
-	ActiveOwner = nullptr;
 	ActiveRequestId.Invalidate();
 	ActiveBuffer.Reset();
 }
@@ -181,31 +179,11 @@ void UDialogueLLMService::HandleModelLoaded(const FString& ModelName)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::HandleNewToken(const FString& Token)
 {
-	const bool bFirstToken = ActiveBuffer.IsEmpty();
-	ActiveBuffer.Append(Token);
-	if (bFirstToken)
-	{
-		SanitizeInPlace(ActiveBuffer);
-	}
-	if (ActiveOwner)
-	{
-		ActiveOwner->OnTokenReceived(ActiveRequestId, ActiveBuffer);
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::HandlePartialGenerated(const FString& Chunk)
 {
-	const bool bFirstToken = ActiveBuffer.IsEmpty();
-	ActiveBuffer.Append(Chunk);
-	if (bFirstToken)
-	{
-		SanitizeInPlace(ActiveBuffer);
-	}
-	if (ActiveOwner)
-	{
-		ActiveOwner->OnTokenReceived(ActiveRequestId, ActiveBuffer);
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -251,6 +229,9 @@ void UDialogueLLMService::TryStartNextRequest()
 		return;
 	
 	if (!LlamaComponent)
+		return;
+	
+	if (!bModelReady)
 		return;
 	
 	const FDialogueRequest Request = PendingRequests[0];
