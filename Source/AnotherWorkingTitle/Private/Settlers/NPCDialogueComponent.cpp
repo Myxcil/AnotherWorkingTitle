@@ -87,16 +87,6 @@ void UNPCDialogueComponent::SendPlayerLine(const FString& PlayerText)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UNPCDialogueComponent::CancelAllRequests()
-{
-	if (UDialogueLLMService* Service = GetService())
-	{
-		Service->CancelAll();
-	}
-	OwnedRequestIds.Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UNPCDialogueComponent::OnResponseGenerated(const FGuid& RequestId, const FString& FullText)
 {
 	if (OwnedRequestIds.Contains(RequestId))

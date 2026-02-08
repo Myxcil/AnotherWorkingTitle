@@ -95,20 +95,6 @@ void UDialogueLLMService::CancelRequest(const FGuid& RequestId)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-void UDialogueLLMService::CancelAll()
-{
-	if (LlamaComponent)
-	{
-		LlamaComponent->StopGeneration();
-	}
-	if (ActiveRequestId.IsValid())
-	{
-		ActiveRequestId.Invalidate();
-	}
-	PendingRequests.Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
 void UDialogueLLMService::Clear()
 {
 	if (LlamaComponent)

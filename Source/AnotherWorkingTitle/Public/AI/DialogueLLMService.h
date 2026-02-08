@@ -70,7 +70,6 @@ public:
 	void SetListener(ILLMServiceListener* InListener);
 	FGuid EnqueueRequest(UPARAM(ref) FDialogueRequest& Request);
 	void CancelRequest(const FGuid& RequestId);
-	void CancelAll();
 
 private:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------

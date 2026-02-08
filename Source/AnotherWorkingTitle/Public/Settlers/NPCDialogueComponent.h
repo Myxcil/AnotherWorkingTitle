@@ -39,11 +39,6 @@ public:
 	void SendPlayerLine(const FString& PlayerText);
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
-	// Cancel active/pending requests originating from this component.
-	UFUNCTION(BlueprintCallable)
-	void CancelAllRequests();
-
-	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	// ILLMServiceListener
 	virtual void OnResponseGenerated(const FGuid& RequestId, const FString& FullText) override;
 	virtual void OnError(const FGuid& RequestId, const FString& ErrorText) override;
