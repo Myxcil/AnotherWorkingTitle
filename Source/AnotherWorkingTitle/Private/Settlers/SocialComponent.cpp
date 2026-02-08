@@ -135,11 +135,6 @@ void USocialComponent::QueryEmotionalState(FString& Output) const
 		if (!Output.IsEmpty()) Output.AppendChar(',');
 		Output.Append(GetEmotionDescription(EPrimaryEmotionAxis::SurpriseAnticipation, CachedSummary.SurpriseAnticipation));	
 	}
-	if (!Output.IsEmpty())
-	{
-		Output.InsertAt(0, "You feel ");
-		Output.Append(".\n");
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -148,11 +143,6 @@ bool USocialComponent::QueryRelationship(FString& Output, const USocialComponent
 	if (const FRelationshipState* PtrRelationshipState = RelationShips.Find(Other))
 	{
 		Output = GetRelationShipDescription(*PtrRelationshipState);
-		if (!Output.IsEmpty())
-		{
-			Output.InsertAt(0, "Your attitude towards the player is ");
-			Output.Append(".\n");
-		}
 		return true;
 	}
 	return false;

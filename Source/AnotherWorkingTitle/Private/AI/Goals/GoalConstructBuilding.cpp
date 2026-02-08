@@ -57,5 +57,5 @@ FString UGoalConstructBuilding::Describe(IAgent& Agent, const FWorldState& World
 			return FString::Printf(TEXT("You are constructing a %s"), *BuildingSite->GetBuildingName());
 		}
 	}
-	return TEXT("You are erecting a building.");
+	return TEXT("You are erecting a building");
 }

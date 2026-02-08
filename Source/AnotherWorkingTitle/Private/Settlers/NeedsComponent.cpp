@@ -207,11 +207,6 @@ void UNeedsComponent::QueryState(FString& Output) const
 		}
 		++Index;
 	}
-	if (bNeedAdded)
-	{
-		Output.InsertAt(0, "You are ");
-		Output.Append(".\n");
-	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

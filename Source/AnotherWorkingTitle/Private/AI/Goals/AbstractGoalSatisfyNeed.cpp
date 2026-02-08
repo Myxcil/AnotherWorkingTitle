@@ -39,15 +39,15 @@ FString UAbstractGoalSatisfyNeed::Describe(IAgent& Agent, const FWorldState& Wor
 	case ENeedType::Unknown:
 		break;
 	case ENeedType::Hunger:
-		return TEXT("You are looking for food.");
+		return TEXT("You are looking for food");
 	case ENeedType::Thirst:
-		return TEXT("You are looking for drink.");
+		return TEXT("You are looking for drink");
 	case ENeedType::Cold:
-		return TEXT("You are looking for heat.");
+		return TEXT("You are looking for heat");
 	case ENeedType::Fatigue:
-		return TEXT("You are looking for rest.");
+		return TEXT("You are looking for rest");
 	case ENeedType::Damage:
-		return TEXT("You are looking for healing.");
+		return TEXT("You are looking for healing");
 	}
 	return Super::Describe(Agent, WorldState);
 }

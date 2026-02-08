@@ -29,10 +29,10 @@ void UNPCDialogueComponent::BeginPlay()
 	Agent = Owner->GetComponentByClass<UGOAPAgentComponent>();
 	check(Agent);
 
-	if (const APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
-	{
-		PlayerSocial = PlayerPawn->GetComponentByClass<USocialComponent>();
-	}
+	const APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	check(PlayerPawn);
+	PlayerSocial = PlayerPawn->GetComponentByClass<USocialComponent>();
+	check(PlayerSocial);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -187,10 +187,7 @@ void UNPCDialogueComponent::PruneHistoryIfNeeded()
 void UNPCDialogueComponent::TakeWorldSnapshot(FWorldSnapshot& Snapshot) const
 {
 	Social->QueryEmotionalState(Snapshot.Mood);
-	if (PlayerSocial)
-	{
-		Social->QueryRelationship(Snapshot.Relationship, PlayerSocial);
-	}
+	Social->QueryRelationship(Snapshot.Relationship, PlayerSocial);
 	Needs->QueryState(Snapshot.Need);
 	Agent->QueryState(Snapshot.Goal);
 }
@@ -199,21 +196,21 @@ void UNPCDialogueComponent::TakeWorldSnapshot(FWorldSnapshot& Snapshot) const
 FString UNPCDialogueComponent::GenerateWorldSnapshotMessage(const FWorldSnapshot& Snapshot) const
 {
 	FString Result;
+	if (!Snapshot.Need.IsEmpty() && Snapshot.Need != CachedSnapshot.Need)
+	{
+		Result.Appendf(TEXT(" - You are %s\n"), *Snapshot.Need);
+	}
 	if (!Snapshot.Mood.IsEmpty() && Snapshot.Mood != CachedSnapshot.Mood)
 	{
-		Result.Append(Snapshot.Mood);
+		Result.Appendf(TEXT("- You feel %s\n"), *Snapshot.Mood);
 	}
 	if (!Snapshot.Relationship.IsEmpty() && Snapshot.Relationship != CachedSnapshot.Relationship)
 	{
-		Result.Append(Snapshot.Relationship);
+		Result.Appendf(TEXT("- Your relationship towards the player is %s\n"), *Snapshot.Relationship);
 	}
 	if (!Snapshot.Goal.IsEmpty() && Snapshot.Goal != CachedSnapshot.Goal)
 	{
-		Result.Append(Snapshot.Goal);
-	}
-	if (!Snapshot.Need.IsEmpty() && Snapshot.Need != CachedSnapshot.Need)
-	{
-		Result.Append(Snapshot.Need);
+		Result.Appendf(TEXT(" - %s\n"), *Snapshot.Goal);
 	}
 	return Result;
 }
