@@ -1,4 +1,4 @@
-﻿#include "AnotherWorkingTitleEdittor.h"
+﻿#include "AnotherWorkingTitleEditor.h"
 
 #include "AIDebugComponentVisualizer.h"
 #include "UnrealEdGlobals.h"
@@ -8,13 +8,13 @@
 #define LOCTEXT_NAMESPACE "FAnotherWorkingTitleEdittorModule"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void FAnotherWorkingTitleEdittorModule::StartupModule()
+void FAnotherWorkingTitleEditorModule::StartupModule()
 {
 	RegisterComponentVisualizer(UGOAPAgentComponent::StaticClass()->GetFName(), MakeShareable(new FAIDebugComponentVisualizer));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void FAnotherWorkingTitleEdittorModule::RegisterComponentVisualizer(const FName& ComponentClassName, const TSharedPtr<FComponentVisualizer>& Visualizer)
+void FAnotherWorkingTitleEditorModule::RegisterComponentVisualizer(const FName& ComponentClassName, const TSharedPtr<FComponentVisualizer>& Visualizer)
 {
 	if (GUnrealEd)
 	{
@@ -28,7 +28,7 @@ void FAnotherWorkingTitleEdittorModule::RegisterComponentVisualizer(const FName&
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-void FAnotherWorkingTitleEdittorModule::ShutdownModule()
+void FAnotherWorkingTitleEditorModule::ShutdownModule()
 {
 	// Ensure the editor engine is available before attempting to unregister visualizers.
 	if (GUnrealEd)
@@ -43,4 +43,4 @@ void FAnotherWorkingTitleEdittorModule::ShutdownModule()
 
 #undef LOCTEXT_NAMESPACE
     
-IMPLEMENT_MODULE(FAnotherWorkingTitleEdittorModule, AnotherWorkingTitleEdittor)
+IMPLEMENT_MODULE(FAnotherWorkingTitleEditorModule, AnotherWorkingTitleEditor)

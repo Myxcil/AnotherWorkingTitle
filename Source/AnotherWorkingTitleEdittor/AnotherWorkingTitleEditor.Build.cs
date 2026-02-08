@@ -1,8 +1,8 @@
 ﻿using UnrealBuildTool;
 
-public class AnotherWorkingTitleEdittor : ModuleRules
+public class AnotherWorkingTitleEditor : ModuleRules
 {
-    public AnotherWorkingTitleEdittor(ReadOnlyTargetRules Target) : base(Target)
+    public AnotherWorkingTitleEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 

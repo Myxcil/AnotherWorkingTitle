@@ -8,7 +8,7 @@
 /**
  * 
  */
-class ANOTHERWORKINGTITLEEDITTOR_API FAIDebugComponentVisualizer : public FComponentVisualizer
+class ANOTHERWORKINGTITLEEDITOR_API FAIDebugComponentVisualizer : public FComponentVisualizer
 {
 public:
 	FAIDebugComponentVisualizer();

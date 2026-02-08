@@ -206,11 +206,6 @@ void UGOAPAgentComponent::TickGOAP(const float DeltaSeconds)
 	if (IsBusy())
 		return;
 	
-	if (Memory.IsModified())
-	{
-		bWorldIsDirty = true;
-	}
-	
 	if (State == EInternalState::Paused)
 		return;
 	

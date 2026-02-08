@@ -9,7 +9,6 @@
 #include "Planning/Planner.h"
 #include "Planning/WorldState.h"
 #include "Settlers/Emotions.h"
-#include "Storage/WorkingMemory.h"
 #include "GOAPAgentComponent.generated.h"
 
 class ASettlerCharacter;
@@ -156,7 +155,6 @@ private:
 	TStaticArray<TArray<const UAbstractAction*>, WorldPropertyKeyCount> ActionList;
 	
 	FWorldState WorldState;
-	FWorkingMemory Memory;
 	FAIBlackboard* Blackboard = nullptr;
 
 	FPlanner Planner;

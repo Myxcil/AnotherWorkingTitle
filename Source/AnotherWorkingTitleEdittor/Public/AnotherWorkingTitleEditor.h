@@ -6,7 +6,7 @@
 class FComponentVisualizer;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-class FAnotherWorkingTitleEdittorModule : public IModuleInterface
+class FAnotherWorkingTitleEditorModule : public IModuleInterface
 {
 public:
     //--------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -16,6 +16,6 @@ public class AnotherWorkingTitleEditorTarget : TargetRules
 
 	private void RegisterModulesCreatedByRider()
 	{
-		ExtraModuleNames.AddRange(new string[] {"AnotherWorkingTitleEdittor"});
+		ExtraModuleNames.AddRange(new string[] {"AnotherWorkingTitleEditor"});
 	}
 }
