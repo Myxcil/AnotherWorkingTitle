@@ -80,8 +80,6 @@ void UDialogueLLMService::CancelRequest(const FGuid& RequestId)
 			LlamaComponent->StopGeneration();
 		}
 		ActiveRequestId.Invalidate();
-
-		TryStartNextRequest();
 	}
 	else
 	{
@@ -108,7 +106,6 @@ void UDialogueLLMService::CancelAll()
 		ActiveRequestId.Invalidate();
 	}
 	PendingRequests.Reset();
-	TryStartNextRequest();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -214,7 +211,6 @@ void UDialogueLLMService::HandleError(const FString& ErrorMessage, int32 ErrorCo
 	}
 	
 	ActiveRequestId.Invalidate();
-	ActiveOwner = nullptr;
 	
 	TryStartNextRequest();
 }
