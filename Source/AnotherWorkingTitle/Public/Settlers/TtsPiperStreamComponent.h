@@ -92,7 +92,6 @@ private:
 
 	// Streaming state (only one active request at a time for your use-case)
 	int64 ActiveRequestId = -1;
-	int64 Epoch = 0;
 
 	UPROPERTY(Transient) USoundWaveProcedural* ActiveWave = nullptr;
 	int32 ActiveSampleRate = 0;

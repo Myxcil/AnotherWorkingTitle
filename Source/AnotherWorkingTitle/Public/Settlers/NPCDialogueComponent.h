@@ -26,9 +26,7 @@ public:
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNPCDialogueToken, FGuid, RequestId, const FString&, TokenOrChunk);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNPCDialogueResponse, FGuid, RequestId, const FString&, FullText);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNPCDialogueError, FGuid, RequestId, const FString&, ErrorText);
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -56,11 +54,7 @@ public:
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintAssignable)
-	FOnNPCDialogueToken OnNPCDialogueToken;
-	UPROPERTY(BlueprintAssignable)
 	FOnNPCDialogueResponse OnResponse;
-	UPROPERTY(BlueprintAssignable)
-	FOnNPCDialogueError OnDialogueError;
 
 protected:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,9 +81,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dialogue|TTS")
 	float TTS_IdleFlushSeconds = 0.45f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dialogue|TTS")
-	bool bTTS_SplitOnComma = true;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void BeginPlay() override;
@@ -125,6 +116,7 @@ private:
 	// helpers
 	static bool IsSentenceEnd(TCHAR C);
 	static bool IsSoftBreak(TCHAR C);
+	static bool IsWhitespace(TCHAR C);
 
 	// --- runtime ---
 	UPROPERTY()

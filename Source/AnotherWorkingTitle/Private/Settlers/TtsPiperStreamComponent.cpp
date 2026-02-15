@@ -225,9 +225,6 @@ void UTtsPiperStreamComponent::Stop()
 		AudioComp->Stop();
 	}
 
-	// bump epoch -> ignore any in-flight lines from old request
-	Epoch++;
-
 	ActiveRequestId = -1;
 	ActiveWave = nullptr;
 	ActiveSampleRate = 0;

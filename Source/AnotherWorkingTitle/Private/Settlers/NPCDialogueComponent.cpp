@@ -167,8 +167,6 @@ void UNPCDialogueComponent::OnTokenGenerated(const FGuid& RequestId, const FStri
 	if (!OwnedRequestIds.Contains(RequestId)) 
 		return;
 
-	OnNPCDialogueToken.Broadcast(RequestId, TokenOrChunk);
-
 	if (!bSpeakNPCResponse || !Tts) 
 		return;
 	
@@ -235,8 +233,6 @@ void UNPCDialogueComponent::OnError(const FGuid& RequestId, const FString& Error
 	if (OwnedRequestIds.Contains(RequestId))
 	{
 		OwnedRequestIds.Remove(RequestId);
-
-		OnDialogueError.Broadcast(RequestId, ErrorText);
 
 		if (GetWorld())
 		{
@@ -384,9 +380,14 @@ void UNPCDialogueComponent::FeedAssistantDelta(const FGuid& RequestId, const FSt
 
 void UNPCDialogueComponent::TrySpeakNext()
 {
-    if (!bSpeakNPCResponse || !Tts) return;
-    if (bTtsBusy) return;
-    if (SegmentQueue.Num() == 0) return;
+    if (!bSpeakNPCResponse || !Tts)
+    	return;
+	
+    if (bTtsBusy) 
+    	return;
+	
+    if (SegmentQueue.Num() == 0) 
+    	return;
 
     FString Next = SegmentQueue[0];
     SegmentQueue.RemoveAt(0);
@@ -404,39 +405,45 @@ void UNPCDialogueComponent::TrySpeakNext()
 
 bool UNPCDialogueComponent::IsSentenceEnd(TCHAR C)
 {
-    return (C == TEXT('.') || C == TEXT('?') || C == TEXT('!'));
+    return C == TEXT('.') || C == TEXT('?') || C == TEXT('!');
 }
 
 bool UNPCDialogueComponent::IsSoftBreak(TCHAR C)
 {
-    return (C == TEXT(';') || C == TEXT(':') || C == TEXT('\n') || C == TEXT('\r') || C == TEXT('\t') ||
-           (C == TEXT(',') ));
+    return C == TEXT(';') || C == TEXT(':') || C == TEXT('\n') || C == TEXT('\r') || C == TEXT('\t') || (C == TEXT(',') );
+}
+
+bool UNPCDialogueComponent::IsWhitespace(const TCHAR C)
+{
+	return C == TEXT(' ') || C == TEXT('\n') || C == TEXT('\r') || C == TEXT('\t');
 }
 
 int32 UNPCDialogueComponent::FindSplitIndex(bool bForceFlush) const
 {
-    const int32 L = AssistantBuffer.Len();
-    if (L == 0) return -1;
+    const int32 BufferLen = AssistantBuffer.Len();
+    if (BufferLen == 0) 
+    	return -1;
 
-    const int32 SearchEnd = FMath::Min(L, TTS_MaxChars);
-    int32 Best = -1;
-    int32 BestScore = INT_MAX;
+    const int32 SearchEnd = FMath::Min(BufferLen, TTS_MaxChars);
 
-    auto IsBoundaryOK = [&](int32 i) -> bool
+    auto IsBoundaryOK = [&](const int32 I) -> bool
     {
-        if (i < 0 || i >= SearchEnd) return false;
-        const TCHAR C = AssistantBuffer[i];
+        if (I < 0 || I >= SearchEnd) 
+        	return false;
+    	
+        const TCHAR C = AssistantBuffer[I];
 
         const bool bHard = IsSentenceEnd(C);
-        const bool bSoft = bTTS_SplitOnComma ? IsSoftBreak(C) : (C == TEXT(';') || C == TEXT(':') || C == TEXT('\n') || C == TEXT('\r') || C == TEXT('\t'));
+        const bool bSoft = !bHard && IsSoftBreak(C);
 
-        if (!(bHard || bSoft)) return false;
+        if (!bHard && !bSoft) 
+        	return false;
 
         // require whitespace/end after boundary if possible (avoid splitting "Mr.Smith")
-        if (i + 1 < L)
+        if (I + 1 < BufferLen)
         {
-            const TCHAR N = AssistantBuffer[i + 1];
-            if (!(N == TEXT(' ') || N == TEXT('\n') || N == TEXT('\r') || N == TEXT('\t')))
+            const TCHAR NextChar = AssistantBuffer[I + 1];
+            if (!(NextChar == TEXT(' ') || NextChar == TEXT('\n') || NextChar == TEXT('\r') || NextChar == TEXT('\t')))
             {
                 return false;
             }
@@ -444,13 +451,18 @@ int32 UNPCDialogueComponent::FindSplitIndex(bool bForceFlush) const
         return true;
     };
 
-    if (L >= TTS_MinChars)
+    if (BufferLen >= TTS_MinChars)
     {
-        for (int32 i = 0; i < SearchEnd; ++i)
+	    int32 BestScore = INT_MAX;
+	    int32 Best = -1;
+	    for (int32 I = 0; I < SearchEnd; ++I)
         {
-            if (!IsBoundaryOK(i)) continue;
-            const int32 Candidate = i + 1;
-            if (Candidate < TTS_MinChars) continue;
+            if (!IsBoundaryOK(I)) 
+            	continue;
+        	
+            const int32 Candidate = I + 1;
+            if (Candidate < TTS_MinChars)
+            	continue;
 
             const int32 Score = FMath::Abs(Candidate - TTS_TargetChars);
             if (Score < BestScore)
@@ -459,18 +471,19 @@ int32 UNPCDialogueComponent::FindSplitIndex(bool bForceFlush) const
                 Best = Candidate;
             }
         }
-        if (Best > 0) return Best;
+        if (Best > 0) 
+        	return Best;
     }
 
     // Hard cut if buffer too long: split on last whitespace before MaxChars
-    if (L >= TTS_MaxChars)
+    if (BufferLen >= TTS_MaxChars)
     {
-        for (int32 i = SearchEnd - 1; i > 0; --i)
+        for (int32 I = SearchEnd - 1; I > 0; --I)
         {
-            const TCHAR C = AssistantBuffer[i];
-            if (C == TEXT(' ') || C == TEXT('\n') || C == TEXT('\r') || C == TEXT('\t'))
+            const TCHAR C = AssistantBuffer[I];
+            if (IsWhitespace(C))
             {
-                return i + 1;
+                return I + 1;
             }
         }
         return SearchEnd;
@@ -478,7 +491,7 @@ int32 UNPCDialogueComponent::FindSplitIndex(bool bForceFlush) const
 
     if (bForceFlush)
     {
-        return L;
+        return BufferLen;
     }
 
     return -1;
@@ -486,10 +499,12 @@ int32 UNPCDialogueComponent::FindSplitIndex(bool bForceFlush) const
 
 void UNPCDialogueComponent::EnqueueSegmentsFromBuffer(bool bForceFlush)
 {
-    for (;;)
+	int32 MaxRuns = 100000;
+    while (--MaxRuns > 0)
     {
         const int32 Split = FindSplitIndex(bForceFlush);
-        if (Split <= 0) break;
+        if (Split <= 0)
+        	break;
 
         FString Chunk = AssistantBuffer.Left(Split);
         AssistantBuffer = AssistantBuffer.Mid(Split);
@@ -502,4 +517,5 @@ void UNPCDialogueComponent::EnqueueSegmentsFromBuffer(bool bForceFlush)
             SegmentQueue.Add(Chunk);
         }
     }
+	check(MaxRuns > 0);
 }
