@@ -105,6 +105,11 @@ struct FEmotionSummary
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EEmotionalLevel SurpriseAnticipation = EEmotionalLevel::Neutral;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EPrimaryEmotionAxis MaxEmotion;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EEmotionalLevel MaxEmotionLevel = EEmotionalLevel::Neutral;
+	
 	void Evaluate(const FEmotionalState& EmotionalState, const FEmotionalThresholds& EmotionalThresholds);
 	bool operator==(const FEmotionSummary& Other) const = default;
 };
@@ -175,6 +180,17 @@ struct FEmotionTemperament
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+UENUM(BlueprintType)
+enum class ERelationShipAspect : uint8
+{
+	Affinity,
+	Trust,
+	Respect,
+	Safety,
+};
+ENUM_RANGE_BY_FIRST_AND_LAST(ERelationShipAspect, ERelationShipAspect::Affinity, ERelationShipAspect::Safety);
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
 struct FRelationshipState
 {
@@ -194,6 +210,11 @@ struct FRelationshipState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="-1.0", ClampMax="1.0"))
 	float Safety = 0.0f;    // Sicherheitsgefühl / Bedrohung
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ERelationShipAspect MaxAspect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxValue = 0.0f;
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	void ApplyEmotionDelta(const FEmotionalState& Delta, float Weight = 1.0f, float Smoothing = 0.2f); 
 	void RecomputeDerivedValues();
@@ -224,5 +245,5 @@ public:
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-FString GetRelationShipDescription(const FRelationshipState& RelationshipState);
+FString GetRelationShipDescription(const ERelationShipAspect Aspect, const float Value);
 FString GetEmotionDescription(const EPrimaryEmotionAxis Axis, const EEmotionalLevel Level);

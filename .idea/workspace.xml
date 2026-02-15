@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="00791995-5e7a-4b23-8b4c-136d4f5b660e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/Settlers/TtsPiperStreamComponent.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/Settlers/TtsPiperStreamComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/BP_Settler_Peasant.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Characters/BP_Settler_Peasant.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/GlobalPrompt.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Characters/GlobalPrompt.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/LLMModels/llm_default_setup.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Content/LLMModels/llm_default_setup.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/AnotherWorkingTitle.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/AnotherWorkingTitle.Build.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/AI/Goals/AbstractGoalCollectResource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/AI/Goals/AbstractGoalCollectResource.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/AI/Goals/GoalCollectStone.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/AI/Goals/GoalCollectStone.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/AI/Goals/GoalCollectWood.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/AI/Goals/GoalCollectWood.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/Settlers/Emotions.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/Settlers/Emotions.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/Settlers/NPCDialogueComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/Settlers/NPCDialogueComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/Settlers/SocialComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Private/Settlers/SocialComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/AI/Goals/AbstractGoalCollectResource.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/AI/Goals/AbstractGoalCollectResource.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/AI/Goals/GoalCollectStone.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/AI/Goals/GoalCollectStone.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/AI/Goals/GoalCollectWood.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/AI/Goals/GoalCollectWood.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/Settlers/Emotions.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/AnotherWorkingTitle/Public/Settlers/Emotions.h" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="39iXxX7sORoRG1kUjm3njkHcGJh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "ai.playground.ignore.import.keys.banner.in.settings": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.29346.308" />
+        <option value="bundled-python-sdk-ca5e2b39c7df-6e1f45a539f7-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.29346.308" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="00791995-5e7a-4b23-8b4c-136d4f5b660e" name="Changes" comment="" />
+      <created>1771180114249</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1771180114249</updated>
+      <workItem from="1771180116596" duration="30000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

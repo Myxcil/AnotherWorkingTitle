@@ -45,6 +45,7 @@ public:
 	virtual ~ILLMServiceListener() = default;
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual void OnTokenGenerated(const FGuid& RequestId, const FString& TokenOrChunk) = 0;
 	virtual void OnResponseGenerated(const FGuid& RequestId, const FString& FullText) = 0;
 	virtual void OnError(const FGuid& RequestId, const FString& ErrorText) = 0;	
 };

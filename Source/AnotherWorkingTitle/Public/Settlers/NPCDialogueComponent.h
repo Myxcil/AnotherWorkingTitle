@@ -10,6 +10,7 @@
 class UGOAPAgentComponent;
 class UNeedsComponent;
 class USocialComponent;
+class UTtsPiperStreamComponent;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 UCLASS()
@@ -49,12 +50,17 @@ public:
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	// ILLMServiceListener
+	virtual void OnTokenGenerated(const FGuid& RequestId, const FString& TokenOrChunk) override;
 	virtual void OnResponseGenerated(const FGuid& RequestId, const FString& FullText) override;
 	virtual void OnError(const FGuid& RequestId, const FString& ErrorText) override;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(BlueprintAssignable)
+	FOnNPCDialogueToken OnNPCDialogueToken;
+	UPROPERTY(BlueprintAssignable)
 	FOnNPCDialogueResponse OnResponse;
+	UPROPERTY(BlueprintAssignable)
+	FOnNPCDialogueError OnDialogueError;
 
 protected:
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -64,7 +70,27 @@ protected:
 	FString Persona;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Dialogue")
 	int32 MaxHistoryMessages = 12;
-	
+
+	// Optional: enable/disable speaking
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dialogue|TTS")
+	bool bSpeakNPCResponse = true;
+
+	// Chunking parameters (low latency vs naturalness)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dialogue|TTS")
+	int32 TTS_MinChars = 40;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dialogue|TTS")
+	int32 TTS_TargetChars = 120;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dialogue|TTS")
+	int32 TTS_MaxChars = 220;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dialogue|TTS")
+	float TTS_IdleFlushSeconds = 0.45f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dialogue|TTS")
+	bool bTTS_SplitOnComma = true;
+
 	//----------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -87,14 +113,39 @@ private:
 	void TakeWorldSnapshot(FWorldSnapshot& Snapshot) const;
 	FString GenerateWorldSnapshotMessage(const FWorldSnapshot& Snapshot) const;
 		
-	//----------------------------------------------------------------------------------------------------------------------------------------------------
+	UFUNCTION()
+	void HandleTtsFinished(const FPiperTtsResult& Result);
+
+	void FeedAssistantDelta(const FGuid& RequestId, const FString& Delta, bool bFinal);
+	void EnqueueSegmentsFromBuffer(bool bForceFlush);
+	int32 FindSplitIndex(bool bForceFlush) const;
+	void TrySpeakNext();
+	void FlushIdle();
+
+	// helpers
+	static bool IsSentenceEnd(TCHAR C);
+	static bool IsSoftBreak(TCHAR C);
+
+	// --- runtime ---
 	UPROPERTY()
+	TObjectPtr<UTtsPiperStreamComponent> Tts = nullptr;
+
+	FGuid ActiveSpeechRequestId;
+	bool bReceivedAnyToken = false;
+	bool bTtsBusy = false;
+
+	FString AssistantBuffer;
+	TArray<FString> SegmentQueue;
+
+	FTimerHandle IdleFlushTimer;
+	
+	UPROPERTY(Transient)
 	TObjectPtr<USocialComponent> Social = nullptr;
-	UPROPERTY()
+	UPROPERTY(Transient)
 	TObjectPtr<UNeedsComponent> Needs = nullptr;
-	UPROPERTY()
+	UPROPERTY(Transient)
 	TObjectPtr<UGOAPAgentComponent> Agent = nullptr;
-	UPROPERTY()
+	UPROPERTY(Transient)
 	TObjectPtr<USocialComponent> PlayerSocial = nullptr;
 	
 	TArray<FDialogueMessage> History;

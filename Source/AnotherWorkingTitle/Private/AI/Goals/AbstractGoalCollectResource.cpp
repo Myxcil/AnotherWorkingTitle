@@ -64,11 +64,3 @@ void UAbstractGoalCollectResource::DeInit(IAgent& Agent, bool bIsSuccess) const
 {
 	Agent.GetBlackboard().Clear(EBlackboardMask::ResourceNode);
 }
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------
-FString UAbstractGoalCollectResource::Describe(IAgent& Agent, const FWorldState& WorldState) const
-{
-	const UResourceDefinition* Resource = GetResource(Agent);
-	check(Resource);
-	return FString::Printf(TEXT("harvesting %s"), *Resource->DisplayName.ToString());
-}

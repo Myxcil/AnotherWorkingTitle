@@ -12,6 +12,10 @@ class ANOTHERWORKINGTITLE_API UGoalCollectStone : public UAbstractGoalCollectRes
 {
 	GENERATED_BODY()
 	
+public:
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	virtual FString Describe(IAgent& Agent, const FWorldState& WorldState) const override;	
+	
 protected:
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	virtual const UResourceDefinition* GetResource(IAgent& Agent) const override;	

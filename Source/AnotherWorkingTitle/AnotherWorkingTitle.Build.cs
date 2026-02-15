@@ -18,7 +18,9 @@ public class AnotherWorkingTitle : ModuleRules
 			"ProceduralMeshComponent", 
 			"AIModule",
 			"NavigationSystem",
-			"LlamaCore"
+			"LlamaCore",
+			"Json",
+			"JsonUtilities",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

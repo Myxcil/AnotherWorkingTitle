@@ -85,6 +85,33 @@ void FEmotionSummary::Evaluate(const FEmotionalState& EmotionalState, const FEmo
 	TrustDisgust = EvaluateEmotion(EmotionalState.TrustDisgust, EmotionalThresholds.Trust, EmotionalThresholds.Disgust);
 	FearAnger = EvaluateEmotion(EmotionalState.FearAnger, EmotionalThresholds.Fear, EmotionalThresholds.Anger);
 	SurpriseAnticipation = EvaluateEmotion(EmotionalState.SurpriseAnticipation, EmotionalThresholds.Surprise, EmotionalThresholds.Anticipation);
+
+	if (FMath::Abs(static_cast<int32>(JoySadness)) >= FMath::Abs(static_cast<int32>(TrustDisgust)) &&
+		FMath::Abs(static_cast<int32>(JoySadness)) >= FMath::Abs(static_cast<int32>(FearAnger)) &&
+		FMath::Abs(static_cast<int32>(JoySadness)) >= FMath::Abs(static_cast<int32>(SurpriseAnticipation)))
+	{
+		MaxEmotion = EPrimaryEmotionAxis::JoySadness;
+		MaxEmotionLevel = JoySadness;
+	}
+	else if (FMath::Abs(static_cast<int32>(TrustDisgust)) >= FMath::Abs(static_cast<int32>(JoySadness)) &&
+		FMath::Abs(static_cast<int32>(TrustDisgust)) >= FMath::Abs(static_cast<int32>(FearAnger)) &&
+		FMath::Abs(static_cast<int32>(TrustDisgust)) >= FMath::Abs(static_cast<int32>(SurpriseAnticipation)))
+	{
+		MaxEmotion = EPrimaryEmotionAxis::TrustDisgust;
+		MaxEmotionLevel = TrustDisgust;
+	}
+	else if (FMath::Abs(static_cast<int32>(FearAnger)) >= FMath::Abs(static_cast<int32>(JoySadness)) &&
+		FMath::Abs(static_cast<int32>(FearAnger)) >= FMath::Abs(static_cast<int32>(TrustDisgust)) &&
+		FMath::Abs(static_cast<int32>(FearAnger)) >= FMath::Abs(static_cast<int32>(SurpriseAnticipation)))
+	{
+		MaxEmotion = EPrimaryEmotionAxis::FearAnger;
+		MaxEmotionLevel = FearAnger;
+	}
+	else
+	{
+		MaxEmotion = EPrimaryEmotionAxis::SurpriseAnticipation;
+		MaxEmotionLevel = SurpriseAnticipation;
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -145,6 +172,33 @@ void FRelationshipState::RecomputeDerivedValues()
 	Trust    = FMath::Clamp(TrustRaw,    -1.0f, 1.0f);
 	Respect  = FMath::Clamp(RespectRaw,  -1.0f, 1.0f);
 	Safety   = FMath::Clamp(SafetyRaw,   -1.0f, 1.0f);
+	
+	if (FMath::Abs(Affinity) >= FMath::Abs(Trust) &&
+		FMath::Abs(Affinity) >= FMath::Abs(Respect) &&
+		FMath::Abs(Affinity) >= FMath::Abs(Safety))
+	{
+		MaxAspect = ERelationShipAspect::Affinity;
+		MaxValue = Affinity;
+	}
+	else if (FMath::Abs(Trust) >= FMath::Abs(Affinity) &&
+		FMath::Abs(Trust) >= FMath::Abs(Respect) &&
+		FMath::Abs(Trust) >= FMath::Abs(Safety))
+	{
+		MaxAspect = ERelationShipAspect::Trust;
+		MaxValue = Trust;
+	}
+	else if (FMath::Abs(Respect) >= FMath::Abs(Affinity) &&
+			FMath::Abs(Respect) >= FMath::Abs(Trust) && 
+			FMath::Abs(Respect) >= FMath::Abs(Safety))
+	{
+		MaxAspect = ERelationShipAspect::Respect;
+		MaxValue = Respect;
+	}
+	else
+	{
+		MaxAspect = ERelationShipAspect::Safety;
+		MaxValue = Safety;
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -170,33 +224,37 @@ void CollectValues(FString& Result, const float Value, const FString Description
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-FString GetRelationShipDescription(const FRelationshipState& RelationshipState)
+FString GetRelationShipDescription(const ERelationShipAspect Aspect, const float Value)
 {
-	static const FString Affinity[] = { TEXT("Hostile"), TEXT("Weary"), TEXT("Neutral"), TEXT("Friendly"), TEXT("Affectionate") };
-	static const FString Trust[] = { TEXT("Distrustful"), TEXT("Skeptical"), TEXT("Neutral"), TEXT("Trusting"), TEXT("Confident") };
-	static const FString Respect[] = { TEXT("Contemptuous"), TEXT("Dismissive"), TEXT("Neutral"), TEXT("Respectful"), TEXT("Reverent") };
-	static const FString Safety[] = { TEXT("Threatened"), TEXT("Uneasy"), TEXT("Neutral"), TEXT("Secure"), TEXT("Protected") };
-	
-	FString Result;
-	CollectValues(Result, RelationshipState.Affinity, Affinity);
-	CollectValues(Result, RelationshipState.Trust, Trust);
-	CollectValues(Result, RelationshipState.Respect, Respect);
-	CollectValues(Result, RelationshipState.Safety, Safety);
-	if (Result.IsEmpty())
+	static const FString Affinity[] = { TEXT("hostile"), TEXT("weary"), TEXT("neutral"), TEXT("friendly"), TEXT("affectionate") };
+	static const FString Trust[] = { TEXT("distrustful"), TEXT("skeptical"), TEXT("neutral"), TEXT("trusting"), TEXT("confident") };
+	static const FString Respect[] = { TEXT("contemptuous"), TEXT("dismissive"), TEXT("neutral"), TEXT("respectful"), TEXT("reverent") };
+	static const FString Safety[] = { TEXT("threatened"), TEXT("uneasy"), TEXT("neutral"), TEXT("secure"), TEXT("protected") };
+		
+	const int32 Index = GetMappedIndex(Value, 5);
+	switch (Aspect)
 	{
-		Result = TEXT("Neutral");
+	case ERelationShipAspect::Affinity:
+		return Affinity[Index];
+	case ERelationShipAspect::Trust:
+		return Trust[Index];
+	case ERelationShipAspect::Respect:
+		return Respect[Index];
+	case ERelationShipAspect::Safety:
+		return Safety[Index];
 	}
-	return Result;
+	static FString Undefined = TEXT("???");
+	return Undefined;
 }
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 FString GetEmotionDescription(const EPrimaryEmotionAxis Axis, const EEmotionalLevel Level)
 {
-	static const FString JoySadness[] = { TEXT("Grieving"), TEXT("Sad"), TEXT("Pensive"), TEXT("Calm"), TEXT("Serene"), TEXT("Joyful"), TEXT("Ecstatic") };
-	static const FString TrustDisgust[] = { TEXT("Loathing"), TEXT("Disgusted"), TEXT("Bored"), TEXT("Calm"), TEXT("Accepting"), TEXT("Trusting"), TEXT("Admiring") };
-	static const FString FearAnger[] = { TEXT("Enraged"), TEXT("Angry"), TEXT("Annoyed"), TEXT("Calm"), TEXT("Apprehensive"), TEXT("Fearful"), TEXT("Terrified") };
-	static const FString SurpriseAnticipation[] = { TEXT("Vigilant"), TEXT("Anticipating"), TEXT("Interested"), TEXT("Calm"), TEXT("Distracted"), TEXT("Surprised"), TEXT("Amazed") };
+	static const FString JoySadness[] = { TEXT("grieving"), TEXT("sad"), TEXT("pensive"), TEXT("calm"), TEXT("serene"), TEXT("joyful"), TEXT("ecstatic") };
+	static const FString TrustDisgust[] = { TEXT("loathing"), TEXT("disgusted"), TEXT("bored"), TEXT("calm"), TEXT("accepting"), TEXT("trusting"), TEXT("admiring") };
+	static const FString FearAnger[] = { TEXT("enraged"), TEXT("angry"), TEXT("annoyed"), TEXT("calm"), TEXT("apprehensive"), TEXT("fearful"), TEXT("terrified") };
+	static const FString SurpriseAnticipation[] = { TEXT("vigilant"), TEXT("anticipating"), TEXT("interested"), TEXT("calm"), TEXT("distracted"), TEXT("surprised"), TEXT("amazed") };
 	
 	const int32 Index = static_cast<int32>(Level);
 	switch (Axis)

@@ -116,24 +116,13 @@ FText USocialComponent::GetEmotionalState() const
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 void USocialComponent::QueryEmotionalState(FString& Output) const
 {
-	if (CachedSummary.JoySadness != EEmotionalLevel::Neutral)
+	if (CachedSummary.MaxEmotionLevel != EEmotionalLevel::Neutral)
 	{
-		Output.Append(GetEmotionDescription(EPrimaryEmotionAxis::JoySadness, CachedSummary.JoySadness));	
+		Output = GetEmotionDescription(CachedSummary.MaxEmotion, CachedSummary.MaxEmotionLevel);	
 	}
-	if (CachedSummary.TrustDisgust != EEmotionalLevel::Neutral)
+	else
 	{
-		if (!Output.IsEmpty()) Output.AppendChar(',');
-		Output.Append(GetEmotionDescription(EPrimaryEmotionAxis::TrustDisgust, CachedSummary.TrustDisgust));	
-	}
-	if (CachedSummary.FearAnger != EEmotionalLevel::Neutral)
-	{
-		if (!Output.IsEmpty()) Output.AppendChar(',');
-		Output.Append(GetEmotionDescription(EPrimaryEmotionAxis::FearAnger, CachedSummary.FearAnger));	
-	}
-	if (CachedSummary.SurpriseAnticipation != EEmotionalLevel::Neutral)
-	{
-		if (!Output.IsEmpty()) Output.AppendChar(',');
-		Output.Append(GetEmotionDescription(EPrimaryEmotionAxis::SurpriseAnticipation, CachedSummary.SurpriseAnticipation));	
+		Output = TEXT("neutral");
 	}
 }
 
@@ -142,7 +131,7 @@ bool USocialComponent::QueryRelationship(FString& Output, const USocialComponent
 {
 	if (const FRelationshipState* PtrRelationshipState = RelationShips.Find(Other))
 	{
-		Output = GetRelationShipDescription(*PtrRelationshipState);
+		Output = GetRelationShipDescription(PtrRelationshipState->MaxAspect, PtrRelationshipState->MaxValue);
 		return true;
 	}
 	return false;
